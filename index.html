@@ -1699,9 +1699,9 @@ const ann=(()=>{
   const HUMAN=/natural|neural|online|premium|enhanced|wavenet|studio|siri/i, ROBOT=/espeak|fred|albert|bad news|bahh|bells|boing|bubbles|cellos|jester|organ|superstar|trinoids|whisper|wobble|zarvox|microsoft david|microsoft mark|microsoft george|microsoft james|microsoft richard|microsoft sean/i;
   const GOOD=/andrew|brian|guy|christopher|eric|roger|davis|steffan|ryan|thomas|evan|nathan|aaron|reed|tom|alex|daniel|arthur|oliver|google uk english male|lee|jason|tony/i;
   /* the studio voices: Kokoro, an open-source neural voice model that runs right in the browser */
-  const STUDIO=[['am_fenrir','Fenrir · American broadcaster, deep (default)'],['am_michael','Michael · American, warm'],['am_puck','Puck · American, upbeat'],['am_eric','Eric · American'],['am_echo','Echo · American'],['am_liam','Liam · American'],['am_onyx','Onyx · American'],['bm_george','George · British'],['bm_fable','Fable · British'],['bm_lewis','Lewis · British']];
+  const STUDIO=[['piper:ryan','Ryan · American, natural (default, works on every device)'],['am_fenrir','Fenrir · American, deep (HD, needs a fast computer)'],['am_michael','Michael · American, warm (HD)'],['am_puck','Puck · American, upbeat'],['am_eric','Eric · American'],['am_echo','Echo · American'],['am_liam','Liam · American'],['am_onyx','Onyx · American'],['bm_george','George · British'],['bm_fable','Fable · British'],['bm_lewis','Lewis · British']];
   const mobile=/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent||'');
-  let voice=null, next=null, vol=0.8, want='', engine=mobile?'device':'studio', sv='am_fenrir', devTok=0, fakeT=0, engineChosen=false;
+  let voice=null, next=null, vol=0.8, want='', engine='studio', sv='piper:ryan', devTok=0, fakeT=0, engineChosen=false;
   try{ const v=parseFloat(localStorage.getItem('fdl-ann-vol')); if(v>=0&&v<=1) vol=v; want=localStorage.getItem('fdl-ann-voice')||''; const e=localStorage.getItem('fdl-ann-engine'); if(e==='studio'||e==='device'){ engine=e; engineChosen=true; } const s=localStorage.getItem('fdl-ann-sv'); if(STUDIO.some(x=>x[0]===s)) sv=s; }catch(e){}
   const MATURE=/guy|christopher|roger|davis|andrew|eric|steffan|evan|nathan|aaron|tom\b/i;
   const BROADCAST=[/christopher/i,/\bguy\b/i,/davis/i,/roger/i,/andrew/i,/brian/i,/\beric\b/i,/steffan/i,/evan/i,/nathan/i,/aaron/i,/\btom\b/i];
@@ -1736,13 +1736,40 @@ const ann=(()=>{
   }
   function fake(t,done){ clearTimeout(fakeT); if(done) fakeT=setTimeout(done,Math.max(3500,Math.min(16000,t.length*60))); }
   /* studio voice: a module worker loads Kokoro from jsDelivr and the model from Hugging Face (cached by the browser after the first time) */
-  const WORKER=`import { KokoroTTS } from 'https://cdn.jsdelivr.net/npm/kokoro-js@1.2.1/dist/kokoro.web.js';
+  /* Piper (Ryan, a natural American male voice, ~60 MB): fast enough for ordinary computers and phones. Runs in a worker on
+     onnxruntime-web, with espeak-ng (phonemizer) turning words into sounds; the voice files are cached in the browser. */
+  const PIPER_HEAD=`const ORT='https://cdn.jsdelivr.net/npm/onnxruntime-web@1.21.0/dist/', PH='https://cdn.jsdelivr.net/npm/phonemizer@1.2.1/dist/phonemizer.js';
+const VOICE='https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/ryan/medium/en_US-ryan-medium';
+let tts=null, loading=null, cut=0, chain=Promise.resolve(); const drop=new Set(); let device='wasm';
+async function grab(url,prog){
+  let c=null; try{ c=await caches.open('fdl-voice-v1'); const hit=await c.match(url); if(hit) return new Uint8Array(await hit.arrayBuffer()); }catch(e){}
+  const r=await fetch(url); if(!r.ok) throw new Error('voice download '+r.status); const total=+r.headers.get('content-length')||0; let buf;
+  if(prog&&r.body&&total){ const rd=r.body.getReader(), parts=[]; let got=0, last=-1;
+    for(;;){ const {done,value}=await rd.read(); if(done) break; parts.push(value); got+=value.length; const p=Math.floor(got/total*100); if(p!==last){ last=p; postMessage({type:'progress',pct:p}); } }
+    buf=new Uint8Array(got); let o=0; for(const x of parts){ buf.set(x,o); o+=x.length; } }
+  else buf=new Uint8Array(await r.arrayBuffer());
+  try{ if(c) await c.put(url,new Response(buf)); }catch(e){} return buf;
+}
+function load(){ if(!loading) loading=(async()=>{ postMessage({type:'device',device:'wasm'});
+  const [ph,ort]=await Promise.all([import(PH),import(ORT+'ort.wasm.min.mjs')]); ort.env.wasm.wasmPaths=ORT;
+  const cfg=JSON.parse(new TextDecoder().decode(await grab(VOICE+'.onnx.json'))), model=await grab(VOICE+'.onnx',true);
+  const sess=await ort.InferenceSession.create(model,{executionProviders:['wasm']});
+  const m=cfg.phoneme_id_map, sr=cfg.audio.sample_rate, inf=cfg.inference||{};
+  const ids=p=>{ const out=[...m['^'],...m['_']]; for(const ch of p){ if(m[ch]) out.push(...m[ch],...m['_']); } out.push(...m['$']); return out; };
+  tts={ async generate(text,{speed=1}={}){ const id=ids((await ph.phonemize(text,'en-us')).join(' '));
+    const feeds={input:new ort.Tensor('int64',BigInt64Array.from(id.map(BigInt)),[1,id.length]),input_lengths:new ort.Tensor('int64',BigInt64Array.from([BigInt(id.length)]),[1]),
+      scales:new ort.Tensor('float32',Float32Array.from([inf.noise_scale==null?.667:inf.noise_scale,(inf.length_scale==null?1:inf.length_scale)/speed,inf.noise_w==null?.8:inf.noise_w]),[3])};
+    const r=await sess.run(feeds); return {audio:r[sess.outputNames[0]].data,sampling_rate:sr}; } };
+  postMessage({type:'ready',device:'wasm'}); return tts; })(); return loading; }
+`;
+  const KOKORO_HEAD=`import { KokoroTTS } from 'https://cdn.jsdelivr.net/npm/kokoro-js@1.2.1/dist/kokoro.web.js';
 let tts=null, loading=null, cut=0, chain=Promise.resolve(); const drop=new Set();
 let device='wasm';
 async function gpu(){ try{ if(self.navigator&&navigator.gpu){ const a=await navigator.gpu.requestAdapter(); return !!a; } }catch(e){} return false; }
 function open(dev){ device=dev; postMessage({type:'device',device:dev}); return KokoroTTS.from_pretrained('onnx-community/Kokoro-82M-v1.0-ONNX',{dtype:dev==='webgpu'?'fp32':'q8',device:dev,progress_callback:p=>{ if(p&&p.status==='progress'&&/onnx/.test(p.file||'')) postMessage({type:'progress',pct:p.progress}); }}); }
 function load(){ if(!loading) loading=(async()=>{ let t=null; if(await gpu()){ try{ t=await open('webgpu'); }catch(e){ t=null; } } if(!t) t=await open('wasm'); tts=t; postMessage({type:'ready',device}); return t; })(); return loading; }
-const gone=m=>m.pre?drop.has(m.key):m.id<=cut;
+`;
+  const COMMON=`const gone=m=>m.pre?drop.has(m.key):m.id<=cut;
 async function run(m){
   try{ await load();
     if(m.type==='load'){ if(!m.voice) return; await tts.generate('Play ball.',{voice:m.voice,speed:m.speed});
@@ -1754,6 +1781,8 @@ async function run(m){
   }catch(err){ postMessage({type:'error',id:m.id,msg:String(err&&err.message||err)}); }
 }
 onmessage=e=>{ const m=e.data; if(m.type==='cancel'){ cut=Math.max(cut,m.upto); return; } if(m.type==='drop'){ m.keys.forEach(k=>drop.add(k)); return; } chain=chain.then(()=>run(m)); };`;
+  const kindOf=v=>String(v).startsWith('piper')?'piper':'kokoro';
+  const workerCode=()=>(kindOf(sv)==='piper'?PIPER_HEAD:KOKORO_HEAD)+COMMON;
   let W=null, wTimer=0, ac=null, gain=null, playing=[], tEnd=0, job=0, cbs={}, lastA=0, firstT=0, heard=0, slowHits=0; const cache=new Map(), SPEED=1.12, DEEP=.95;
   /* the studio voice is only used where this computer renders it faster than it's spoken */
   const humanDev=()=>!!voice&&HUMAN.test(voice.name), autoDev=()=>!engineChosen&&humanDev();
@@ -1762,7 +1791,7 @@ onmessage=e=>{ const m=e.data; if(m.type==='cancel'){ cut=Math.max(cut,m.upto); 
   function warm(){
     if(cloud.state!=='off'){ probeCloud(()=>{ if(cloud.state==='off') warm(); }); return; }
     if(W||status.state==='failed'||engine!=='studio'||!on||autoDev()) return;
-    try{ const url=URL.createObjectURL(new Blob([WORKER],{type:'text/javascript'})); W=new Worker(url,{type:'module'}); }catch(e){ fail('This browser can’t run the studio voice.'); return; }
+    try{ const url=URL.createObjectURL(new Blob([workerCode()],{type:'text/javascript'})); W=new Worker(url,{type:'module'}); }catch(e){ fail('This browser can’t run the studio voice.'); return; }
     status.state='loading'; status.pct=0; notify();
     W.onmessage=e=>{ const m=e.data;
       if(m.type==='progress'){ status.pct=Math.round(m.pct||0); notify(); }
@@ -1847,7 +1876,8 @@ onmessage=e=>{ const m=e.data; if(m.type==='cancel'){ cut=Math.max(cut,m.upto); 
     voices:()=>list().map(v=>({name:v.name,lang:v.lang,human:HUMAN.test(v.name)})),
     setVoice(n){ want=n; try{ localStorage.setItem('fdl-ann-voice',n); }catch(e){} pickVoice(); },
     get engine(){ return autoDev()?'device':engine; }, setEngine(e){ engine=e; engineChosen=true; hush(); dropAll(); try{ localStorage.setItem('fdl-ann-engine',e); }catch(x){} if(e==='studio'){ if(status.state==='failed'){ status.state='idle'; status.err=''; } warm(); } notify(); },
-    studio:STUDIO, get studioVoice(){ return sv; }, setStudioVoice(v){ sv=v; dropAll(); try{ localStorage.setItem('fdl-ann-sv',v); }catch(e){} },
+    studio:STUDIO, get studioVoice(){ return sv; }, setStudioVoice(v){ const was=kindOf(sv); sv=v; dropAll(); try{ localStorage.setItem('fdl-ann-sv',v); }catch(e){}
+      if(kindOf(v)!==was){ hush(); if(W){ try{ W.terminate(); }catch(e){} W=null; } Object.assign(status,{state:'idle',pct:0,err:'',rtf:undefined,slow:false,blocked:false,device:undefined}); slowHits=0; notify(); warm(); } },
     status, onStatus(f){ subs.add(f); return ()=>subs.delete(f); }, cloud,
     ok:!!S
   };
@@ -3950,7 +3980,7 @@ function annPanel(){
   pop=document.createElement('div'); pop.className='annpop'; pop.setAttribute('role','dialog'); pop.setAttribute('aria-label','Announcer');
   const vs=ann.voices(), cur=ann.voiceName, st=ann.status;
   pop.innerHTML=`<div class="row"><button class="btn small" type="button" id="apOn">${ann.on?'Turn announcer off':'Turn announcer on'}</button><button class="btn small" type="button" id="apTest">Test voice</button><button class="btn small" type="button" id="apX">Done</button></div>
-<div class="eng" role="radiogroup" aria-label="Voice type"><label class="opt"><input type="radio" name="apEng" value="studio"${ann.engine==='studio'?' checked':''}><span><b>Studio voice</b> · human-sounding AI voice, free. One-time download (about 90 MB, or 330 MB to run on your graphics chip), then it’s saved in your browser.</span></label>
+<div class="eng" role="radiogroup" aria-label="Voice type"><label class="opt"><input type="radio" name="apEng" value="studio"${ann.engine==='studio'?' checked':''}><span><b>Studio voice</b> · natural AI voice that runs on this device, free. One-time download of about 60 MB, then it’s saved.</span></label>
 <label class="opt"><input type="radio" name="apEng" value="device"${ann.engine==='device'?' checked':''}><span><b>Device voice</b> · your browser’s built-in voice. No download.</span></label></div>
 <label id="apSvW">Announcer<select id="apSv">${ann.studio.map(([id,n])=>`<option value="${id}"${id===ann.studioVoice?' selected':''}>${esc(n)}</option>`).join('')}</select></label>
 <label id="apVoiceW">Device voice<select id="apVoice">${vs.length?vs.map(v=>`<option value="${esc(v.name)}"${v.name===cur?' selected':''}>${v.human?'★ ':''}${esc(v.name)}</option>`).join(''):'<option>No voices on this device</option>'}</select></label>
