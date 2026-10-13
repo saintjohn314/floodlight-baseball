@@ -873,7 +873,7 @@ button,select,input{font:inherit;color:inherit}
 <button class="btn small" id="tips" type="button" aria-pressed="true" title="Show hints about what you can do right now">Tips on</button>
 <button class="btn small" id="lights" type="button" aria-pressed="true">Lights on</button>
 <button class="btn small" id="sound" type="button" aria-pressed="true">Sound on</button>
-<button class="btn small" id="annBtn" type="button" aria-pressed="true" title="Announcer: turn it on or off, pick a voice, set the volume">Announcer on</button>
+<button class="btn small" id="annBtn" type="button" aria-pressed="true" title="Announcer: turn it on or off, set the volume">Announcer on</button>
 <button class="btn small" id="fs" type="button" hidden>Full screen</button>
 </div>
 </header>
@@ -3980,25 +3980,16 @@ function paintAnn(){ const b=$('annBtn'), st=ann.status; b.setAttribute('aria-pr
   b.textContent=!ann.on?'Announcer off':ann.engine==='studio'&&st.state==='loading'?`Announcer · voice ${st.pct}%`:'Announcer on'; }
 ann.onStatus(paintAnn);
 $('annBtn').addEventListener('click',e=>{ e.stopPropagation(); annPanel(); });
-/* announcer settings: on/off, which voice, how loud */
+/* announcer settings: on/off and how loud */
 function annPanel(){
   let pop=document.querySelector('.annpop'); if(pop){ pop.remove(); return; }
   pop=document.createElement('div'); pop.className='annpop'; pop.setAttribute('role','dialog'); pop.setAttribute('aria-label','Announcer');
-  pop.innerHTML=`<div class="row"><button class="btn small" type="button" id="apOn">${ann.on?'Turn announcer off':'Turn announcer on'}</button><button class="btn small" type="button" id="apTest">Test voice</button><button class="btn small" type="button" id="apX">Done</button></div>
-<label>Volume <span id="apVolN" style="text-transform:none">${Math.round(ann.vol*100)}</span><input type="range" id="apVol" min="0" max="100" step="5" value="${Math.round(ann.vol*100)}"></label>
-<small id="apSt"></small>`;
+  pop.innerHTML=`<div class="row"><button class="btn small" type="button" id="apOn">${ann.on?'Turn announcer off':'Turn announcer on'}</button><button class="btn small" type="button" id="apX">Done</button></div>
+<label>Volume <span id="apVolN" style="text-transform:none">${Math.round(ann.vol*100)}</span><input type="range" id="apVol" min="0" max="100" step="5" value="${Math.round(ann.vol*100)}"></label>`;
   document.body.appendChild(pop);
-  const paint=()=>{ if(!pop.isConnected) return; const n=ann.voiceName;
-    $('apSt').textContent = !ann.ok ? 'This browser has no speech voices, so the calls show as captions.'
-      : ann.isMark ? 'Voice: Microsoft Mark (English, United States).'
-      : n ? `Microsoft Mark isn’t on this device, so the closest American voice is calling the games: ${n.replace(/ - .*$/,'')}.` : 'Loading the voice…';
-    const r=$('annBtn').getBoundingClientRect(); pop.style.top=Math.max(8,Math.min(r.bottom+8,innerHeight-pop.offsetHeight-8))+'px'; pop.style.left=Math.max(16,Math.min(r.left,innerWidth-pop.offsetWidth-16))+'px'; };
-  paint(); setTimeout(paint,600);
-  const test=()=>{ if(ann.on) ann.say('Good evening, and welcome to the ballpark. It\'s a beautiful night for baseball under the lights.',true); };
-  $('apOn').onclick=()=>{ ann.set(!ann.on); paintAnn(); $('apOn').textContent=ann.on?'Turn announcer off':'Turn announcer on'; if(ann.on) test(); };
-  $('apTest').onclick=test;
+  const r=$('annBtn').getBoundingClientRect(); pop.style.top=Math.max(8,Math.min(r.bottom+8,innerHeight-pop.offsetHeight-8))+'px'; pop.style.left=Math.max(16,Math.min(r.left,innerWidth-pop.offsetWidth-16))+'px';
+  $('apOn').onclick=()=>{ ann.set(!ann.on); paintAnn(); $('apOn').textContent=ann.on?'Turn announcer off':'Turn announcer on'; };
   $('apVol').oninput=e=>{ ann.setVol(e.target.value/100); $('apVolN').textContent=e.target.value; };
-  $('apVol').onchange=test;
   $('apX').onclick=()=>pop.remove();
   setTimeout(()=>document.addEventListener('click',function out(ev){ if(!pop.isConnected){ document.removeEventListener('click',out); return; } if(!pop.contains(ev.target)){ pop.remove(); document.removeEventListener('click',out); } }),0);
 }
