@@ -924,7 +924,7 @@ button,select,input{font:inherit;color:inherit}
 
 <section class="guide" aria-labelledby="guideTitle">
 <h2 class="big" id="guideTitle">How the prototype plays</h2>
-<p>This is a virtual version of the Floodlight Baseball tabletop prototype. Each at-bat is one roll of a word die, the meeples move around the bases, and the LED scoreboard keeps the game, just like it will on your table. In Simulation mode, each team also draws action cards, gets two designated hitters, and every player has an <b>ability</b> they can use once a game. Play <b>vs Computer</b> (you're RED, pick home or away before each game) or <b>2 Players</b> to pass and play with a friend. Want a whole season? Hit <b>Franchise</b>: 32 games against five computer teams, playoffs, and the <b>Floodlight Series</b>, with every stat saved.</p>
+<p>This is a virtual version of the Floodlight Baseball tabletop prototype. Each at-bat is one roll of a word die, the meeples move around the bases, and the LED scoreboard keeps the game, just like it will on your table. In Simulation mode, each team also draws action cards, gets one designated hitter, and every player has an <b>ability</b> they can use once a game. Play <b>vs Computer</b> (you're RED, pick home or away before each game) or <b>2 Players</b> to pass and play with a friend. Want a whole season? Hit <b>Franchise</b>: 32 games against five computer teams, playoffs, and the <b>Floodlight Series</b>, with every stat saved.</p>
 <div class="guidegrid">
 <section class="card wide">
 <h2>Player abilities</h2>
@@ -957,7 +957,7 @@ button,select,input{font:inherit;color:inherit}
 </section>
 <section class="card">
 <h2>Designated hitters</h2>
-<p class="intro">Twelve cards, shuffled face down. Each team gets two: one to use in <b>innings 1–4</b> and one in <b>innings 5–8</b>. Use it or lose it. Tap <b>DH</b> to send one up blind. They bat once, always reach base, and take that spot in the batting order until they're out, score or the inning ends.</p>
+<p class="intro">Sixteen cards, shuffled face down. Each team gets <b>one per game</b>, to use any time in <b>innings 1–8</b>. Tap <b>DH</b> to send one up blind. They bat once: twelve of the sixteen reach base (walks, hits, even home runs), but four come up empty. If they reach, they take that spot in the batting order until they're out, score or the inning ends.</p>
 <ul class="dlist" id="dlist"></ul>
 </section>
 </div>
@@ -1079,7 +1079,8 @@ const DHS = [
   {name:'Ned Corrigan',o:'BB'}, {name:'Felix Duran',o:'BB'},
   {name:'Otis Wilder',o:'1B'}, {name:'Josie Kincaid',o:'1B',f:1}, {name:'Gil Petrakis',o:'1B'}, {name:'Lyle Brannock',o:'1B'},
   {name:'Royce Tanner',o:'2B'}, {name:'Zeke Holloway',o:'2B'}, {name:'Rosie Callahan',o:'2B',f:1},
-  {name:'Clint Marlowe',o:'3B'}, {name:'Brock Mallory',o:'HR'}, {name:'Moose Ellery',o:'HR'}
+  {name:'Clint Marlowe',o:'3B'}, {name:'Brock Mallory',o:'HR'}, {name:'Moose Ellery',o:'HR'},
+  {name:'Hank Pruitt',o:'K'}, {name:'Lou Whitcomb',o:'K'}, {name:'Dutch Kessler',o:'OUT'}, {name:'Ace Mulvaney',o:'OUT'}  // a pinch hitter can come up empty
 ];
 const DRAW_INNINGS = [1,4,7];
 const BASE_N = ['first','second','third','home'];
@@ -2093,8 +2094,8 @@ function renderLineup(){
 const cardsOn = () => (G?G.mode:mode)==='sim'; // action cards, designated hitters and abilities are Simulation rules; Arcade is just the dice
 const has = (t,id) => G.hands[t].includes(id);
 function take(t,id){ const i=G.hands[t].indexOf(id); if(i>=0) G.hands[t].splice(i,1); }
-const dhWindow = () => G.inning<=4?0:G.inning<=8?1:-1;
-const dhLeft = t => (G.inning<=4&&!G.dhUse[t][0]?1:0)+(G.inning<=8&&!G.dhUse[t][1]?1:0);
+const dhWindow = () => G.inning<=8?0:-1; // one designated hitter per team, any time in innings 1-8
+const dhLeft = t => G.inning<=8&&!G.dhUse[t][0]?1:0;
 const mustInjure = () => !G.over && G.inning>=9 && has(G.half,'INJ');
 function canDH(t){ const w=dhWindow(); return cardsOn() && !G.over && !busy && t===G.half && w>=0 && !G.dhUse[t][w] && G.dhPile.length>0 && !mustInjure(); }
 function legal(t,id){
@@ -2125,7 +2126,7 @@ function renderHands(){
   const nextDraw=t=>{ const n=DRAW_INNINGS.find(i=>i>=G.inning && !G.drawn[i+'-'+t]); return n?`next card: ${ordinal(n)} inn.`:'no more draws'; };
   box.innerHTML=[0,1].map(t=>{
     const T=G.teams[t], up=!G.over&&t===G.half, n=dhLeft(t), ok=canDH(t), w=dhWindow(), c=cpu(t);
-    const dh=`<button type="button" class="dhmini${ok?' go':''}${n?'':' empty'}" ${c?'tabindex="-1" data-ro="1"':`data-dh="${t}"`} aria-disabled="${!ok}" title="${w<0?'Designated hitters are for innings 1–8.':`Designated hitter pile: ${n} left (one for innings 1–4, one for 5–8).${c?'':' Tap to send one up. Always reaches base.'}`}"><span class="mstk${n>1?' two':''}"><b>DH</b></span><span class="mcnt">${n?'×'+n:'—'}</span></button>`;
+    const dh=`<button type="button" class="dhmini${ok?' go':''}${n?'':' empty'}" ${c?'tabindex="-1" data-ro="1"':`data-dh="${t}"`} aria-disabled="${!ok}" title="${w<0?'Designated hitters are for innings 1–8.':`Designated hitter: ${n?'one left':'used'} (one per game, innings 1–8).${c?'':' Tap to send one up. Most reach base, but not all.'}`}"><span class="mstk${n>1?' two':''}"><b>DH</b></span><span class="mcnt">${n?'×'+n:'—'}</span></button>`;
     const cards = c ? (G.hands[t].length?`<span class="mback"><span class="mstk${G.hands[t].length>1?' two':''}"><b>?</b></span><span class="mcnt">×${G.hands[t].length}</span></span>`:'')
       : G.hands[t].map(id=>{ const A=ACTIONS[id], go=legal(t,id);
         return `<button type="button" class="acbtn ${A.side}${go?' go':''}" data-card="${id}" data-team="${t}" aria-disabled="${!go}" title="${esc(A.name)}. ${esc(A.when)} ${esc(A.text)}"><img src="${ACARD[id]}" alt=""><span>${esc(A.short)}${go?'<em>play</em>':A.react?'<small>auto</small>':A.side==='def'?'<small>def</small>':''}</span></button>`; }).join('');
@@ -2147,7 +2148,7 @@ function tipText(){
   if(human){
     const acts=activeAbils(t); if(acts.length){ const a=acts[0]; return `${abIcon(a.k)} <b>${esc(a.name)}</b> can use <b>${ABIL[a.k].name}</b> right now: ${esc(ABIL[a.k].short.toLowerCase())}. Tap the glowing button under Roll. Once a game.`; }
     const go=G.hands[t].find(id=>legal(t,id)); if(go) return `You can play your <b>${ACTIONS[go].name}</b> card now (it's glowing in your Action cards). ${esc(ACTIONS[go].text)}`;
-    if(canDH(t)){ const last=(dhWindow()===0&&G.inning===4)||(dhWindow()===1&&G.inning===8); return `${last?'<b>Last inning to use it!</b> ':''}Your <b>DH pile</b> is ready: tap the <b>DH</b> pile to send a designated hitter up for ${esc(lastName(bat))}. They always reach base.`; }
+    if(canDH(t)){ const last=G.inning===8; return `${last?'<b>Last inning to use it!</b> ':''}Your <b>designated hitter</b> is ready: tap the <b>DH</b> pile to send one up for ${esc(lastName(bat))}. One per game, and most of them reach base.`; }
     if(k && ABIL[k].type==='react' && !G.abUsed[t][bat]) return `${abIcon(k)} <b>${esc(bat)}</b> has <b>${ABIL[k].name}</b> (${esc(ABIL[k].short.toLowerCase())}). If it applies after the roll, you'll be asked if you want to use it.`;
     const react=G.hands[t].find(id=>ACTIONS[id].react); if(react) return `Your <b>${ACTIONS[react].name}</b> card pops up on its own when it can be used: ${esc(ACTIONS[react].when.toLowerCase())}`;
   }
@@ -2228,7 +2229,7 @@ function askAb(t,k,name,q,ctx){
 function showDH(t,card,sub){
   return new Promise(res=>{
     const ov=$('ov'); sfx.flip();
-    ov.innerHTML=`<div class="dhcard" role="dialog" aria-label="Designated hitter"><span class="aside">${teamMark(G.teams[t])}${esc(TN(t))} · Designated hitter</span><b>${esc(card.name)}</b><span class="res ${kind(card.o)}">${LABEL[card.o]}</span><span class="sub">Guaranteed. Batting for ${esc(sub)}.</span></div>`;
+    ov.innerHTML=`<div class="dhcard" role="dialog" aria-label="Designated hitter"><span class="aside">${teamMark(G.teams[t])}${esc(TN(t))} · Designated hitter</span><b>${esc(card.name)}</b><span class="res ${kind(card.o)}">${LABEL[card.o]}</span><span class="sub">Batting for ${esc(sub)}.</span></div>`;
     ov.hidden=false;
     let gone=false; const done=()=>{ if(gone) return; gone=true; ov.onclick=null; ov.hidden=true; ov.innerHTML=''; res(); };
     ov.onclick=done; setTimeout(done, reduce?700:2100);
@@ -2250,7 +2251,7 @@ function explainDH(t){
   if(w<0) why='Designated hitters are for innings 1–8.';
   else if(t!==G.half) why=`Send one up when ${TN(t)} is batting.`;
   else if(mustInjure()) why='Injured has to be played first.';
-  else if(G.dhUse[t][w]) why = w===0 ? 'Already used the one for innings 1–4. The next one opens in the 5th.' : 'Both designated hitters are used.';
+  else if(G.dhUse[t][w]) why='Already used this game: one designated hitter per team.';
   else why='Not right now.';
   toast(t,`<b>Designated hitter</b>: ${esc(why)}`,'');
 }
@@ -2336,7 +2337,7 @@ function dhCore(t){
 function dhSwing(t,card){
   G.pinch=null;
   const hr=G.hitRun; G.hitRun=false;
-  applyPA(G,card.o,{batter:card.name,dh:true,hitRun:hr,title:LABEL[card.o],text:`Designated hitter <b>${esc(card.name)}</b>: ${LABEL[card.o].toLowerCase()}, guaranteed.`,logText:`DH ${card.name}: ${LABEL[card.o]}`});
+  applyPA(G,card.o,{batter:card.name,dh:true,hitRun:hr,title:LABEL[card.o],text:isOut(card.o)?`Designated hitter <b>${esc(card.name)}</b> ${card.o==='K'?'strikes out':'is out'}. The pinch hitter comes up empty.`:`Designated hitter <b>${esc(card.name)}</b>: ${LABEL[card.o].toLowerCase()}.`,logText:`DH ${card.name}: ${LABEL[card.o]}`});
 }
 
 /* ---------- ability plays (Speed, Eagle Eye, Small Ball are used before a roll) ---------- */
@@ -2589,7 +2590,7 @@ function cpuPick(){
   const t=G.half, b=G.bases, inn=G.inning, outs=G.outs, on=!!(b[0]||b[1]||b[2]), close=closeGame();
   if(has(t,'INJ') && legal(t,'INJ') && (abOf(G,t,curBatter(G))==='IRN' || isInjured(G,t,curBatter(G)) || (inn>=7 && outs===2 && !on))) return 'INJ';
   if(has(t,'RC') && legal(t,'RC')) return 'RC';
-  if(canDH(t)){ const w=dhWindow(), lastInn=(w===0&&inn===4)||(w===1&&inn===8);
+  if(canDH(t)){ const lastInn=inn===8;
     if(isInjured(G,t,curBatter(G)) || (lastInn && (on || outs>0 || G.halfPA>0)) || (on && (b[1]||b[2]) && Math.random()<.55)) return 'DH'; }
   if(has(t,'SQ') && legal(t,'SQ') && (inn>=6 || close)) return 'SQ';
   if(has(t,'SB') && legal(t,'SB') && outs<2) return 'SB';
