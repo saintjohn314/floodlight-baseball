@@ -1696,7 +1696,7 @@ const sfx=(()=>{
     maxCrowd:CROWD_MAX, get crowdVol(){ return crowdVol; }, setCrowdVol(v){ crowdVol=Math.max(0,Math.min(CROWD_MAX,v)); if(cbus) cbus.gain.value=crowdVol; try{ localStorage.setItem('fdl-crowd-vol2',crowdVol); }catch(e){} },
     /* the crowd is heard only during a game: the page calls this a couple of times a second (level 0 = fade it out) */
     crowd(level,sec=1.5){ if(level>0&&!ctx&&navigator.userActivation&&!navigator.userActivation.hasBeenActive) return; if(level>0||bedSrc) bedTo(level,sec); },
-    unlock(){ if(ctxOK()&&crowdOn) loadCrowd().catch(()=>{}); },
+    unlock(){ ctxOK(); }, // the crowd file is fetched the first time a game is on screen, not on the first tap
     dice(){ if(!ac()) return; const t=now(); for(let i=0;i<7;i++) noise(t+i*.085+Math.random()*.03,.05,{f:2200+Math.random()*1900,q:4,gain:.2,attack:.002,wet:false}); },
     /* a wood bat: the snap, the ring of the barrel, the thump */
     crack(){ if(!ac()) return; const t=now();
@@ -1726,12 +1726,10 @@ const ann=(()=>{
   const FEMALE=/^google us english$|\b(female|woman|samantha|victoria|karen|moira|tessa|fiona|zira|susan|hazel|catherine|serena|ava|allison|kate|martha|nicky|joanna|salli|kimberly|ivy|emma|amy|aria|jenny|libby|sonia|natasha|michelle|sara|zoe|nora|shelley|sandy|flo|grandma|kathy|vicki|veena|anna|monica|paulina|amelie|alice|ellen|joana|laura|luciana|mei|yuna|zuzana|melina|alva|damayanti|kanya|kyoko|lekha|sinji|tingting|yelda|carmit|ioana|mariska|milena|sin-ji)\b/i;
   const HUMAN=/natural|neural|online|premium|enhanced|wavenet|studio|siri/i, ROBOT=/espeak|fred|albert|bad news|bahh|bells|boing|bubbles|cellos|jester|organ|superstar|trinoids|whisper|wobble|zarvox|microsoft david|microsoft mark|microsoft george|microsoft james|microsoft richard|microsoft sean/i;
   const GOOD=/andrew|brian|guy|christopher|eric|roger|davis|steffan|ryan|thomas|evan|nathan|aaron|reed|tom|alex|daniel|arthur|oliver|google uk english male|lee|jason|tony/i;
-  /* the studio voices: Kokoro, an open-source neural voice model that runs right in the browser */
-  const STUDIO=[['piper:ryan','Ryan · American, natural (default, works on every device)'],['am_fenrir','Fenrir · American, deep (HD, needs a fast computer)'],['am_michael','Michael · American, warm (HD)'],['am_puck','Puck · American, upbeat'],['am_eric','Eric · American'],['am_echo','Echo · American'],['am_liam','Liam · American'],['am_onyx','Onyx · American'],['bm_george','George · British'],['bm_fable','Fable · British'],['bm_lewis','Lewis · British']];
   const mobile=/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent||'');
   const ANN_MAX=.6; // the announcer tops out at 60% and starts there
-  let voice=null, next=null, vol=ANN_MAX, want='', engine='studio', sv='piper:ryan', devTok=0, fakeT=0, engineChosen=false;
-  try{ const v=parseFloat(localStorage.getItem('fdl-ann-vol2')); if(v>=0) vol=Math.min(ANN_MAX,v); want=localStorage.getItem('fdl-ann-voice')||''; const e=localStorage.getItem('fdl-ann-engine'); if(e==='studio'||e==='device'){ engine=e; engineChosen=true; } const s=localStorage.getItem('fdl-ann-sv'); if(STUDIO.some(x=>x[0]===s)) sv=s; }catch(e){}
+  let voice=null, next=null, vol=ANN_MAX, devTok=0, fakeT=0;
+  try{ const v=parseFloat(localStorage.getItem('fdl-ann-vol2')); if(v>=0) vol=Math.min(ANN_MAX,v); }catch(e){}
   const MATURE=/guy|christopher|roger|davis|andrew|eric|steffan|evan|nathan|aaron|tom\b/i;
   const BROADCAST=[/christopher/i,/\bguy\b/i,/davis/i,/roger/i,/andrew/i,/brian/i,/\beric\b/i,/steffan/i,/evan/i,/nathan/i,/aaron/i,/\btom\b/i];
   const bcast=n=>{ const i=BROADCAST.findIndex(r=>r.test(n)); return i<0?0:60-i*4; };
@@ -1747,8 +1745,7 @@ const ann=(()=>{
     .replace(/(\d)–(\d)/g,'$1 and $2').replace(/–/g,', ').replace(/\u0001(\d+)\u0001/g,(m,d)=>avgWords(+d)).replace(/\bRBI\b/g,'R B I').replace(/\bMVP\b/g,'M V P').replace(/#(\d+)/g,'number $1').replace(/\bNo\. (\d)/g,'number $1').replace(/[“”"]/g,'');
   const shown=t=>t.replace(/\u0001(\d+)\u0001/g,(m,d)=>'.'+String(d).padStart(3,'0').replace(/^1000$/,'1.000'));
   function avgWords(d){ if(d>=1000) return 'a thousand'; if(d===0) return 'zero'; const a=Math.floor(d/100), b=d%100; return a? `${a} ${b===0?'hundred':b<10?'oh '+b:b}` : (b<10?'oh oh '+b:'oh '+b); }
-  const status={state:'idle',pct:0,err:''}, subs=new Set(); const notify=()=>subs.forEach(f=>{ try{ f(status); }catch(e){} });
-  /* device voice */
+  /* the voice: Microsoft Mark (English, United States), built into Windows; elsewhere the closest American male voice */
   /* devLive: one of our calls is being spoken. If the browser's speech is stuck "speaking" with nothing of ours playing
      (it happens in Chrome after sleep or a dropped line), the next call clears it instead of waiting behind it forever.
      devUs keeps the lines alive until they finish, so Chrome can't throw them away mid-call. */
@@ -1768,152 +1765,28 @@ const ann=(()=>{
     wd=setTimeout(watch,t.length*80+2500);
   }
   function fake(t,done){ clearTimeout(fakeT); if(done) fakeT=setTimeout(done,Math.max(3500,Math.min(16000,t.length*60))); }
-  /* studio voice: a module worker loads Kokoro from jsDelivr and the model from Hugging Face (cached by the browser after the first time) */
-  /* Piper (Ryan, a natural American male voice, ~60 MB): fast enough for ordinary computers and phones. Runs in a worker on
-     onnxruntime-web, with espeak-ng (phonemizer) turning words into sounds; the voice files are cached in the browser. */
-  const PIPER_HEAD=`const ORT='https://cdn.jsdelivr.net/npm/onnxruntime-web@1.21.0/dist/', PH='https://cdn.jsdelivr.net/npm/phonemizer@1.2.1/dist/phonemizer.js';
-const VOICE='https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/ryan/medium/en_US-ryan-medium';
-let tts=null, loading=null, cut=0, chain=Promise.resolve(); const drop=new Set(); let device='wasm';
-async function grab(url,prog){
-  let c=null; try{ c=await caches.open('fdl-voice-v1'); const hit=await c.match(url); if(hit) return new Uint8Array(await hit.arrayBuffer()); }catch(e){}
-  const r=await fetch(url); if(!r.ok) throw new Error('voice download '+r.status); const total=+r.headers.get('content-length')||0; let buf;
-  if(prog&&r.body&&total){ const rd=r.body.getReader(), parts=[]; let got=0, last=-1;
-    for(;;){ const {done,value}=await rd.read(); if(done) break; parts.push(value); got+=value.length; const p=Math.floor(got/total*100); if(p!==last){ last=p; postMessage({type:'progress',pct:p}); } }
-    buf=new Uint8Array(got); let o=0; for(const x of parts){ buf.set(x,o); o+=x.length; } }
-  else buf=new Uint8Array(await r.arrayBuffer());
-  try{ if(c) await c.put(url,new Response(buf)); }catch(e){} return buf;
-}
-function load(){ if(!loading) loading=(async()=>{ postMessage({type:'device',device:'wasm'});
-  const [ph,ort]=await Promise.all([import(PH),import(ORT+'ort.wasm.min.mjs')]); ort.env.wasm.wasmPaths=ORT;
-  const cfg=JSON.parse(new TextDecoder().decode(await grab(VOICE+'.onnx.json'))), model=await grab(VOICE+'.onnx',true);
-  const sess=await ort.InferenceSession.create(model,{executionProviders:['wasm']});
-  const m=cfg.phoneme_id_map, sr=cfg.audio.sample_rate, inf=cfg.inference||{};
-  const ids=p=>{ const out=[...m['^'],...m['_']]; for(const ch of p){ if(m[ch]) out.push(...m[ch],...m['_']); } out.push(...m['$']); return out; };
-  tts={ async generate(text,{speed=1}={}){ const id=ids((await ph.phonemize(text,'en-us')).join(' '));
-    const feeds={input:new ort.Tensor('int64',BigInt64Array.from(id.map(BigInt)),[1,id.length]),input_lengths:new ort.Tensor('int64',BigInt64Array.from([BigInt(id.length)]),[1]),
-      scales:new ort.Tensor('float32',Float32Array.from([inf.noise_scale==null?.667:inf.noise_scale,(inf.length_scale==null?1:inf.length_scale)/speed,inf.noise_w==null?.8:inf.noise_w]),[3])};
-    const r=await sess.run(feeds); return {audio:r[sess.outputNames[0]].data,sampling_rate:sr}; } };
-  postMessage({type:'ready',device:'wasm'}); return tts; })(); return loading; }
-`;
-  const KOKORO_HEAD=`import { KokoroTTS } from 'https://cdn.jsdelivr.net/npm/kokoro-js@1.2.1/dist/kokoro.web.js';
-let tts=null, loading=null, cut=0, chain=Promise.resolve(); const drop=new Set();
-let device='wasm';
-async function gpu(){ try{ if(self.navigator&&navigator.gpu){ const a=await navigator.gpu.requestAdapter(); return !!a; } }catch(e){} return false; }
-function open(dev){ device=dev; postMessage({type:'device',device:dev}); return KokoroTTS.from_pretrained('onnx-community/Kokoro-82M-v1.0-ONNX',{dtype:dev==='webgpu'?'fp32':'q8',device:dev,progress_callback:p=>{ if(p&&p.status==='progress'&&/onnx/.test(p.file||'')) postMessage({type:'progress',pct:p.progress}); }}); }
-function load(){ if(!loading) loading=(async()=>{ let t=null; if(await gpu()){ try{ t=await open('webgpu'); }catch(e){ t=null; } } if(!t) t=await open('wasm'); tts=t; postMessage({type:'ready',device}); return t; })(); return loading; }
-`;
-  const COMMON=`const gone=m=>m.pre?drop.has(m.key):m.id<=cut;
-async function run(m){
-  try{ await load();
-    if(m.type==='load'){ if(!m.voice) return; await tts.generate('Play ball.',{voice:m.voice,speed:m.speed});
-      const t0=performance.now(), a=await tts.generate('Good evening, and welcome to the ballpark. It is a beautiful night for baseball.',{voice:m.voice,speed:m.speed});
-      postMessage({type:'speed',device,rtf:(a.audio.length/a.sampling_rate)/((performance.now()-t0)/1000)}); return; }
-    if(m.type!=='say') return;
-    for(let i=0;i<m.parts.length;i++){ if(gone(m)) return; const a=await tts.generate(m.parts[i],{voice:m.voice,speed:m.speed}); if(gone(m)) return;
-      const pcm=new Float32Array(a.audio); postMessage({type:'audio',id:m.id,pre:m.pre,key:m.key,last:i===m.parts.length-1,pcm,sr:a.sampling_rate},[pcm.buffer]); }
-  }catch(err){ postMessage({type:'error',id:m.id,msg:String(err&&err.message||err)}); }
-}
-onmessage=e=>{ const m=e.data; if(m.type==='cancel'){ cut=Math.max(cut,m.upto); return; } if(m.type==='drop'){ m.keys.forEach(k=>drop.add(k)); return; } chain=chain.then(()=>run(m)); };`;
-  const kindOf=v=>String(v).startsWith('piper')?'piper':'kokoro';
-  const workerCode=()=>(kindOf(sv)==='piper'?PIPER_HEAD:KOKORO_HEAD)+COMMON;
-  let W=null, wTimer=0, ac=null, gain=null, playing=[], tEnd=0, job=0, cbs={}, lastA=0, firstT=0, heard=0, slowHits=0; const cache=new Map(), SPEED=1.12, DEEP=.95;
-  /* the studio voice is only used where this computer renders it faster than it's spoken */
-  const humanDev=()=>!!voice&&HUMAN.test(voice.name), autoDev=()=>!engineChosen&&humanDev();
-  const ONLY_DEVICE=true; // the announcer is Microsoft Mark only: no studio download, no server voice
-  const studioOK=()=>!ONLY_DEVICE&&!autoDev()&&engine==='studio'&&status.state==='ready'&&status.rtf>=1.05&&!status.slow&&!(status.blocked&&(!ac||ac.state!=='running'));
-  function fail(msg){ status.state='failed'; status.err=msg||'The studio voice could not load.'; clearTimeout(wTimer); if(W){ try{ W.terminate(); }catch(e){} W=null; } notify(); }
-  function warm(){
-    if(ONLY_DEVICE) return;
-    if(cloud.state!=='off'){ probeCloud(()=>{ if(cloud.state==='off') warm(); }); return; }
-    if(W||status.state==='failed'||engine!=='studio'||!on||autoDev()) return;
-    try{ const url=URL.createObjectURL(new Blob([workerCode()],{type:'text/javascript'})); W=new Worker(url,{type:'module'}); }catch(e){ fail('This browser can’t run the studio voice.'); return; }
-    status.state='loading'; status.pct=0; notify();
-    W.onmessage=e=>{ const m=e.data;
-      if(m.type==='progress'){ status.pct=Math.round(m.pct||0); notify(); }
-      else if(m.type==='ready'){ clearTimeout(wTimer); status.state='ready'; status.pct=100; notify(); }
-      else if(m.type==='device'){ status.device=m.device; notify(); }
-      else if(m.type==='speed'){ status.rtf=m.rtf; status.device=m.device||status.device; if(m.rtf<1.05){ status.slow=true; dropAll(); } notify(); }
-      else if(m.type==='audio'){ if(m.pre){ const c=cache.get(m.key); if(c){ c.chunks.push(m); if(m.last) c.done=true; if(c.live===job) play(Object.assign({},m,{id:job,pcm:m.pcm.slice()})); } } else play(m); }
-      else if(m.type==='error') fail(m.msg); };
-    W.onerror=e=>{ e.preventDefault&&e.preventDefault(); fail('The studio voice could not load here.'); };
-    W.postMessage({type:'load',voice:sv,speed:SPEED});
-  }
-  function actx(){ try{ if(!ac){ const C=window.AudioContext||window.webkitAudioContext; if(!C) return null; ac=new C(); gain=ac.createGain(); gain.connect(ac.destination); } if(ac.state==='suspended') ac.resume(); gain.gain.value=vol; return ac; }catch(e){ return null; } }
-  function play(m){
-    if(m.id!==job) return; const c=actx(); if(!c) return; lastA=Date.now(); heard=job;
-    const b=c.createBuffer(1,m.pcm.length,m.sr); b.copyToChannel(m.pcm,0); const s=c.createBufferSource(); s.buffer=b; s.playbackRate.value=DEEP; s.connect(gain);
-    const t=Math.max(c.currentTime+.05,tEnd); s.start(t); tEnd=t+b.duration/DEEP+.18; playing.push(s);
-    s.onended=()=>{ playing=playing.filter(x=>x!==s); if(m.last&&m.id===job&&cbs[m.id]){ const d=cbs[m.id]; delete cbs[m.id]; d(); } };
-  }
-  /* the broadcast voice: lines spoken on the site's server (a Microsoft neural voice), so every browser and
-     phone hears the same announcer. The game checks once whether the site has it set up. */
-  const TTS_API=(/\.netlify\.app$/.test(location.hostname)?location.origin:SITE_URL)+'/api/tts';
-  const cloud={state:'unknown',voice:'',fails:0}, ccache=new Map();
-  const cloudOK=()=>!ONLY_DEVICE&&cloud.state==='on';
-  function probeCloud(then){
-    if(cloud.state!=='unknown'){ if(then) then(); return; } cloud.state='checking';
-    const end=st=>{ cloud.state=st; notify(); if(then) then(); };
-    fetch(TTS_API+'?probe=1',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{ cloud.voice=j&&j.voice||''; end(j&&j.ok?'on':'off'); }).catch(()=>end('off'));
-  }
-  function cloudGet(text){
-    return fetch(TTS_API,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({text})})
-      .then(r=>{ if(!r.ok) throw new Error('voice '+r.status); return r.arrayBuffer(); })
-      .then(b=>new Promise((res,rej)=>{ const c=actx(); if(!c) return rej(new Error('no audio')); c.decodeAudioData(b,res,rej); }));
-  }
-  function cloudLine(t){ let e=ccache.get(t); if(!e){ e=parts(t,90,220).map(p=>{ const pr=cloudGet(p); pr.catch(()=>{}); return pr; }); ccache.set(t,e); if(ccache.size>40) ccache.delete(ccache.keys().next().value); } return e; }
-  function playBuf(b,id,last,rate=1){
-    if(id!==job) return; const c=actx(); if(!c) return; lastA=Date.now(); heard=job;
-    const s=c.createBufferSource(); s.buffer=b; s.playbackRate.value=rate; s.connect(gain);
-    const t=Math.max(c.currentTime+.05,tEnd); s.start(t); tEnd=t+b.duration/rate+.15; playing.push(s);
-    s.onended=()=>{ playing=playing.filter(x=>x!==s); if(last&&id===job&&cbs[id]){ const d=cbs[id]; delete cbs[id]; d(); } };
-  }
-  function cloudSay(t,done){
-    hush(); if(done) cbs[job]=done; actx(); lastA=Date.now(); const me=job, list=cloudLine(t);
-    let chain=Promise.resolve(); list.forEach((pr,i)=>{ chain=chain.then(()=>pr).then(b=>playBuf(b,me,i===list.length-1)); });
-    chain.catch(()=>{ ccache.delete(t); if(++cloud.fails>=3){ cloud.state='off'; notify(); } if(job!==me) return; hush(); devSay(t,true,done); });
-    // nothing heard in 4 s (slow network, or the browser is holding audio): the device voice takes the line
-    firstT=setTimeout(()=>{ if(job!==me) return; if(heard===me&&ac&&ac.state==='running') return; hush(); devSay(t,true,done); },4000);
-  }
   function parts(t,max=60,rest=max*2){ const raw=spoken(t).match(/[^.!?]+[.!?]+["')]*\s*|[^.!?]+$/g)||[t], out=[]; let cur='';
     for(const r of raw){ const x=r.trim(); if(!x) continue; const lim=out.length?rest:max; if((cur+' '+x).length<lim||!cur) cur=(cur?cur+' ':'')+x; else { out.push(cur); cur=x; } } if(cur) out.push(cur);
     if(out.length>1&&out[out.length-1].length<40){ const l=out.pop(); out[out.length-1]+=' '+l; } return out; }
-  function dropAll(){ const keys=[...cache.keys()]; if(W&&keys.length) W.postMessage({type:'drop',keys}); cache.clear(); }
-  function hush(){ clearTimeout(firstT); for(const c of cache.values()) c.live=0; job++; if(W) W.postMessage({type:'cancel',upto:job-1}); for(const s of playing){ try{ s.stop(); }catch(e){} } playing=[]; tEnd=0; cbs={}; next=null; devTok++; devLive=false; devUs=[]; if(S&&(S.speaking||S.pending)){ S.cancel(); lastCancel=Date.now(); } clearTimeout(fakeT); }
+  function hush(){ next=null; devTok++; devLive=false; devUs=[]; clearInterval(keep); if(S&&(S.speaking||S.pending)){ S.cancel(); lastCancel=Date.now(); } clearTimeout(fakeT); }
   function caption(t){ const cap=$('anncap'); if(cap){ cap.hidden=false; cap.innerHTML=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-3.1A7 7 0 0 0 19 11z"/></svg><span>${esc(shown(t))}</span>`; } }
   /* say(text, interrupt, onDone): onDone runs when the call has finished (or after a reading pause when nothing is spoken) */
   function say(t,big,done,quiet){
     if(!t){ if(done) done(); return; } if(!quiet) caption(t);
     if(!on){ fake(t,done); return; }
-    if(cloudOK()){ cloudSay(t,done); return; }
-    if(studioOK()){ hush(); if(done) cbs[job]=done; actx(); lastA=Date.now(); const key=sv+'|'+t, c=cache.get(key), me=job;
-      if(c){ c.live=job; c.chunks.forEach(m=>play(Object.assign({},m,{id:job,pcm:m.pcm.slice()}))); if(c.done) cache.delete(key); }
-      else W.postMessage({type:'say',id:job,parts:parts(t),voice:sv,speed:SPEED});
-      // nothing heard in 2.5 s: the device voice takes this line (and after twice, the rest of the session)
-      const blocked=()=>!ac||ac.state!=='running';
-      firstT=setTimeout(()=>{ if(job!==me) return; if(heard===me&&!blocked()) return; if(blocked()) status.blocked=true; else if(++slowHits>=2){ status.slow=true; dropAll(); notify(); } hush(); devSay(t,true,done); },(c&&c.chunks.length)?900:2500);
-      return; }
-    if(engine==='studio'&&status.state!=='failed') warm();
     if(big) hush(); devSay(t,big,done);
   }
   return {
     get on(){ return on; },
-    set(v){ on=v; try{ localStorage.setItem('fdl-ann',v?'on':'off'); }catch(e){} if(!v) hush(); else warm(); },
-    say, stop:hush, warm, caption, spoken,
+    set(v){ on=v; try{ localStorage.setItem('fdl-ann',v?'on':'off'); }catch(e){} if(!v) hush(); },
+    say, stop:hush, caption, spoken,
     /* still talking (or about to): nothing should cut in */
-    get busy(){ if(!on) return false; if(S&&(S.speaking||S.pending)) return true; return playing.length>0||(!!cbs[job]&&Date.now()-lastA<(cloudOK()?8000:4000)); },
-    /* get a line ready ahead of time (the studio voice renders it in the background) */
-    prefetch(t){ if(!t||!on) return; if(cloudOK()){ cloudLine(t); return; } if(!studioOK()) return; const key=sv+'|'+t; if(cache.has(key)) return; if(cache.size>12){ const k=cache.keys().next().value; W.postMessage({type:'drop',keys:[k]}); cache.delete(k); }
-      cache.set(key,{chunks:[],done:false,live:0}); W.postMessage({type:'say',id:0,pre:true,key,parts:parts(t),voice:sv,speed:SPEED}); },
-    dropAll, unlock(){ actx(); try{ if(S&&!S.speaking){ const u=new SpeechSynthesisUtterance(' '); u.volume=0; S.speak(u); } }catch(e){} },
+    get busy(){ return on&&devLive; },
+    /* Chrome and Safari only speak after the page has been touched: a silent word on the first tap opens the way */
+    unlock(){ try{ if(S&&!S.speaking){ const u=new SpeechSynthesisUtterance(' '); u.volume=0; S.speak(u); } }catch(e){} },
     avg:x=>'\u0001'+Math.round(Math.max(0,Math.min(1,x))*1000)+'\u0001',
     get voiceName(){ return voice?voice.name:''; }, get isMark(){ return !!voice&&MARK.test(voice.name); },
-    maxVol:ANN_MAX, get vol(){ return vol; }, setVol(v){ vol=Math.max(0,Math.min(ANN_MAX,v)); if(gain) gain.gain.value=vol; try{ localStorage.setItem('fdl-ann-vol2',vol); }catch(e){} },
-    voices:()=>list().map(v=>({name:v.name,lang:v.lang,human:HUMAN.test(v.name)})),
-    setVoice(n){ want=n; try{ localStorage.setItem('fdl-ann-voice',n); }catch(e){} pickVoice(); },
-    get engine(){ return autoDev()?'device':engine; }, setEngine(e){ engine=e; engineChosen=true; hush(); dropAll(); try{ localStorage.setItem('fdl-ann-engine',e); }catch(x){} if(e==='studio'){ if(status.state==='failed'){ status.state='idle'; status.err=''; } warm(); } notify(); },
-    studio:STUDIO, get studioVoice(){ return sv; }, setStudioVoice(v){ const was=kindOf(sv); sv=v; dropAll(); try{ localStorage.setItem('fdl-ann-sv',v); }catch(e){}
-      if(kindOf(v)!==was){ hush(); if(W){ try{ W.terminate(); }catch(e){} W=null; } Object.assign(status,{state:'idle',pct:0,err:'',rtf:undefined,slow:false,blocked:false,device:undefined}); slowHits=0; notify(); warm(); } },
-    status, onStatus(f){ subs.add(f); return ()=>subs.delete(f); }, cloud,
+    maxVol:ANN_MAX, get vol(){ return vol; }, setVol(v){ vol=Math.max(0,Math.min(ANN_MAX,v)); try{ localStorage.setItem('fdl-ann-vol2',vol); }catch(e){} },
     ok:!!S
   };
 })();
@@ -2099,13 +1972,13 @@ function tvShow(m){
     let said=false, min=false; const me=i; const adv=()=>{ if(said&&min&&i===me&&!gone) go(); };
     t1=setTimeout(()=>{ min=true; adv(); },1800); const cap=Date.now()+S.say.length*170+12000, quiet=()=>{ if(ann.busy&&Date.now()<cap){ t2=setTimeout(quiet,1000); return; } said=true; min=true; adv(); }; t2=setTimeout(quiet,Math.max(9000,S.say.length*90));
     ann.say(S.say,true,()=>{ said=true; setTimeout(adv,250); },true); };
-  const close=()=>{ if(gone) return; gone=true; clearTimeout(t1); clearTimeout(t2); ann.stop(); ann.dropAll(); document.removeEventListener('keydown',key,true); el.classList.add('out'); setTimeout(()=>el.remove(),reduce?0:400); };
+  const close=()=>{ if(gone) return; gone=true; clearTimeout(t1); clearTimeout(t2); ann.stop(); document.removeEventListener('keydown',key,true); el.classList.add('out'); setTimeout(()=>el.remove(),reduce?0:400); };
   const skip=()=>{ if(gone||i<0) return; ann.stop(); go(); };
   /* Space or a click anywhere on the show skips to the next segment; Escape ends the show */
   const key=e=>{ if(gone) return; if(e.code==='Space'||e.key===' '){ e.preventDefault(); e.stopPropagation(); skip(); } else if(e.key==='Escape'){ e.stopPropagation(); close(); } };
   document.addEventListener('keydown',key,true);
   el.addEventListener('click',e=>{ if(e.button!==0) return; if(e.target.closest('#tvSkip')){ close(); return; } skip(); });
-  segs.forEach(g=>ann.prefetch(g.say)); setTimeout(go, reduce?0:700);
+  setTimeout(go, reduce?0:700);
 }
 function annStart(){ if(G) G.annPrev={inning:G.inning,half:G.half,outs:G.outs,a:total(G,0),h:total(G,1)}; const c=$('anncap'); if(c){ c.hidden=true; c.innerHTML=''; } }
 
@@ -3030,7 +2903,7 @@ function frNext(){
 function frPregame(){
   const nx=frNext(); if(!nx) return;
   const M=me(), O=F.teams[nx.opp], rec=id=>`${F.rec[id].w}–${F.rec[id].l}`;
-  closeHub(); ann.prefetch(pregameCall(nx.home?O:M,nx.home?M:O,nx.kind,nx.label).say);
+  closeHub();
   openPregame({kicker:nx.label, title:nx.home?`${O.name} at ${M.name}`:`${M.name} at ${O.name}`,
     sub:`<b>${esc(M.name)}</b> ${rec(M.id)} · <b>${esc(O.name)}</b> ${rec(O.id)}${nx.series?` · ${esc(seriesText(nx.series))}`:''}`,
     venue:nx.kind==='po'?`${nx.home?'Home':'On the road'} · ${nx.home?'you bat last':'you bat first'} · the higher seed has home field`:`${nx.home?'Home game · you bat last':'Road game · you bat first'} · set on the schedule before the season`,
@@ -4024,9 +3897,8 @@ function annPanel(){
   setTimeout(()=>document.addEventListener('click',function out(ev){ if(!pop.isConnected){ document.removeEventListener('click',out); return; } if(!pop.contains(ev.target)){ pop.remove(); document.removeEventListener('click',out); } }),0);
 }
 /* start fetching the studio voice on the first tap, so it's ready by the first pitch */
-document.addEventListener('pointerdown',()=>{ ann.unlock(); ann.warm(); },{once:true});
+document.addEventListener('pointerdown',()=>ann.unlock(),{once:true});
 document.addEventListener('keydown',()=>ann.unlock(),{once:true});
-setTimeout(()=>ann.warm(),800);
 paintAnn();
 function paintModeTabs(){ document.querySelectorAll('.tab[data-mode]').forEach(b=>{ const on=b.dataset.mode===mode; b.setAttribute('aria-selected',on); b.tabIndex=on?0:-1; }); }
 function setMode(m){
