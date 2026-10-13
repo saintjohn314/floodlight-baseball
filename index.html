@@ -1625,8 +1625,8 @@ const TN = t => G.teams[t].name;
 const sfx=(()=>{
   /* the sound effects are built live with Web Audio: a wood bat, a leather mitt, a ballpark organ. The crowd is recorded:
      light chatter from hundreds of real voices (audio/crowd-bed.mp3) on its own volume, heard only while a game is on screen. */
-  /* the mix: sound effects top out at 55%, the crowd at 35% (the announcer at 60%), and each starts at its top */
-  const FX_MAX=.55, CROWD_MAX=.35;
+  /* the mix: sound effects top out at 55%, the crowd at 27% (the announcer at 60%), and each starts at its top */
+  const FX_MAX=.55, CROWD_MAX=.27;
   let ctx=null, on=true, vol=FX_MAX, buf=null, pink=null, out=null, room=null;
   let crowdOn=true, crowdVol=CROWD_MAX, cbus=null, bedSrc=null, bedG=null, bedAt=-1, cLoad=null; const CB={};
   try{ on=localStorage.getItem('fdl-sound')!=='off'; crowdOn=localStorage.getItem('fdl-crowd')!=='off';
@@ -4010,7 +4010,7 @@ function annPanel(){
   let pop=document.querySelector('.annpop'); if(pop){ pop.remove(); return; }
   pop=document.createElement('div'); pop.className='annpop'; pop.setAttribute('role','dialog'); pop.setAttribute('aria-label','Audio');
   const row=(id,label,on,v,max)=>`<div class="arow${on?'':' off'}" id="${id}R"><span class="alab">${label}</span><button class="btn small" type="button" id="${id}" aria-pressed="${on}">${on?'On':'Off'}</button>
-<span class="arng"><input type="range" id="${id}V" min="0" max="${Math.round(max*100)}" step="5" value="${Math.round(v*100)}" aria-label="${label} volume"><span class="anum" id="${id}N">${Math.round(v*100)}</span></span></div>`;
+<span class="arng"><input type="range" id="${id}V" min="0" max="${Math.round(max*100)}" step="1" value="${Math.round(v*100)}" aria-label="${label} volume"><span class="anum" id="${id}N">${Math.round(v*100)}</span></span></div>`;
   pop.innerHTML=`<b class="atitle">Audio</b>${row('apAnn','Announcer',ann.on,ann.vol,ann.maxVol)}${row('apFx','Sound effects',sfx.on,sfx.vol,sfx.maxVol)}${row('apCr','Crowd',sfx.crowdOn,sfx.crowdVol,sfx.maxCrowd)}
 <div class="row"><button class="btn small" type="button" id="apX">Done</button></div>`;
   document.body.appendChild(pop);
