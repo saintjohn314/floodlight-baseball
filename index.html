@@ -220,6 +220,30 @@ button,select,input{font:inherit;color:inherit}
 .cutsc .story{color:#d8dfec;font-size:clamp(14px,1.8vw,17px);max-width:58ch;animation:cutUp .6s .9s both}
 .cutsc .skip{color:var(--muted);font-size:12px;letter-spacing:.12em;text-transform:uppercase;margin-top:6px;animation:cutUp .6s 1.3s both}
 @keyframes cutIn{from{opacity:0}to{opacity:1}}
+/* the seventh-inning stretch: a night look around the ballpark while the organ plays, words on the board */
+.stretch{position:fixed;inset:0;z-index:9300;background:#050a16;overflow:hidden;cursor:pointer;animation:cutIn .7s ease-out both}
+.stretch.out{animation:cutOut .6s ease-in both}
+.stretch svg.pano{position:absolute;inset:0;width:100%;height:100%;display:block}
+.stretch .flash{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none}
+.stretch .flash.go{animation:stCut .45s ease-out}
+@keyframes stCut{0%{opacity:.85}100%{opacity:0}}
+.stretch .bug{position:absolute;top:max(16px,env(safe-area-inset-top));left:16px;right:16px;display:flex;flex-direction:column;gap:2px;animation:cutUp .7s .3s both;pointer-events:none}
+.stretch .bug .k{font-family:var(--f-head);font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:var(--flood);font-size:clamp(11px,1.5vw,14px)}
+.stretch .bug b{font-family:var(--f-logo);font-weight:400;font-size:clamp(26px,4.6vw,50px);color:var(--cream);text-shadow:3px 3px 0 #9e2f28,0 0 26px rgba(255,200,97,.5);line-height:1.1}
+.stretch .board{position:absolute;left:50%;bottom:max(7vh,54px);transform:translateX(-50%);width:min(94vw,940px);padding:14px 18px 16px;border-radius:14px;background:rgba(4,8,18,.62);border:1px solid rgba(255,215,122,.22);box-shadow:0 0 40px rgba(0,0,0,.5);text-align:center;pointer-events:none;backdrop-filter:blur(3px)}
+.stretch .lyr{position:relative;font-family:var(--f-head);font-weight:700;font-size:clamp(21px,4.4vw,44px);line-height:1.2;color:rgba(255,255,255,.42);min-height:1.2em;padding-top:22px}
+.stretch .lyr .w{transition:color .1s}.stretch .lyr .w.on,.stretch .lyr .w.done{color:#fff}.stretch .lyr .w.on{color:#ffd77a;text-shadow:0 0 18px rgba(255,200,97,.65)}
+.stretch .ball{position:absolute;top:0;left:0;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,#ffd77a 60%,#e0a43a);box-shadow:0 0 12px rgba(255,215,122,.8);transition:left .16s ease-out;opacity:0}
+.stretch .ball.hop{animation:stHop var(--d,.34s) ease-in-out}
+@keyframes stHop{0%{transform:translateY(8px)}45%{transform:translateY(-10px)}100%{transform:translateY(8px)}}
+.stretch .skip{position:absolute;right:16px;bottom:max(14px,env(safe-area-inset-bottom));color:#aab6cc;font-size:12px;letter-spacing:.12em;text-transform:uppercase;pointer-events:none}
+.stretch .bulbs{animation:stOn 1.6s ease-out both}.stretch .twr2 .bulbs{animation-delay:.35s}.stretch .twr3 .bulbs{animation-delay:.7s}.stretch .twr4 .bulbs{animation-delay:1.05s}
+.stretch .halo,.stretch .beams{animation:stHalo 1.8s ease-out both}.stretch .twr2 .halo,.stretch .twr2 .beams{animation-delay:.35s}.stretch .twr3 .halo,.stretch .twr3 .beams{animation-delay:.7s}.stretch .twr4 .halo,.stretch .twr4 .beams{animation-delay:1.05s}
+@keyframes stOn{0%{opacity:.15}12%{opacity:1}18%{opacity:.35}30%{opacity:1}100%{opacity:1}}
+@keyframes stHalo{0%{opacity:0}30%{opacity:.4}100%{opacity:1}}
+.stretch .mote{animation:stMote var(--t,9s) linear infinite;animation-delay:var(--dl,0s)}
+@keyframes stMote{from{transform:translate(0,0);opacity:0}15%{opacity:.8}85%{opacity:.6}to{transform:translate(var(--dx,40px),-260px);opacity:0}}
+@media (prefers-reduced-motion:reduce){.stretch .bulbs,.stretch .halo,.stretch .beams,.stretch .mote,.stretch .ball.hop{animation:none}}
 @keyframes cutOut{to{opacity:0;transform:scale(1.04)}}
 @keyframes cutUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 @keyframes cutL{from{opacity:0;transform:translateX(-60px)}to{opacity:1;transform:none}}
@@ -1681,12 +1705,32 @@ const sfx=(()=>{
     osc.connect(g); g.connect(dest(o.wet)); osc.start(t0); osc.stop(t0+dur+.03); return osc;
   }
   /* the ballpark organ: drawbar partials, a Leslie wobble */
-  function organNote(t,f,d,lvl=.03){
+  function organNote(t,f,d,lvl=.03,to){
     const c=ac(); if(!c) return; const g=c.createGain(); g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(lvl,t+.012); g.gain.setValueAtTime(lvl,t+d); g.gain.exponentialRampToValueAtTime(0.0001,t+d+.09);
     const lp=c.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=3800; const trem=c.createGain(); trem.gain.value=1; const lfo=c.createOscillator(); lfo.frequency.value=6.4; const lg=c.createGain(); lg.gain.value=.14; lfo.connect(lg); lg.connect(trem.gain);
     for(const [m,a] of [[.5,.45],[1,1],[2,.7],[3,.35],[4,.28],[6,.12]]){ const o=c.createOscillator(); o.type='sine'; o.frequency.value=f*m; const og=c.createGain(); og.gain.value=a; o.connect(og); og.connect(lp); o.start(t); o.stop(t+d+.12); }
-    lp.connect(trem); trem.connect(g); g.connect(dest(true)); lfo.start(t); lfo.stop(t+d+.12);
+    lp.connect(trem); trem.connect(g); g.connect(to||dest(true)); lfo.start(t); lfo.stop(t+d+.12);
   }
+  /* the seventh-inning stretch: the organ plays the first half of the chorus of "Take Me Out to the Ball Game"
+     (Albert Von Tilzer, 1908, public domain), softly: 30% with the sound effects at their usual 55%, and quieter if they're turned down */
+  const STRETCH=.30, BEAT=.34, NOTE={C3:130.81,D3:146.83,G2:98,A2:110,C4:261.63,D4:293.66,E4:329.63,F4:349.23,G4:392,'G#4':415.3,A4:440,B4:493.88,C5:523.25,D5:587.33};
+  const TUNE=[ // [note, beats] in 3/4, with the words it carries
+    ['C4',2],['C5',1],['A4',1],['G4',1],['E4',1],['G4',3],['D4',3],           // Take me out to the ball game,
+    ['C4',2],['C5',1],['A4',1],['G4',1],['E4',1],['G4',5],[null,1],          // take me out with the crowd.
+    ['A4',1],['G#4',1],['A4',1],['E4',1],['F4',1],['G4',1],['A4',2],['F4',1],['D4',3], // Buy me some peanuts and Cracker Jack,
+    ['A4',1],['A4',1],['A4',1],['B4',1],['C5',1],['D5',1],['B4',2],['A4',1],['G4',3]]; // I don't care if I never get back.
+  const BASS=['C3','C3','C3','G2','C3','C3','C3','A2','D3','A2','D3','D3','D3','G2','G2','G2']; // one low note on the first beat of each bar
+  let sbus=null, sEnd=0;
+  function stretch(){
+    const c=ac(); if(!c||(sbus&&c.currentTime<sEnd)) return; stopStretch();
+    sbus=c.createGain(); sbus.gain.value=STRETCH/FX_MAX; sbus.connect(out); sbus.connect(room);
+    let t=c.currentTime+.15; const t0=t;
+    for(const [n,b] of TUNE){ if(n) organNote(t,NOTE[n],b*BEAT*.92,.03,sbus); t+=b*BEAT; }
+    BASS.forEach((n,i)=>organNote(t0+i*3*BEAT,NOTE[n],BEAT*1.6,.016,sbus));
+    // and home: a soft C major chord
+    for(const n of ['C3','C4','E4','G4','C5']) organNote(t,NOTE[n],BEAT*5,n==='C5'?.024:.014,sbus);
+    sEnd=t+BEAT*5+.3; }
+  function stopStretch(){ if(!sbus) return; const g=sbus; sbus=null; sEnd=0; try{ const t=ctx.currentTime; g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value,t); g.gain.linearRampToValueAtTime(.0001,t+.6); setTimeout(()=>{ try{ g.disconnect(); }catch(e){} },800); }catch(e){} }
   const now=()=>{ const c=ac(); return c?c.currentTime+.01:0; };
   return {
     get on(){ return on; },
@@ -1696,7 +1740,8 @@ const sfx=(()=>{
     maxCrowd:CROWD_MAX, get crowdVol(){ return crowdVol; }, setCrowdVol(v){ crowdVol=Math.max(0,Math.min(CROWD_MAX,v)); if(cbus) cbus.gain.value=crowdVol; try{ localStorage.setItem('fdl-crowd-vol2',crowdVol); }catch(e){} },
     /* the crowd is heard only during a game: the page calls this a couple of times a second (level 0 = fade it out) */
     crowd(level,sec=1.5){ if(level>0&&!ctx&&navigator.userActivation&&!navigator.userActivation.hasBeenActive) return; if(level>0||bedSrc) bedTo(level,sec); },
-    unlock(){ if(ctxOK()&&crowdOn) loadCrowd().catch(()=>{}); },
+    stretch, stopStretch, tune:{notes:TUNE,beat:BEAT}, get stretching(){ return !!sbus&&!!ctx&&ctx.currentTime<sEnd; },
+    unlock(){ ctxOK(); }, // the crowd file is fetched the first time a game is on screen, not on the first tap
     dice(){ if(!ac()) return; const t=now(); for(let i=0;i<7;i++) noise(t+i*.085+Math.random()*.03,.05,{f:2200+Math.random()*1900,q:4,gain:.2,attack:.002,wet:false}); },
     /* a wood bat: the snap, the ring of the barrel, the thump */
     crack(){ if(!ac()) return; const t=now();
@@ -1726,12 +1771,10 @@ const ann=(()=>{
   const FEMALE=/^google us english$|\b(female|woman|samantha|victoria|karen|moira|tessa|fiona|zira|susan|hazel|catherine|serena|ava|allison|kate|martha|nicky|joanna|salli|kimberly|ivy|emma|amy|aria|jenny|libby|sonia|natasha|michelle|sara|zoe|nora|shelley|sandy|flo|grandma|kathy|vicki|veena|anna|monica|paulina|amelie|alice|ellen|joana|laura|luciana|mei|yuna|zuzana|melina|alva|damayanti|kanya|kyoko|lekha|sinji|tingting|yelda|carmit|ioana|mariska|milena|sin-ji)\b/i;
   const HUMAN=/natural|neural|online|premium|enhanced|wavenet|studio|siri/i, ROBOT=/espeak|fred|albert|bad news|bahh|bells|boing|bubbles|cellos|jester|organ|superstar|trinoids|whisper|wobble|zarvox|microsoft david|microsoft mark|microsoft george|microsoft james|microsoft richard|microsoft sean/i;
   const GOOD=/andrew|brian|guy|christopher|eric|roger|davis|steffan|ryan|thomas|evan|nathan|aaron|reed|tom|alex|daniel|arthur|oliver|google uk english male|lee|jason|tony/i;
-  /* the studio voices: Kokoro, an open-source neural voice model that runs right in the browser */
-  const STUDIO=[['piper:ryan','Ryan · American, natural (default, works on every device)'],['am_fenrir','Fenrir · American, deep (HD, needs a fast computer)'],['am_michael','Michael · American, warm (HD)'],['am_puck','Puck · American, upbeat'],['am_eric','Eric · American'],['am_echo','Echo · American'],['am_liam','Liam · American'],['am_onyx','Onyx · American'],['bm_george','George · British'],['bm_fable','Fable · British'],['bm_lewis','Lewis · British']];
   const mobile=/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent||'');
   const ANN_MAX=.6; // the announcer tops out at 60% and starts there
-  let voice=null, next=null, vol=ANN_MAX, want='', engine='studio', sv='piper:ryan', devTok=0, fakeT=0, engineChosen=false;
-  try{ const v=parseFloat(localStorage.getItem('fdl-ann-vol2')); if(v>=0) vol=Math.min(ANN_MAX,v); want=localStorage.getItem('fdl-ann-voice')||''; const e=localStorage.getItem('fdl-ann-engine'); if(e==='studio'||e==='device'){ engine=e; engineChosen=true; } const s=localStorage.getItem('fdl-ann-sv'); if(STUDIO.some(x=>x[0]===s)) sv=s; }catch(e){}
+  let voice=null, next=null, vol=ANN_MAX, devTok=0, fakeT=0;
+  try{ const v=parseFloat(localStorage.getItem('fdl-ann-vol2')); if(v>=0) vol=Math.min(ANN_MAX,v); }catch(e){}
   const MATURE=/guy|christopher|roger|davis|andrew|eric|steffan|evan|nathan|aaron|tom\b/i;
   const BROADCAST=[/christopher/i,/\bguy\b/i,/davis/i,/roger/i,/andrew/i,/brian/i,/\beric\b/i,/steffan/i,/evan/i,/nathan/i,/aaron/i,/\btom\b/i];
   const bcast=n=>{ const i=BROADCAST.findIndex(r=>r.test(n)); return i<0?0:60-i*4; };
@@ -1747,8 +1790,7 @@ const ann=(()=>{
     .replace(/(\d)–(\d)/g,'$1 and $2').replace(/–/g,', ').replace(/\u0001(\d+)\u0001/g,(m,d)=>avgWords(+d)).replace(/\bRBI\b/g,'R B I').replace(/\bMVP\b/g,'M V P').replace(/#(\d+)/g,'number $1').replace(/\bNo\. (\d)/g,'number $1').replace(/[“”"]/g,'');
   const shown=t=>t.replace(/\u0001(\d+)\u0001/g,(m,d)=>'.'+String(d).padStart(3,'0').replace(/^1000$/,'1.000'));
   function avgWords(d){ if(d>=1000) return 'a thousand'; if(d===0) return 'zero'; const a=Math.floor(d/100), b=d%100; return a? `${a} ${b===0?'hundred':b<10?'oh '+b:b}` : (b<10?'oh oh '+b:'oh '+b); }
-  const status={state:'idle',pct:0,err:''}, subs=new Set(); const notify=()=>subs.forEach(f=>{ try{ f(status); }catch(e){} });
-  /* device voice */
+  /* the voice: Microsoft Mark (English, United States), built into Windows; elsewhere the closest American male voice */
   /* devLive: one of our calls is being spoken. If the browser's speech is stuck "speaking" with nothing of ours playing
      (it happens in Chrome after sleep or a dropped line), the next call clears it instead of waiting behind it forever.
      devUs keeps the lines alive until they finish, so Chrome can't throw them away mid-call. */
@@ -1768,152 +1810,28 @@ const ann=(()=>{
     wd=setTimeout(watch,t.length*80+2500);
   }
   function fake(t,done){ clearTimeout(fakeT); if(done) fakeT=setTimeout(done,Math.max(3500,Math.min(16000,t.length*60))); }
-  /* studio voice: a module worker loads Kokoro from jsDelivr and the model from Hugging Face (cached by the browser after the first time) */
-  /* Piper (Ryan, a natural American male voice, ~60 MB): fast enough for ordinary computers and phones. Runs in a worker on
-     onnxruntime-web, with espeak-ng (phonemizer) turning words into sounds; the voice files are cached in the browser. */
-  const PIPER_HEAD=`const ORT='https://cdn.jsdelivr.net/npm/onnxruntime-web@1.21.0/dist/', PH='https://cdn.jsdelivr.net/npm/phonemizer@1.2.1/dist/phonemizer.js';
-const VOICE='https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/ryan/medium/en_US-ryan-medium';
-let tts=null, loading=null, cut=0, chain=Promise.resolve(); const drop=new Set(); let device='wasm';
-async function grab(url,prog){
-  let c=null; try{ c=await caches.open('fdl-voice-v1'); const hit=await c.match(url); if(hit) return new Uint8Array(await hit.arrayBuffer()); }catch(e){}
-  const r=await fetch(url); if(!r.ok) throw new Error('voice download '+r.status); const total=+r.headers.get('content-length')||0; let buf;
-  if(prog&&r.body&&total){ const rd=r.body.getReader(), parts=[]; let got=0, last=-1;
-    for(;;){ const {done,value}=await rd.read(); if(done) break; parts.push(value); got+=value.length; const p=Math.floor(got/total*100); if(p!==last){ last=p; postMessage({type:'progress',pct:p}); } }
-    buf=new Uint8Array(got); let o=0; for(const x of parts){ buf.set(x,o); o+=x.length; } }
-  else buf=new Uint8Array(await r.arrayBuffer());
-  try{ if(c) await c.put(url,new Response(buf)); }catch(e){} return buf;
-}
-function load(){ if(!loading) loading=(async()=>{ postMessage({type:'device',device:'wasm'});
-  const [ph,ort]=await Promise.all([import(PH),import(ORT+'ort.wasm.min.mjs')]); ort.env.wasm.wasmPaths=ORT;
-  const cfg=JSON.parse(new TextDecoder().decode(await grab(VOICE+'.onnx.json'))), model=await grab(VOICE+'.onnx',true);
-  const sess=await ort.InferenceSession.create(model,{executionProviders:['wasm']});
-  const m=cfg.phoneme_id_map, sr=cfg.audio.sample_rate, inf=cfg.inference||{};
-  const ids=p=>{ const out=[...m['^'],...m['_']]; for(const ch of p){ if(m[ch]) out.push(...m[ch],...m['_']); } out.push(...m['$']); return out; };
-  tts={ async generate(text,{speed=1}={}){ const id=ids((await ph.phonemize(text,'en-us')).join(' '));
-    const feeds={input:new ort.Tensor('int64',BigInt64Array.from(id.map(BigInt)),[1,id.length]),input_lengths:new ort.Tensor('int64',BigInt64Array.from([BigInt(id.length)]),[1]),
-      scales:new ort.Tensor('float32',Float32Array.from([inf.noise_scale==null?.667:inf.noise_scale,(inf.length_scale==null?1:inf.length_scale)/speed,inf.noise_w==null?.8:inf.noise_w]),[3])};
-    const r=await sess.run(feeds); return {audio:r[sess.outputNames[0]].data,sampling_rate:sr}; } };
-  postMessage({type:'ready',device:'wasm'}); return tts; })(); return loading; }
-`;
-  const KOKORO_HEAD=`import { KokoroTTS } from 'https://cdn.jsdelivr.net/npm/kokoro-js@1.2.1/dist/kokoro.web.js';
-let tts=null, loading=null, cut=0, chain=Promise.resolve(); const drop=new Set();
-let device='wasm';
-async function gpu(){ try{ if(self.navigator&&navigator.gpu){ const a=await navigator.gpu.requestAdapter(); return !!a; } }catch(e){} return false; }
-function open(dev){ device=dev; postMessage({type:'device',device:dev}); return KokoroTTS.from_pretrained('onnx-community/Kokoro-82M-v1.0-ONNX',{dtype:dev==='webgpu'?'fp32':'q8',device:dev,progress_callback:p=>{ if(p&&p.status==='progress'&&/onnx/.test(p.file||'')) postMessage({type:'progress',pct:p.progress}); }}); }
-function load(){ if(!loading) loading=(async()=>{ let t=null; if(await gpu()){ try{ t=await open('webgpu'); }catch(e){ t=null; } } if(!t) t=await open('wasm'); tts=t; postMessage({type:'ready',device}); return t; })(); return loading; }
-`;
-  const COMMON=`const gone=m=>m.pre?drop.has(m.key):m.id<=cut;
-async function run(m){
-  try{ await load();
-    if(m.type==='load'){ if(!m.voice) return; await tts.generate('Play ball.',{voice:m.voice,speed:m.speed});
-      const t0=performance.now(), a=await tts.generate('Good evening, and welcome to the ballpark. It is a beautiful night for baseball.',{voice:m.voice,speed:m.speed});
-      postMessage({type:'speed',device,rtf:(a.audio.length/a.sampling_rate)/((performance.now()-t0)/1000)}); return; }
-    if(m.type!=='say') return;
-    for(let i=0;i<m.parts.length;i++){ if(gone(m)) return; const a=await tts.generate(m.parts[i],{voice:m.voice,speed:m.speed}); if(gone(m)) return;
-      const pcm=new Float32Array(a.audio); postMessage({type:'audio',id:m.id,pre:m.pre,key:m.key,last:i===m.parts.length-1,pcm,sr:a.sampling_rate},[pcm.buffer]); }
-  }catch(err){ postMessage({type:'error',id:m.id,msg:String(err&&err.message||err)}); }
-}
-onmessage=e=>{ const m=e.data; if(m.type==='cancel'){ cut=Math.max(cut,m.upto); return; } if(m.type==='drop'){ m.keys.forEach(k=>drop.add(k)); return; } chain=chain.then(()=>run(m)); };`;
-  const kindOf=v=>String(v).startsWith('piper')?'piper':'kokoro';
-  const workerCode=()=>(kindOf(sv)==='piper'?PIPER_HEAD:KOKORO_HEAD)+COMMON;
-  let W=null, wTimer=0, ac=null, gain=null, playing=[], tEnd=0, job=0, cbs={}, lastA=0, firstT=0, heard=0, slowHits=0; const cache=new Map(), SPEED=1.12, DEEP=.95;
-  /* the studio voice is only used where this computer renders it faster than it's spoken */
-  const humanDev=()=>!!voice&&HUMAN.test(voice.name), autoDev=()=>!engineChosen&&humanDev();
-  const ONLY_DEVICE=true; // the announcer is Microsoft Mark only: no studio download, no server voice
-  const studioOK=()=>!ONLY_DEVICE&&!autoDev()&&engine==='studio'&&status.state==='ready'&&status.rtf>=1.05&&!status.slow&&!(status.blocked&&(!ac||ac.state!=='running'));
-  function fail(msg){ status.state='failed'; status.err=msg||'The studio voice could not load.'; clearTimeout(wTimer); if(W){ try{ W.terminate(); }catch(e){} W=null; } notify(); }
-  function warm(){
-    if(ONLY_DEVICE) return;
-    if(cloud.state!=='off'){ probeCloud(()=>{ if(cloud.state==='off') warm(); }); return; }
-    if(W||status.state==='failed'||engine!=='studio'||!on||autoDev()) return;
-    try{ const url=URL.createObjectURL(new Blob([workerCode()],{type:'text/javascript'})); W=new Worker(url,{type:'module'}); }catch(e){ fail('This browser can’t run the studio voice.'); return; }
-    status.state='loading'; status.pct=0; notify();
-    W.onmessage=e=>{ const m=e.data;
-      if(m.type==='progress'){ status.pct=Math.round(m.pct||0); notify(); }
-      else if(m.type==='ready'){ clearTimeout(wTimer); status.state='ready'; status.pct=100; notify(); }
-      else if(m.type==='device'){ status.device=m.device; notify(); }
-      else if(m.type==='speed'){ status.rtf=m.rtf; status.device=m.device||status.device; if(m.rtf<1.05){ status.slow=true; dropAll(); } notify(); }
-      else if(m.type==='audio'){ if(m.pre){ const c=cache.get(m.key); if(c){ c.chunks.push(m); if(m.last) c.done=true; if(c.live===job) play(Object.assign({},m,{id:job,pcm:m.pcm.slice()})); } } else play(m); }
-      else if(m.type==='error') fail(m.msg); };
-    W.onerror=e=>{ e.preventDefault&&e.preventDefault(); fail('The studio voice could not load here.'); };
-    W.postMessage({type:'load',voice:sv,speed:SPEED});
-  }
-  function actx(){ try{ if(!ac){ const C=window.AudioContext||window.webkitAudioContext; if(!C) return null; ac=new C(); gain=ac.createGain(); gain.connect(ac.destination); } if(ac.state==='suspended') ac.resume(); gain.gain.value=vol; return ac; }catch(e){ return null; } }
-  function play(m){
-    if(m.id!==job) return; const c=actx(); if(!c) return; lastA=Date.now(); heard=job;
-    const b=c.createBuffer(1,m.pcm.length,m.sr); b.copyToChannel(m.pcm,0); const s=c.createBufferSource(); s.buffer=b; s.playbackRate.value=DEEP; s.connect(gain);
-    const t=Math.max(c.currentTime+.05,tEnd); s.start(t); tEnd=t+b.duration/DEEP+.18; playing.push(s);
-    s.onended=()=>{ playing=playing.filter(x=>x!==s); if(m.last&&m.id===job&&cbs[m.id]){ const d=cbs[m.id]; delete cbs[m.id]; d(); } };
-  }
-  /* the broadcast voice: lines spoken on the site's server (a Microsoft neural voice), so every browser and
-     phone hears the same announcer. The game checks once whether the site has it set up. */
-  const TTS_API=(/\.netlify\.app$/.test(location.hostname)?location.origin:SITE_URL)+'/api/tts';
-  const cloud={state:'unknown',voice:'',fails:0}, ccache=new Map();
-  const cloudOK=()=>!ONLY_DEVICE&&cloud.state==='on';
-  function probeCloud(then){
-    if(cloud.state!=='unknown'){ if(then) then(); return; } cloud.state='checking';
-    const end=st=>{ cloud.state=st; notify(); if(then) then(); };
-    fetch(TTS_API+'?probe=1',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{ cloud.voice=j&&j.voice||''; end(j&&j.ok?'on':'off'); }).catch(()=>end('off'));
-  }
-  function cloudGet(text){
-    return fetch(TTS_API,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({text})})
-      .then(r=>{ if(!r.ok) throw new Error('voice '+r.status); return r.arrayBuffer(); })
-      .then(b=>new Promise((res,rej)=>{ const c=actx(); if(!c) return rej(new Error('no audio')); c.decodeAudioData(b,res,rej); }));
-  }
-  function cloudLine(t){ let e=ccache.get(t); if(!e){ e=parts(t,90,220).map(p=>{ const pr=cloudGet(p); pr.catch(()=>{}); return pr; }); ccache.set(t,e); if(ccache.size>40) ccache.delete(ccache.keys().next().value); } return e; }
-  function playBuf(b,id,last,rate=1){
-    if(id!==job) return; const c=actx(); if(!c) return; lastA=Date.now(); heard=job;
-    const s=c.createBufferSource(); s.buffer=b; s.playbackRate.value=rate; s.connect(gain);
-    const t=Math.max(c.currentTime+.05,tEnd); s.start(t); tEnd=t+b.duration/rate+.15; playing.push(s);
-    s.onended=()=>{ playing=playing.filter(x=>x!==s); if(last&&id===job&&cbs[id]){ const d=cbs[id]; delete cbs[id]; d(); } };
-  }
-  function cloudSay(t,done){
-    hush(); if(done) cbs[job]=done; actx(); lastA=Date.now(); const me=job, list=cloudLine(t);
-    let chain=Promise.resolve(); list.forEach((pr,i)=>{ chain=chain.then(()=>pr).then(b=>playBuf(b,me,i===list.length-1)); });
-    chain.catch(()=>{ ccache.delete(t); if(++cloud.fails>=3){ cloud.state='off'; notify(); } if(job!==me) return; hush(); devSay(t,true,done); });
-    // nothing heard in 4 s (slow network, or the browser is holding audio): the device voice takes the line
-    firstT=setTimeout(()=>{ if(job!==me) return; if(heard===me&&ac&&ac.state==='running') return; hush(); devSay(t,true,done); },4000);
-  }
   function parts(t,max=60,rest=max*2){ const raw=spoken(t).match(/[^.!?]+[.!?]+["')]*\s*|[^.!?]+$/g)||[t], out=[]; let cur='';
     for(const r of raw){ const x=r.trim(); if(!x) continue; const lim=out.length?rest:max; if((cur+' '+x).length<lim||!cur) cur=(cur?cur+' ':'')+x; else { out.push(cur); cur=x; } } if(cur) out.push(cur);
     if(out.length>1&&out[out.length-1].length<40){ const l=out.pop(); out[out.length-1]+=' '+l; } return out; }
-  function dropAll(){ const keys=[...cache.keys()]; if(W&&keys.length) W.postMessage({type:'drop',keys}); cache.clear(); }
-  function hush(){ clearTimeout(firstT); for(const c of cache.values()) c.live=0; job++; if(W) W.postMessage({type:'cancel',upto:job-1}); for(const s of playing){ try{ s.stop(); }catch(e){} } playing=[]; tEnd=0; cbs={}; next=null; devTok++; devLive=false; devUs=[]; if(S&&(S.speaking||S.pending)){ S.cancel(); lastCancel=Date.now(); } clearTimeout(fakeT); }
+  function hush(){ next=null; devTok++; devLive=false; devUs=[]; clearInterval(keep); if(S&&(S.speaking||S.pending)){ S.cancel(); lastCancel=Date.now(); } clearTimeout(fakeT); }
   function caption(t){ const cap=$('anncap'); if(cap){ cap.hidden=false; cap.innerHTML=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-3.1A7 7 0 0 0 19 11z"/></svg><span>${esc(shown(t))}</span>`; } }
   /* say(text, interrupt, onDone): onDone runs when the call has finished (or after a reading pause when nothing is spoken) */
   function say(t,big,done,quiet){
     if(!t){ if(done) done(); return; } if(!quiet) caption(t);
     if(!on){ fake(t,done); return; }
-    if(cloudOK()){ cloudSay(t,done); return; }
-    if(studioOK()){ hush(); if(done) cbs[job]=done; actx(); lastA=Date.now(); const key=sv+'|'+t, c=cache.get(key), me=job;
-      if(c){ c.live=job; c.chunks.forEach(m=>play(Object.assign({},m,{id:job,pcm:m.pcm.slice()}))); if(c.done) cache.delete(key); }
-      else W.postMessage({type:'say',id:job,parts:parts(t),voice:sv,speed:SPEED});
-      // nothing heard in 2.5 s: the device voice takes this line (and after twice, the rest of the session)
-      const blocked=()=>!ac||ac.state!=='running';
-      firstT=setTimeout(()=>{ if(job!==me) return; if(heard===me&&!blocked()) return; if(blocked()) status.blocked=true; else if(++slowHits>=2){ status.slow=true; dropAll(); notify(); } hush(); devSay(t,true,done); },(c&&c.chunks.length)?900:2500);
-      return; }
-    if(engine==='studio'&&status.state!=='failed') warm();
     if(big) hush(); devSay(t,big,done);
   }
   return {
     get on(){ return on; },
-    set(v){ on=v; try{ localStorage.setItem('fdl-ann',v?'on':'off'); }catch(e){} if(!v) hush(); else warm(); },
-    say, stop:hush, warm, caption, spoken,
+    set(v){ on=v; try{ localStorage.setItem('fdl-ann',v?'on':'off'); }catch(e){} if(!v) hush(); },
+    say, stop:hush, caption, spoken,
     /* still talking (or about to): nothing should cut in */
-    get busy(){ if(!on) return false; if(S&&(S.speaking||S.pending)) return true; return playing.length>0||(!!cbs[job]&&Date.now()-lastA<(cloudOK()?8000:4000)); },
-    /* get a line ready ahead of time (the studio voice renders it in the background) */
-    prefetch(t){ if(!t||!on) return; if(cloudOK()){ cloudLine(t); return; } if(!studioOK()) return; const key=sv+'|'+t; if(cache.has(key)) return; if(cache.size>12){ const k=cache.keys().next().value; W.postMessage({type:'drop',keys:[k]}); cache.delete(k); }
-      cache.set(key,{chunks:[],done:false,live:0}); W.postMessage({type:'say',id:0,pre:true,key,parts:parts(t),voice:sv,speed:SPEED}); },
-    dropAll, unlock(){ actx(); try{ if(S&&!S.speaking){ const u=new SpeechSynthesisUtterance(' '); u.volume=0; S.speak(u); } }catch(e){} },
+    get busy(){ return on&&devLive; },
+    /* Chrome and Safari only speak after the page has been touched: a silent word on the first tap opens the way */
+    unlock(){ try{ if(S&&!S.speaking){ const u=new SpeechSynthesisUtterance(' '); u.volume=0; S.speak(u); } }catch(e){} },
     avg:x=>'\u0001'+Math.round(Math.max(0,Math.min(1,x))*1000)+'\u0001',
     get voiceName(){ return voice?voice.name:''; }, get isMark(){ return !!voice&&MARK.test(voice.name); },
-    maxVol:ANN_MAX, get vol(){ return vol; }, setVol(v){ vol=Math.max(0,Math.min(ANN_MAX,v)); if(gain) gain.gain.value=vol; try{ localStorage.setItem('fdl-ann-vol2',vol); }catch(e){} },
-    voices:()=>list().map(v=>({name:v.name,lang:v.lang,human:HUMAN.test(v.name)})),
-    setVoice(n){ want=n; try{ localStorage.setItem('fdl-ann-voice',n); }catch(e){} pickVoice(); },
-    get engine(){ return autoDev()?'device':engine; }, setEngine(e){ engine=e; engineChosen=true; hush(); dropAll(); try{ localStorage.setItem('fdl-ann-engine',e); }catch(x){} if(e==='studio'){ if(status.state==='failed'){ status.state='idle'; status.err=''; } warm(); } notify(); },
-    studio:STUDIO, get studioVoice(){ return sv; }, setStudioVoice(v){ const was=kindOf(sv); sv=v; dropAll(); try{ localStorage.setItem('fdl-ann-sv',v); }catch(e){}
-      if(kindOf(v)!==was){ hush(); if(W){ try{ W.terminate(); }catch(e){} W=null; } Object.assign(status,{state:'idle',pct:0,err:'',rtf:undefined,slow:false,blocked:false,device:undefined}); slowHits=0; notify(); warm(); } },
-    status, onStatus(f){ subs.add(f); return ()=>subs.delete(f); }, cloud,
+    maxVol:ANN_MAX, get vol(){ return vol; }, setVol(v){ vol=Math.max(0,Math.min(ANN_MAX,v)); try{ localStorage.setItem('fdl-ann-vol2',vol); }catch(e){} },
     ok:!!S
   };
 })();
@@ -2099,13 +2017,13 @@ function tvShow(m){
     let said=false, min=false; const me=i; const adv=()=>{ if(said&&min&&i===me&&!gone) go(); };
     t1=setTimeout(()=>{ min=true; adv(); },1800); const cap=Date.now()+S.say.length*170+12000, quiet=()=>{ if(ann.busy&&Date.now()<cap){ t2=setTimeout(quiet,1000); return; } said=true; min=true; adv(); }; t2=setTimeout(quiet,Math.max(9000,S.say.length*90));
     ann.say(S.say,true,()=>{ said=true; setTimeout(adv,250); },true); };
-  const close=()=>{ if(gone) return; gone=true; clearTimeout(t1); clearTimeout(t2); ann.stop(); ann.dropAll(); document.removeEventListener('keydown',key,true); el.classList.add('out'); setTimeout(()=>el.remove(),reduce?0:400); };
+  const close=()=>{ if(gone) return; gone=true; clearTimeout(t1); clearTimeout(t2); ann.stop(); document.removeEventListener('keydown',key,true); el.classList.add('out'); setTimeout(()=>el.remove(),reduce?0:400); };
   const skip=()=>{ if(gone||i<0) return; ann.stop(); go(); };
   /* Space or a click anywhere on the show skips to the next segment; Escape ends the show */
   const key=e=>{ if(gone) return; if(e.code==='Space'||e.key===' '){ e.preventDefault(); e.stopPropagation(); skip(); } else if(e.key==='Escape'){ e.stopPropagation(); close(); } };
   document.addEventListener('keydown',key,true);
   el.addEventListener('click',e=>{ if(e.button!==0) return; if(e.target.closest('#tvSkip')){ close(); return; } skip(); });
-  segs.forEach(g=>ann.prefetch(g.say)); setTimeout(go, reduce?0:700);
+  setTimeout(go, reduce?0:700);
 }
 function annStart(){ if(G) G.annPrev={inning:G.inning,half:G.half,outs:G.outs,a:total(G,0),h:total(G,1)}; const c=$('anncap'); if(c){ c.hidden=true; c.innerHTML=''; } }
 
@@ -2607,9 +2525,113 @@ async function doRoll(){
 function post(){
   checkDH(); checkDraw(); busy=false;
   if(G.over) G.big = G.walkoff ? (G.last&&G.last.o==='HR'&&G.last.team===1 ? (G.last.runs===4?'Walk-off Grand Slam!':'Walk-off Home Run!') : 'Walk-off!') : (G.big||'Final');
-  renderGame(); celebrate(); playFx();
+  renderGame(); celebrate(); playFx(); maybeStretch();
   autoSave();
   if(G.over && !G.shownFinal){ G.shownFinal=true; gameOver(); setTimeout(showFinal, reduce?250:1900); }
+}
+/* the seventh-inning stretch: once a game, as the top of the 7th ends */
+function maybeStretch(){
+  if(!G||G.over||G.stretched||G.inning!==7||G.half!==1||G.halfPA!==0||G.outs!==0) return;
+  G.stretched=true; let tries=0;
+  const go=()=>{ if(!crowdLive()) return; if((busy||!$('ov').hidden||document.querySelector('.cutsc,.stretch'))&&tries++<20){ setTimeout(go,700); return; } stretchScene(); };
+  setTimeout(go,1400);
+}
+/* the ballpark at night, drawn wide (3200 x 1400) so a camera can move around it: light towers, empty stands,
+   the padded outfield wall with the sponsors' posters, the warning track and the grass under the lights */
+function stretchPano(){
+  const W=3200, rnd=(a,b)=>a+Math.random()*(b-a), f=n=>Math.round(n*10)/10;
+  let o=`<defs><linearGradient id="spSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#02050d"/><stop offset=".45" stop-color="#0a1530"/><stop offset="1" stop-color="#1b2f58"/></linearGradient>
+<radialGradient id="spBulb"><stop offset="0" stop-color="#fff"/><stop offset=".45" stop-color="#fff6d8"/><stop offset=".8" stop-color="#ffd77a"/><stop offset="1" stop-color="#ffd77a" stop-opacity="0"/></radialGradient>
+<radialGradient id="spHalo"><stop offset="0" stop-color="#fff4cf" stop-opacity=".75"/><stop offset=".25" stop-color="#ffd98a" stop-opacity=".32"/><stop offset="1" stop-color="#ffcc66" stop-opacity="0"/></radialGradient>
+<linearGradient id="spBeam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0c6" stop-opacity=".34"/><stop offset="1" stop-color="#fff0c6" stop-opacity="0"/></linearGradient>
+<linearGradient id="spWall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1c5a3c"/><stop offset=".55" stop-color="#11402a"/><stop offset="1" stop-color="#0a2a1b"/></linearGradient>
+<linearGradient id="spTrack" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a5532"/><stop offset="1" stop-color="#5e3520"/></linearGradient>
+<linearGradient id="spGrass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a8a46"/><stop offset="1" stop-color="#14522a"/></linearGradient>
+<radialGradient id="spWash"><stop offset="0" stop-color="#fff3cc" stop-opacity=".34"/><stop offset="1" stop-color="#fff3cc" stop-opacity="0"/></radialGradient>
+<linearGradient id="spVig" x1="0" y1="0" x2="0" y2="1"><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></linearGradient></defs>
+<rect width="${W}" height="1400" fill="url(#spSky)"/>`;
+  for(let i=0;i<90;i++) o+=`<circle cx="${f(rnd(0,W))}" cy="${f(rnd(0,300))}" r="${f(rnd(.8,2.2))}" fill="#fff" opacity="${f(rnd(.15,.7))}"/>`;
+  // the light towers stand behind the stands; the outer two are closer, so taller and bigger
+  const towers=[[430,60,1],[1190,170,.68],[2010,170,.68],[2770,60,1]];
+  towers.forEach(([x,y,k],i)=>{
+    const w=250*k, h=150*k, hx=x-w/2, foot=760, pw=26*k;
+    let lat=`<path d="M${x-pw} ${y+h} L${x-pw*1.6} ${foot} M${x+pw} ${y+h} L${x+pw*1.6} ${foot}" stroke="#2b313b" stroke-width="${6*k}"/>`, zz='';
+    for(let yy=y+h, j=0; yy<foot-30; yy+=60*k, j++){ const a=(yy-(y+h))/(foot-(y+h)), l=x-pw-pw*.6*a, r=x+pw+pw*.6*a; zz+=`${j%2?r:l},${f(yy)} `; }
+    lat+=`<polyline points="${zz}" fill="none" stroke="#2b313b" stroke-width="${3*k}"/>`;
+    let bulbs=''; for(let r=0;r<4;r++) for(let c=0;c<6;c++) bulbs+=`<circle cx="${f(hx+(26+c*39.5)*k)}" cy="${f(y+(26+r*33)*k)}" r="${f(15*k)}"/>`;
+    const side=x<1600?1:-1;
+    o+=`<g class="twr${i+1}"><g class="beams" opacity=".9"><path d="M${x} ${y+h*.6} L${x+side*900*k} 1400 L${x+side*200*k} 1400Z" fill="url(#spBeam)"/><path d="M${x} ${y+h*.6} L${x+side*1500*k} 1400 L${x+side*1100*k} 1400Z" fill="url(#spBeam)" opacity=".7"/></g>
+${lat}<rect x="${f(hx)}" y="${y}" width="${f(w)}" height="${f(h)}" rx="${f(8*k)}" fill="#22262d" stroke="#0d0f12" stroke-width="${f(4*k)}"/>
+<circle class="halo" cx="${x}" cy="${f(y+h/2)}" r="${f(460*k)}" fill="url(#spHalo)"/><g class="bulbs" fill="url(#spBulb)">${bulbs}</g></g>`;
+  });
+  // the stands: a bowl of empty seats, curving away at the ends, with a lit facade along the top
+  const top=x=>330+40*((x-1600)/1600)**2, edge=370, ctl=290, foot=780;
+  o+=`<path d="M0 ${edge} Q1600 ${ctl} ${W} ${edge} L${W} ${foot} L0 ${foot}Z" fill="#1b1f27"/>`;
+  let y0=24;
+  for(let r=0;r<17;r++){ const hgt=15+r*1.1, pitch=17+r*.9, yy=y0+hgt/2;
+    o+=`<path d="M0 ${f(edge+yy)} Q1600 ${f(ctl+yy)} ${W} ${f(edge+yy)}" fill="none" stroke="#283a63" stroke-width="${f(hgt*.62)}" stroke-dasharray="${f(pitch*.8)} ${f(pitch*.2)}" stroke-dashoffset="${f(r%2?pitch/2:0)}"/>
+<path d="M0 ${f(edge+yy+hgt*.32)} Q1600 ${f(ctl+yy+hgt*.32)} ${W} ${f(edge+yy+hgt*.32)}" fill="none" stroke="#3a5591" stroke-width="${f(hgt*.18)}" stroke-dasharray="${f(pitch*.8)} ${f(pitch*.2)}" stroke-dashoffset="${f(r%2?pitch/2:0)}"/>`;
+    y0+=hgt+3; }
+  for(let x=200;x<W;x+=400){ const t=top(x); o+=`<rect x="${x-12}" y="${f(t+20)}" width="24" height="${f(foot-t-20)}" fill="#3b414c" opacity=".9"/>`; }
+  o+=`<path d="M0 ${edge} Q1600 ${ctl} ${W} ${edge} L${W} ${edge+26} Q1600 ${ctl+26} 0 ${edge+26}Z" fill="#0e1117"/>`;
+  for(let x=40;x<W;x+=46) o+=`<circle cx="${x}" cy="${f(top(x)+13)}" r="3.2" fill="#ffe7a8" opacity=".85"/>`;
+  for(const [x,,k] of towers) o+=`<ellipse cx="${x}" cy="560" rx="${700*k}" ry="260" fill="url(#spWash)"/>`;
+  // the outfield wall: padded panels, the yellow home run line, distances, and the sponsors
+  o+=`<rect x="0" y="770" width="${W}" height="135" fill="url(#spWall)"/>`;
+  for(let x=0;x<W;x+=160) o+=`<line x1="${x}" y1="776" x2="${x}" y2="905" stroke="#08261a" stroke-width="3"/>`;
+  o+=`<rect x="0" y="764" width="${W}" height="9" fill="#f2c94c"/>`;
+  const ads=['pizza','hallofgood','strikezone','ghostrunner','curveball','warningtrack','popcorn','hotdogs','badhops','umpire','giftshop'];
+  ads.forEach((a,i)=>{ const x=260+i*268-70; o+=`<rect x="${x-4}" y="782" width="148" height="104" rx="6" fill="#071a11"/><use href="#st-${a}" transform="translate(${x} 786) scale(.457)"/>`; });
+  for(const [i,d] of [[0,'330'],[3,'375'],[6,'375'],[9,'330']]) o+=`<text x="${260+i*268+134}" y="862" text-anchor="middle" font-family="Barlow Condensed,Barlow,sans-serif" font-weight="700" font-size="46" fill="#f4f1e6">${d}</text>`;
+  o+=`<rect x="0" y="770" width="${W}" height="135" fill="url(#spWash)" opacity=".5"/>`;
+  // the warning track and the grass, mowed in stripes and lit where the beams land
+  o+=`<rect x="0" y="905" width="${W}" height="65" fill="url(#spTrack)"/><rect x="0" y="970" width="${W}" height="430" fill="url(#spGrass)"/>`;
+  for(let x=0;x<W;x+=200) o+=`<rect x="${x}" y="970" width="100" height="430" fill="#ffffff" opacity=".045"/>`;
+  for(const [x,,k] of towers) o+=`<ellipse cx="${x+(x<1600?1:-1)*700*k}" cy="1150" rx="${620*k}" ry="200" fill="url(#spWash)"/>`;
+  o+=`<rect width="${W}" height="1400" fill="url(#spVig)"/>`;
+  // a few moths and dust in the light
+  for(let i=0;i<26;i++){ const [x,y,k]=towers[i%4], mx=x+(x<1600?1:-1)*rnd(100,700)*k, my=rnd(420,1150);
+    o+=`<circle class="mote" cx="${f(mx)}" cy="${f(my)}" r="${f(rnd(1.5,3.5))}" fill="#fff3cc" style="--t:${f(rnd(7,13))}s;--dl:-${f(rnd(0,12))}s;--dx:${f(rnd(-60,60))}px"/>`; }
+  return o;
+}
+/* the stretch itself: four camera moves, one per line of the song, the words on the board with a bouncing ball, then back to the game */
+function stretchScene(){
+  if(document.querySelector('.stretch')) return;
+  const A=G.teams[0], H=G.teams[1], el=document.createElement('div');
+  el.className='stretch'; el.setAttribute('role','dialog'); el.setAttribute('aria-label','Seventh-inning stretch');
+  el.innerHTML=`<svg class="pano" viewBox="0 0 3200 1400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${stretchPano()}</svg><div class="flash"></div>
+<div class="bug"><span class="k">Middle of the 7th · ${esc(A.abbr)} ${total(G,0)}, ${esc(H.abbr)} ${total(G,1)}</span><b>Seventh-Inning Stretch</b></div>
+<div class="board"><div class="lyr"><span class="ball"></span><p></p></div></div><span class="skip">Tap to skip</span>`;
+  document.body.appendChild(el); sfx.stretch();
+  const svg=el.querySelector('svg'), lyr=el.querySelector('.lyr p'), ball=el.querySelector('.ball'), flash=el.querySelector('.flash');
+  // the words, one syllable per note
+  const LINES=[['Take ','me ','out ','to ','the ','ball ','game,'],['take ','me ','out ','with ','the ','crowd.'],['Buy ','me ','some ','pea','nuts ','and ','Crack','er ','Jack,'],['I ','don’t ','care ','if ','I ','nev','er ','get ','back.']];
+  const {notes,beat}=sfx.tune, cues=[]; let t=0, li=0, wi=0;
+  for(const [n,b] of notes){ if(n){ cues.push({t,li,wi,d:b*beat}); wi++; if(wi>=LINES[li].length){ li++; wi=0; } } t+=b*beat; }
+  const SONG=t, LINE=12*beat, END=SONG+beat*5;
+  // the camera: [start, end] as centre x, centre y, width, for each line, then the last chord on the wide shot
+  const SHOTS=[[[700,830,1150],[1500,830,1150]],[[1850,840,1300],[2100,520,1350]],[[2450,420,1500],[2770,190,880]],[[2300,420,1800],[1600,700,3200]],[[1600,700,3200],[1600,690,3000]]];
+  const ease=x=>x<.5?2*x*x:1-((-2*x+2)**2)/2;
+  const cam=(tt)=>{ const i=Math.min(SHOTS.length-1,Math.floor(tt/LINE)), u=i<4?(tt-i*LINE)/LINE:Math.min(1,(tt-4*LINE)/(END-4*LINE)), [a,b]=SHOTS[i], e=reduce?1:ease(Math.max(0,Math.min(1,u)));
+    const cx=a[0]+(b[0]-a[0])*e, cy=a[1]+(b[1]-a[1])*e; let w=reduce?3200:a[2]+(b[2]-a[2])*e; const asp=innerWidth/innerHeight;
+    let h=w/asp; if(h>1400){ h=1400; w=h*asp; } if(w>3200){ w=3200; h=w/asp; }
+    const x=Math.max(0,Math.min(3200-w,cx-w/2)), y=Math.max(0,Math.min(1400-h,cy-h/2)); svg.setAttribute('viewBox',`${x.toFixed(1)} ${y.toFixed(1)} ${w.toFixed(1)} ${h.toFixed(1)}`); return i; };
+  let shot=-1, line=-1, cue=-1, raf=0, gone=false; const t0=performance.now()+150; // the organ starts 0.15 s after it's asked to
+  const showLine=i=>{ lyr.innerHTML=LINES[i].map(w=>`<span class="w">${esc(w)}</span>`).join(''); lyr.style.animation='none'; void lyr.offsetWidth; lyr.style.animation='cutUp .35s both'; };
+  showLine(0);
+  const tick=()=>{ if(gone) return; const tt=(performance.now()-t0)/1000;
+    const i=cam(Math.max(0,tt)); if(i!==shot){ if(shot>=0&&i<4&&!reduce){ flash.classList.remove('go'); void flash.offsetWidth; flash.classList.add('go'); } shot=i; }
+    while(cue+1<cues.length&&tt>=cues[cue+1].t){ cue++; const c=cues[cue]; if(c.li!==line){ line=c.li; showLine(line); }
+      const ws=lyr.querySelectorAll('.w'); ws.forEach((w,k)=>{ w.classList.toggle('on',k===c.wi); w.classList.toggle('done',k<c.wi); });
+      const w=ws[c.wi]; if(w){ ball.style.opacity=1; ball.style.left=(w.offsetLeft+w.offsetWidth/2-lyr.offsetLeft+lyr.offsetLeft)+'px'; ball.style.setProperty('--d',Math.max(.25,c.d)+'s'); ball.classList.remove('hop'); void ball.offsetWidth; ball.classList.add('hop'); } }
+    if(tt>=SONG&&line!==4){ line=4; lyr.querySelectorAll('.w').forEach(w=>{ w.classList.remove('on'); w.classList.add('done'); }); ball.style.opacity=0; }
+    if(tt>=END+.4){ close(false); return; }
+    raf=requestAnimationFrame(tick); };
+  const key=e=>{ e.preventDefault(); e.stopPropagation(); if(e.key===' '||e.key==='Enter'||e.key==='Escape') close(true); };
+  const close=skipped=>{ if(gone) return; gone=true; cancelAnimationFrame(raf); if(skipped) sfx.stopStretch(); document.removeEventListener('keydown',key,true);
+    el.classList.add('out'); setTimeout(()=>el.remove(),reduce?0:600); };
+  el.addEventListener('click',()=>close(true)); document.addEventListener('keydown',key,true);
+  raf=requestAnimationFrame(tick);
 }
 function playFx(){
   const fx=G.fx; G.fx=null; if(!fx) return;
@@ -3030,7 +3052,7 @@ function frNext(){
 function frPregame(){
   const nx=frNext(); if(!nx) return;
   const M=me(), O=F.teams[nx.opp], rec=id=>`${F.rec[id].w}–${F.rec[id].l}`;
-  closeHub(); ann.prefetch(pregameCall(nx.home?O:M,nx.home?M:O,nx.kind,nx.label).say);
+  closeHub();
   openPregame({kicker:nx.label, title:nx.home?`${O.name} at ${M.name}`:`${M.name} at ${O.name}`,
     sub:`<b>${esc(M.name)}</b> ${rec(M.id)} · <b>${esc(O.name)}</b> ${rec(O.id)}${nx.series?` · ${esc(seriesText(nx.series))}`:''}`,
     venue:nx.kind==='po'?`${nx.home?'Home':'On the road'} · ${nx.home?'you bat last':'you bat first'} · the higher seed has home field`:`${nx.home?'Home game · you bat last':'Road game · you bat first'} · set on the schedule before the season`,
@@ -4003,7 +4025,7 @@ function paintAnn(){ $('annBtn').textContent=ann.on||sfx.on||sfx.crowdOn?'Audio'
 paintAnn();
 /* the crowd is only heard while a game is on screen: not on the menu, the franchise hub or the TV show, and it fades out after the final out */
 const crowdLive=()=>!!G&&!G.over&&$('menu').classList.contains('out')&&$('hub').hidden&&!document.querySelector('div.tv')&&!document.hidden;
-setInterval(()=>{ const live=crowdLive(); sfx.crowd(live?(ann.busy?.55:1):0, live?1.2:(G&&G.over?4:1.2)); },500);
+setInterval(()=>{ const live=crowdLive(); if(!live) sfx.stopStretch(); sfx.crowd(live?(ann.busy?.55:1):0, live?1.2:(G&&G.over?4:1.2)); },500);
 $('annBtn').addEventListener('click',e=>{ e.stopPropagation(); annPanel(); });
 /* audio settings: the announcer, the sound effects and the crowd, each with its own switch and volume */
 function annPanel(){
@@ -4024,9 +4046,8 @@ function annPanel(){
   setTimeout(()=>document.addEventListener('click',function out(ev){ if(!pop.isConnected){ document.removeEventListener('click',out); return; } if(!pop.contains(ev.target)){ pop.remove(); document.removeEventListener('click',out); } }),0);
 }
 /* start fetching the studio voice on the first tap, so it's ready by the first pitch */
-document.addEventListener('pointerdown',()=>{ ann.unlock(); ann.warm(); },{once:true});
+document.addEventListener('pointerdown',()=>ann.unlock(),{once:true});
 document.addEventListener('keydown',()=>ann.unlock(),{once:true});
-setTimeout(()=>ann.warm(),800);
 paintAnn();
 function paintModeTabs(){ document.querySelectorAll('.tab[data-mode]').forEach(b=>{ const on=b.dataset.mode===mode; b.setAttribute('aria-selected',on); b.tabIndex=on?0:-1; }); }
 function setMode(m){
