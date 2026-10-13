@@ -1625,10 +1625,12 @@ const TN = t => G.teams[t].name;
 const sfx=(()=>{
   /* the sound effects are built live with Web Audio: a wood bat, a leather mitt, a ballpark organ. The crowd is recorded:
      light chatter from hundreds of real voices (audio/crowd-bed.mp3) on its own volume, heard only while a game is on screen. */
-  let ctx=null, on=true, vol=.9, buf=null, pink=null, out=null, room=null;
-  let crowdOn=true, crowdVol=.7, cbus=null, bedSrc=null, bedG=null, bedAt=-1, cLoad=null; const CB={};
+  /* the mix: sound effects top out at 55%, the crowd at 35% (the announcer at 60%), and each starts at its top */
+  const FX_MAX=.55, CROWD_MAX=.35;
+  let ctx=null, on=true, vol=FX_MAX, buf=null, pink=null, out=null, room=null;
+  let crowdOn=true, crowdVol=CROWD_MAX, cbus=null, bedSrc=null, bedG=null, bedAt=-1, cLoad=null; const CB={};
   try{ on=localStorage.getItem('fdl-sound')!=='off'; crowdOn=localStorage.getItem('fdl-crowd')!=='off';
-    const v=parseFloat(localStorage.getItem('fdl-sfx-vol')); if(v>=0&&v<=1) vol=v; const c=parseFloat(localStorage.getItem('fdl-crowd-vol')); if(c>=0&&c<=1) crowdVol=c; }catch(e){}
+    const v=parseFloat(localStorage.getItem('fdl-sfx-vol2')); if(v>=0) vol=Math.min(FX_MAX,v); const c=parseFloat(localStorage.getItem('fdl-crowd-vol2')); if(c>=0) crowdVol=Math.min(CROWD_MAX,c); }catch(e){}
   function ac(){ return on?ctxOK():null; }
   function ctxOK(){
     try{
@@ -1689,9 +1691,9 @@ const sfx=(()=>{
   return {
     get on(){ return on; },
     set(v){ on=v; try{ localStorage.setItem('fdl-sound',v?'on':'off'); }catch(e){} if(v) ac(); },
-    get vol(){ return vol; }, setVol(v){ vol=Math.max(0,Math.min(1,v)); if(out) out.gain.value=vol; try{ localStorage.setItem('fdl-sfx-vol',vol); }catch(e){} },
+    maxVol:FX_MAX, get vol(){ return vol; }, setVol(v){ vol=Math.max(0,Math.min(FX_MAX,v)); if(out) out.gain.value=vol; try{ localStorage.setItem('fdl-sfx-vol2',vol); }catch(e){} },
     get crowdOn(){ return crowdOn; }, setCrowd(v){ crowdOn=v; try{ localStorage.setItem('fdl-crowd',v?'on':'off'); }catch(e){} if(!v) bedTo(0,.6); },
-    get crowdVol(){ return crowdVol; }, setCrowdVol(v){ crowdVol=Math.max(0,Math.min(1,v)); if(cbus) cbus.gain.value=crowdVol; try{ localStorage.setItem('fdl-crowd-vol',crowdVol); }catch(e){} },
+    maxCrowd:CROWD_MAX, get crowdVol(){ return crowdVol; }, setCrowdVol(v){ crowdVol=Math.max(0,Math.min(CROWD_MAX,v)); if(cbus) cbus.gain.value=crowdVol; try{ localStorage.setItem('fdl-crowd-vol2',crowdVol); }catch(e){} },
     /* the crowd is heard only during a game: the page calls this a couple of times a second (level 0 = fade it out) */
     crowd(level,sec=1.5){ if(level>0&&!ctx&&navigator.userActivation&&!navigator.userActivation.hasBeenActive) return; if(level>0||bedSrc) bedTo(level,sec); },
     unlock(){ if(ctxOK()&&crowdOn) loadCrowd().catch(()=>{}); },
@@ -1727,8 +1729,9 @@ const ann=(()=>{
   /* the studio voices: Kokoro, an open-source neural voice model that runs right in the browser */
   const STUDIO=[['piper:ryan','Ryan · American, natural (default, works on every device)'],['am_fenrir','Fenrir · American, deep (HD, needs a fast computer)'],['am_michael','Michael · American, warm (HD)'],['am_puck','Puck · American, upbeat'],['am_eric','Eric · American'],['am_echo','Echo · American'],['am_liam','Liam · American'],['am_onyx','Onyx · American'],['bm_george','George · British'],['bm_fable','Fable · British'],['bm_lewis','Lewis · British']];
   const mobile=/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent||'');
-  let voice=null, next=null, vol=0.8, want='', engine='studio', sv='piper:ryan', devTok=0, fakeT=0, engineChosen=false;
-  try{ const v=parseFloat(localStorage.getItem('fdl-ann-vol')); if(v>=0&&v<=1) vol=v; want=localStorage.getItem('fdl-ann-voice')||''; const e=localStorage.getItem('fdl-ann-engine'); if(e==='studio'||e==='device'){ engine=e; engineChosen=true; } const s=localStorage.getItem('fdl-ann-sv'); if(STUDIO.some(x=>x[0]===s)) sv=s; }catch(e){}
+  const ANN_MAX=.6; // the announcer tops out at 60% and starts there
+  let voice=null, next=null, vol=ANN_MAX, want='', engine='studio', sv='piper:ryan', devTok=0, fakeT=0, engineChosen=false;
+  try{ const v=parseFloat(localStorage.getItem('fdl-ann-vol2')); if(v>=0) vol=Math.min(ANN_MAX,v); want=localStorage.getItem('fdl-ann-voice')||''; const e=localStorage.getItem('fdl-ann-engine'); if(e==='studio'||e==='device'){ engine=e; engineChosen=true; } const s=localStorage.getItem('fdl-ann-sv'); if(STUDIO.some(x=>x[0]===s)) sv=s; }catch(e){}
   const MATURE=/guy|christopher|roger|davis|andrew|eric|steffan|evan|nathan|aaron|tom\b/i;
   const BROADCAST=[/christopher/i,/\bguy\b/i,/davis/i,/roger/i,/andrew/i,/brian/i,/\beric\b/i,/steffan/i,/evan/i,/nathan/i,/aaron/i,/\btom\b/i];
   const bcast=n=>{ const i=BROADCAST.findIndex(r=>r.test(n)); return i<0?0:60-i*4; };
@@ -1904,7 +1907,7 @@ onmessage=e=>{ const m=e.data; if(m.type==='cancel'){ cut=Math.max(cut,m.upto); 
     dropAll, unlock(){ actx(); try{ if(S&&!S.speaking){ const u=new SpeechSynthesisUtterance(' '); u.volume=0; S.speak(u); } }catch(e){} },
     avg:x=>'\u0001'+Math.round(Math.max(0,Math.min(1,x))*1000)+'\u0001',
     get voiceName(){ return voice?voice.name:''; }, get isMark(){ return !!voice&&MARK.test(voice.name); },
-    get vol(){ return vol; }, setVol(v){ vol=Math.max(0,Math.min(1,v)); if(gain) gain.gain.value=vol; try{ localStorage.setItem('fdl-ann-vol',vol); }catch(e){} },
+    maxVol:ANN_MAX, get vol(){ return vol; }, setVol(v){ vol=Math.max(0,Math.min(ANN_MAX,v)); if(gain) gain.gain.value=vol; try{ localStorage.setItem('fdl-ann-vol2',vol); }catch(e){} },
     voices:()=>list().map(v=>({name:v.name,lang:v.lang,human:HUMAN.test(v.name)})),
     setVoice(n){ want=n; try{ localStorage.setItem('fdl-ann-voice',n); }catch(e){} pickVoice(); },
     get engine(){ return autoDev()?'device':engine; }, setEngine(e){ engine=e; engineChosen=true; hush(); dropAll(); try{ localStorage.setItem('fdl-ann-engine',e); }catch(x){} if(e==='studio'){ if(status.state==='failed'){ status.state='idle'; status.err=''; } warm(); } notify(); },
@@ -4006,9 +4009,9 @@ $('annBtn').addEventListener('click',e=>{ e.stopPropagation(); annPanel(); });
 function annPanel(){
   let pop=document.querySelector('.annpop'); if(pop){ pop.remove(); return; }
   pop=document.createElement('div'); pop.className='annpop'; pop.setAttribute('role','dialog'); pop.setAttribute('aria-label','Audio');
-  const row=(id,label,on,v)=>`<div class="arow${on?'':' off'}" id="${id}R"><span class="alab">${label}</span><button class="btn small" type="button" id="${id}" aria-pressed="${on}">${on?'On':'Off'}</button>
-<span class="arng"><input type="range" id="${id}V" min="0" max="100" step="5" value="${Math.round(v*100)}" aria-label="${label} volume"><span class="anum" id="${id}N">${Math.round(v*100)}</span></span></div>`;
-  pop.innerHTML=`<b class="atitle">Audio</b>${row('apAnn','Announcer',ann.on,ann.vol)}${row('apFx','Sound effects',sfx.on,sfx.vol)}${row('apCr','Crowd',sfx.crowdOn,sfx.crowdVol)}
+  const row=(id,label,on,v,max)=>`<div class="arow${on?'':' off'}" id="${id}R"><span class="alab">${label}</span><button class="btn small" type="button" id="${id}" aria-pressed="${on}">${on?'On':'Off'}</button>
+<span class="arng"><input type="range" id="${id}V" min="0" max="${Math.round(max*100)}" step="5" value="${Math.round(v*100)}" aria-label="${label} volume"><span class="anum" id="${id}N">${Math.round(v*100)}</span></span></div>`;
+  pop.innerHTML=`<b class="atitle">Audio</b>${row('apAnn','Announcer',ann.on,ann.vol,ann.maxVol)}${row('apFx','Sound effects',sfx.on,sfx.vol,sfx.maxVol)}${row('apCr','Crowd',sfx.crowdOn,sfx.crowdVol,sfx.maxCrowd)}
 <div class="row"><button class="btn small" type="button" id="apX">Done</button></div>`;
   document.body.appendChild(pop);
   const r=$('annBtn').getBoundingClientRect(); pop.style.top=Math.max(8,Math.min(r.bottom+8,innerHeight-pop.offsetHeight-8))+'px'; pop.style.left=Math.max(16,Math.min(r.left,innerWidth-pop.offsetWidth-16))+'px';
