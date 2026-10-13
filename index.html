@@ -523,6 +523,10 @@ button,select,input{font:inherit;color:inherit}
 .troster li span:first-child{font-family:var(--f-num);font-size:11px;color:var(--muted);width:14px;text-align:right}
 .troster li .ab{margin-left:auto}
 .recs{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.hof{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.plq{border:1px solid rgba(255,200,97,.45);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:3px;background:linear-gradient(160deg,rgba(255,200,97,.14),rgba(6,11,22,.4))}
+.plq b{color:#ffd77e;font-size:15px}.plq small{color:var(--muted);font-size:12px}.plq span{font-size:13px;color:var(--cream)}
+.plq .hon{color:#ffd77e;font-size:12px}
 .rec{border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
 .rec .aside{color:var(--muted);font-size:11px}
 .rec b{font-family:var(--f-led);font-weight:400;font-size:26px;line-height:1.1;color:#ffd77e;text-shadow:0 0 4px rgba(255,190,80,.45)}
@@ -2300,7 +2304,7 @@ ${fr?`<p class="frnote">${fr}</p>`:''}
 function gameOver(){ if(FR) frGameOver(); }
 
 /* ---------- franchise mode: six teams, 32-game season, best-of-3 semis, best-of-7 Floodlight Series, saved in this browser ---------- */
-const LEAGUE_HISPANIC=20, LEAGUE_JAPANESE=2, ROOKIE_AGE=18, RETIRE_AGE=40, FKEY='fdl-franchise-v1', SEASON_GAMES=32, MIN_PA=80;
+const LEAGUE_HISPANIC=20, LEAGUE_JAPANESE=2, ROOKIE_AGE=18, RETIRE_AGE=40, HOF_CLASS=10, FKEY='fdl-franchise-v1', SEASON_GAMES=32, MIN_PA=80;
 const CITIES=['Tacoma','Spokane','Boise','Yakima','Eugene','Salem','Bellingham','Olympia','Missoula','Reno','Anchorage','Fresno','Bend','Medford','Billings','Juneau','Everett','Sacramento','Pocatello','Walla Walla'];
 const NICKS=['Night Owls','Lamplighters','Comets','Ospreys','Lumberjacks','Sea Lions','Bighorns','Rattlers','Riveters','Moonshots','Beacons','Fireflies','Grizzlies','Harbor Hawks','Ironworkers','Rockhounds','Timber Wolves','Bluebirds','Gold Miners','Starlights','Thunderheads','Switchbacks'];
 const FIRST_M=['Abe','Benny','Cal','Dutch','Eddie','Frankie','Gabe','Hal','Ike','Joey','Kip','Lou','Mickey','Nate','Ozzie','Pete','Rusty','Sal','Tex','Vic','Woody','Zack','Buck','Dom','Marcus','Dante','Ray','Bo','Cole','Finn','Ollie','Mack','Andre','Theo','Rocco','Jesse'];
@@ -2538,8 +2542,9 @@ function frSimUser(){
 function frSimToPlayoffs(){ if(!F||F.live) return; let w=0,l=0; const before=Object.assign({},F.rec[F.userId]); while(F.phase==='reg') frFinishDay(null); const r=F.rec[F.userId]; hubMsg=`Simulated the rest of the regular season: ${r.w-before.w}–${r.l-before.l} the rest of the way.`; frSave(); renderHub(); }
 function frSimPlayoffs(){ if(!F||F.live) return; const was=F.phase; let g=0; while(F.phase==='post' && g++<40) frPlayoffDay(null); hubMsg='Simulated the rest of the playoffs.'; frSave(); renderHub(); maybeTrophy(was); }
 function frNextSeason(){
-  const gone=frRetire(); F.season++; frNewSeason(); nwRetire(gone); F.rookies=gone.map(g=>g.rookie);
-  hubMsg=`Season ${F.season} is set. Same six teams, a fresh 32-game schedule.`+(gone.length?` ${gone.length} player${gone.length===1?'':'s'} retired at ${RETIRE_AGE} and ${gone.length===1?'a rookie takes that spot':'rookies take their spots'}. <button class="btn small" type="button" data-act="rookies">Name the rookies</button>`:'');
+  const gone=frRetire(), cls=frInduct(gone); F.season++; frNewSeason(); nwRetire(gone); nwHof(cls); F.rookies=gone.map(g=>g.rookie);
+  hubMsg=`Season ${F.season} is set. Same six teams, a fresh 32-game schedule.`+(gone.length?` ${gone.length} player${gone.length===1?'':'s'} retired at ${RETIRE_AGE} and ${gone.length===1?'a rookie takes that spot':'rookies take their spots'}. <button class="btn small" type="button" data-act="rookies">Name the rookies</button>`:'')
+    +(cls.length?` ${cls.length} ${cls.length===1?'legend was':'legends were'} voted into the Hall of Fame. <button class="btn small" type="button" data-act="hof">See the Hall of Fame</button>`:'');
   frSave(); renderHub();
 }
 /* a new 18-year-old who replaces a retiring player: same team, same lineup spot and ability, and the same background so the league's makeup holds */
@@ -2564,6 +2569,26 @@ function frRetire(){
   }
   prepCards(F.ids.map(id=>F.teams[id]));
   return out;
+}
+/* career honors for a player who spent seasons a..b with team tid */
+function frHonors(n,tid,a,b){
+  const o={mvp:0,hrk:0,bat:0,smvp:0,rings:0};
+  for(const h of F.history){ if(h.season<a||h.season>b) continue; const w=h.awards||{};
+    if(w.mvp&&w.mvp.name===n) o.mvp++; if(w.hr&&w.hr.name===n) o.hrk++; if(w.bat&&w.bat.name===n) o.bat++;
+    if(h.smvp&&h.smvp.n===n) o.smvp++; if(h.champ===tid) o.rings++; }
+  return o;
+}
+function honorsText(o){ const t=[], p=(k,one,many)=>{ if(o[k]) t.push(o[k]===1?one:`${o[k]}× ${many}`); };
+  p('mvp','MVP','MVP'); p('hrk','Home run title','home run champ'); p('bat','Batting title','batting champ'); p('smvp','Series MVP','Series MVP'); if(o.rings) t.push(o.rings===1?'1 title':`${o.rings} titles`); return t; }
+/* the Hall of Fame: at each retirement stage the best HOF_CLASS careers among the retirees get in */
+function frInduct(gone){
+  F.hof=F.hof||[]; if(!gone.length) return [];
+  const yr=F.season, cand=gone.map(g=>{ const R=F.retired.find(r=>r.name===g.old&&r.season===yr), c=F.career[g.old]; if(!R||!c||!c.PA) return null;
+    const hon=frHonors(g.old,g.tid,yr-c.seasons+1,yr);
+    const score=c.H+c.HR*2+c.RBI+c.R*0.5+c.SB*0.5+hon.mvp*60+hon.hrk*30+hon.bat*30+hon.smvp*20+hon.rings*10;
+    return {name:g.old,tid:g.tid,team:R.team,num:R.num,ab:R.ab,cls:yr,seasons:c.seasons,G:c.G,H:c.H,HR:c.HR,RBI:c.RBI,R:c.R,SB:c.SB,avg:f3(avg(c)),hon,score}; }).filter(Boolean);
+  const cls=cand.sort((a,b)=>b.score-a.score).slice(0,HOF_CLASS); cls.forEach((x,i)=>x.rank=i+1);
+  F.hof.push(...cls); return cls;
 }
 /* rename this year's rookies */
 function frEditRookies(){
@@ -2597,7 +2622,7 @@ function frExit(){ autoSave(); frMode=false; FR=null; setFrUI(); closeHub(); set
 /* ---------- the hub ---------- */
 function openHub(){ if(busy) return; const h=$('hub'); h.hidden=false; h.classList.add('anim'); renderHub(); setTimeout(()=>h.classList.remove('anim'),300); document.body.style.overflow='hidden'; }
 function closeHub(){ $('hub').hidden=true; document.body.style.overflow=''; }
-const TABS=[['home','Home'],['news','News'],['standings','Standings'],['schedule','Schedule'],['stats','Player stats'],['records','Records'],['champs','Champions'],['teams','Teams'],['settings','Settings']];
+const TABS=[['home','Home'],['news','News'],['standings','Standings'],['schedule','Schedule'],['stats','Player stats'],['records','Records'],['hof','Hall of Fame'],['champs','Champions'],['teams','Teams'],['settings','Settings']];
 function renderHub(){
   const hub=$('hub');
   if(F) nwInit();
@@ -2630,6 +2655,7 @@ function hubAct(a,el){
   else if(a==='export') openSaves();
   else if(a==='names') frEditNames();
   else if(a==='rookies') frEditRookies();
+  else if(a==='hof'){ hubTab='hof'; renderHub(); }
   else if(a==='reset'){ if(confirm(`Delete Franchise ${frSlot} and all its seasons, stats and records? Your other franchises are not touched. This cannot be undone.`)){ try{ localStorage.removeItem(frKey(frSlot)); }catch(e){} F=null; frMode=false; FR=null; setFrUI(); startExhibition(); renderHub(); } }
   else if(a==='exit') frExit();
 }
@@ -2640,6 +2666,7 @@ function hubBody(){
     case 'news': return newsHTML();
     case 'stats': return statsHTML();
     case 'records': return recordsHTML();
+    case 'hof': return hofHTML();
     case 'champs': return champsHTML();
     case 'teams': return teamsHTML();
     case 'settings': return settingsHTML();
@@ -2723,10 +2750,18 @@ ${mineH.length?`<div class="tscroll"><table class="tbl"><thead><tr><th class="l"
 ${careerLeadersHTML()}
 <div class="hcard"><h4>League single-season records</h4>${cards?`<div class="recs">${cards}</div>`:'<p class="empty2">Records are set when a season ends.</p>'}<p class="legend">Average and OPS need ${MIN_PA} plate appearances.</p></div>`;
 }
+function hofHTML(){
+  const H=F.hof||[];
+  if(!H.length) return `<div class="hcard"><h4>Floodlight Hall of Fame</h4><p class="empty2">Nobody has been inducted yet. Players retire at ${RETIRE_AGE}, and each time a group retires, the best ${HOF_CLASS} careers among them are voted in.</p></div>`;
+  const classes=[...new Set(H.map(x=>x.cls))].sort((a,b)=>b-a);
+  return `<div class="hcard"><h4>Floodlight Hall of Fame</h4><p class="legend">${H.length} member${H.length===1?'':'s'}. Each retirement class sends at most ${HOF_CLASS} players in, picked on career hits, home runs, RBI, runs, steals, awards and championships.</p></div>`
+    +classes.map(y=>`<div class="hcard"><h4>Class of Season ${y}</h4><div class="hof">${H.filter(x=>x.cls===y).sort((a,b)=>a.rank-b.rank).map(x=>{ const hn=honorsText(x.hon);
+      return `<div class="plq"><b>${F.teams[x.tid]?tdot(x.tid):''}${esc(x.name)}</b><small>#${x.num} · ${esc(x.team)} · ${x.seasons} seasons</small><span>${x.avg} · ${x.H} H · ${x.HR} HR · ${x.RBI} RBI</span>${hn.length?`<span class="hon">${hn.join(' · ')}</span>`:''}</div>`; }).join('')}</div></div>`).join('');
+}
 function careerLeadersHTML(){
-  const C=careerNow(), ret=new Set((F.retired||[]).map(r=>r.name)), act=new Set(F.ids.flatMap(id=>F.teams[id].lineup));
+  const C=careerNow(), ret=new Set((F.retired||[]).map(r=>r.name)), hof=new Set((F.hof||[]).map(x=>x.name));
   const col=(k,lbl)=>{ const top=Object.entries(C).filter(([,s])=>s[k]>0).sort((a,b)=>b[1][k]-a[1][k]).slice(0,5);
-    return `<div><span class="aside" style="color:var(--flood)">${lbl}</span>${top.length?top.map(([n,s],i)=>`<div>${i+1}. ${F.teams[s.team]?tdot(s.team):''}${esc(n)} <b>${s[k]}</b>${ret.has(n)?' <small style="color:var(--muted)">retired</small>':act.has(n)?'':''}</div>`).join(''):'<span class="empty2">None yet</span>'}</div>`; };
+    return `<div><span class="aside" style="color:var(--flood)">${lbl}</span>${top.length?top.map(([n,s],i)=>`<div>${i+1}. ${F.teams[s.team]?tdot(s.team):''}${esc(n)} <b>${s[k]}</b>${hof.has(n)?' <small style="color:#ffd77e">Hall of Fame</small>':ret.has(n)?' <small style="color:var(--muted)">retired</small>':''}</div>`).join(''):'<span class="empty2">None yet</span>'}</div>`; };
   return `<div class="hcard"><h4>All-time career leaders</h4><div class="awards">${col('HR','Home runs')}${col('H','Hits')}${col('RBI','RBI')}</div><p class="legend">Every franchise player starts at ${ROOKIE_AGE} and retires at ${RETIRE_AGE}, so careers are the same length and comparable.</p></div>`;
 }
 function champsHTML(){
@@ -2975,6 +3010,10 @@ function nwRetire(gone){
     const line=c&&c.PA?` ${yrs} season${yrs===1?'':'s'}: ${c.H} hits, ${c.HR} home runs, ${c.RBI} RBI and a ${f3(avg(c))} career average.`:'';
     nwAdd(g.tid===u?'lore':'league',`${g.old} retires`,`${g.old} hangs up the spikes at ${R?R.age:RETIRE_AGE}${R?`, after wearing #${R.num} for the ${nwN(g.tid)}`:''}.${line}\nRookie ${g.rookie}, ${ROOKIE_AGE}, from ${B.town}, takes the open spot. ${B.back}.`,{w:'Preseason',t:[g.tid],p:{n:g.rookie,tid:g.tid},pr:g.tid===u?4:2});
   }
+}
+function nwHof(cls){
+  if(!cls.length) return; const u=F.userId, top=cls[0], mine=cls.filter(x=>x.tid===u);
+  nwAdd('lore',`Hall of Fame Class of Season ${cls[0].cls}`,`${cls.length} legends are headed to the Floodlight Hall of Fame. Leading the class: ${top.name} of the ${nwN(top.tid)}, ${top.H} hits, ${top.HR} home runs and ${top.RBI} RBI over ${top.seasons} seasons.\nThe class: ${cls.map(x=>x.name).join(', ')}.${mine.length?`\n${mine.length===1?`${mine[0].name} goes in`:`${mine.length} of them go in`} wearing your colors.`:''}`,{w:'Preseason',t:[...new Set(cls.map(x=>x.tid))],p:{n:top.name,tid:top.tid},pr:5});
 }
 function nwPlayoffs(){
   nwInit(); const s=F.po.seeds, u=F.userId, A=F.awards||{}; F.nx.fs={};
