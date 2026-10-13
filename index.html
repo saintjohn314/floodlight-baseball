@@ -858,7 +858,7 @@ button,select,input{font:inherit;color:inherit}
 <p class="mtag">Strategy baseball with dice, action cards and a lit-up mini stadium.</p>
 <button class="btn primary mplay" id="mPlay" type="button">Play ball</button>
 <p class="mresume" id="mResume" hidden></p>
-<nav class="mlinks" aria-label="Menu options"><button type="button" data-m="quick">New quick game</button><button type="button" data-m="fr">Franchise</button><button type="button" data-m="saves">Save / Load</button><button type="button" data-m="how">How to play</button></nav>
+<nav class="mlinks" aria-label="Menu options"><button type="button" data-m="quick">New quick game</button><button type="button" data-m="fr">Franchise</button><button type="button" data-m="qsave" title="Save everything right now. Load it from Save / Load.">Quick save</button><button type="button" data-m="saves">Save / Load</button><button type="button" data-m="how">How to play</button></nav>
 </div>
 </div>
 <div class="ov" id="ov" hidden></div>
@@ -2346,11 +2346,11 @@ function renderHub(){
   if(!F){ hub.innerHTML=`<div class="hubpanel" role="dialog" aria-modal="true" aria-label="Franchise"><div class="hubhead"><span class="logo">Floodlight Baseball</span><h3>Franchise</h3><button class="btn small x" type="button" id="hubX">Close</button></div><div class="hubbody">${slotBarHTML()}${hubMsg?`<p class="frnote">${hubMsg}</p>`:''}${newFranchiseHTML()}</div></div>`;
     hubMsg=''; $('hubX').onclick=closeHub; wireNewFranchise(); wireSlots(); return; }
   hub.innerHTML=`<div class="hubpanel" role="dialog" aria-modal="true" aria-label="Franchise hub">
-<div class="hubhead"><span class="logo">Floodlight Baseball</span><h3>Franchise · Season ${F.season}</h3><button class="btn small x" type="button" id="hubX">${frMode?'Back to the stadium':'Close'}</button></div>
+<div class="hubhead"><span class="logo">Floodlight Baseball</span><h3>Franchise · Season ${F.season}</h3><button class="btn small x" type="button" id="hubQS" title="Save everything right now. Load it from Save / Load.">Quick save</button><button class="btn small" type="button" id="hubX">${frMode?'Back to the stadium':'Close'}</button></div>
 <nav class="hubtabs" role="tablist">${TABS.map(([k,l])=>`<button type="button" role="tab" data-ht="${k}" aria-selected="${hubTab===k}">${l}</button>`).join('')}</nav>
 <div class="hubbody" id="hubBody">${slotBarHTML()}${hubMsg?`<p class="frnote">${hubMsg}</p>`:''}${hubBody()}</div></div>`;
   hubMsg='';
-  $('hubX').onclick=closeHub;
+  $('hubX').onclick=closeHub; $('hubQS').onclick=e=>quickSaveNow(e.currentTarget);
   hub.querySelectorAll('[data-ht]').forEach(b=>b.onclick=()=>{ hubTab=b.dataset.ht; renderHub(); });
   hub.onclick=e=>{ if(e.target===hub) closeHub(); const a=e.target.closest('[data-act]'); if(a) hubAct(a.dataset.act,a); };
   hub.querySelectorAll('select[data-sel]').forEach(s=>s.onchange=()=>{ if(s.dataset.sel==='scope') statScope=s.value; else if(s.dataset.sel==='spot') newsSpot=s.value; else statTeam=s.value; renderHub(); });
@@ -2824,6 +2824,12 @@ function applySnap(b){
 }
 const stamp=t=>new Date(t).toLocaleString([], {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
 function slotRead(i){ return jparse(lsGet('fdl-slot-'+i)); }
+/* one-click save of everything to its own spot; load it from Save / Load */
+function quickSaveNow(btn){
+  if(busy) return; const ok=lsSet('fdl-quicksave',JSON.stringify(snapshot()));
+  if(btn){ const t=btn.dataset.lbl||btn.textContent; btn.dataset.lbl=t; btn.textContent=ok?'Saved ✓':'Could not save'; clearTimeout(btn._qs); btn._qs=setTimeout(()=>{ btn.textContent=t; },1800); }
+  return ok;
+}
 
 /* save codes: the whole save, zipped down into text you can paste anywhere */
 const b64=u8=>{ let s=''; for(let i=0;i<u8.length;i+=0x8000) s+=String.fromCharCode.apply(null,u8.subarray(i,i+0x8000)); return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); };
@@ -2865,6 +2871,7 @@ function openSaves(firstMsg){
 ${msg?`<p class="frnote" role="status">${msg}</p>`:''}
 <h4 class="svh">Franchises · up to 3</h4><ol class="slots">${[1,2,3].map(frRow).join('')}</ol>
 <p class="svsub">${frFull()?'All three slots are full. To start a fourth franchise, tap <b>New here</b> on the one you want to replace.':'Tap <b>Start new franchise</b> on an empty slot. Each franchise keeps its own seasons, stats and records.'}</p>
+<h4 class="svh">Quick save</h4><ol class="slots">${(()=>{ const q=jparse(lsGet('fdl-quicksave')); return `<li class="slot"><span class="sn">Q</span><span class="sd">${q?`<b>${esc(describeSnap(q))}</b><small>Saved ${esc(stamp(q.at))}</small>`:'<b class="empty2">No quick save yet</b>'}</span><span class="sb"><button class="btn small" type="button" data-sv="qsave">Quick save</button>${q?'<button class="btn small" type="button" data-sv="qload">Load</button>':''}</span></li>`; })()}</ol>
 <h4 class="svh">Save slots on this device</h4><ol class="slots">${[1,2,3].map(slotRow).join('')}</ol>
 <h4 class="svh">Move your save to another phone or computer</h4>
 <div class="svgrid"><div class="svbox"><b>Save file</b><p>Download a save file (on a phone you can send it to yourself or keep it in Files / Drive), then open it on the other device.</p><div class="ovbtns"><button class="btn" type="button" data-sv="file">Save file</button><label class="btn" style="cursor:pointer;text-align:center">Open save file<input type="file" id="svFile" accept="application/json,.json,text/plain" hidden></label></div></div>
@@ -2882,6 +2889,8 @@ ${msg?`<p class="frnote" role="status">${msg}</p>`:''}
     const b=t.closest('[data-sv]'); if(!b) return; const a=b.dataset.sv, i=b.dataset.i;
     if(a==='frplay'){ close(); frGo(+i); return; }
     if(a==='frnew'){ const n=+i, o=n===frSlot?F:frPeek(n); if(o){ const T=o.teams[o.userId], r=o.rec[o.userId]; if(!confirm(`Start a new franchise in slot ${n}? ${T.name} (Season ${o.season}, ${r.w}–${r.l}) and all its stats and records will be deleted. This cannot be undone.`)) return; } close(); frNewIn(n); return; }
+    if(a==='qsave'){ draw(quickSaveNow()?'Quick saved.':'Could not save: this browser’s storage is full or blocked.'); return; }
+    if(a==='qload'){ const q=jparse(lsGet('fdl-quicksave')); if(q && confirm('Load your quick save? Your current game will be replaced.')){ applySnap(q); close(); toast(G.half,'Quick save loaded.','abil'); } return; }
     if(a==='save'){ const ok=lsSet('fdl-slot-'+i,JSON.stringify(snapshot())); draw(ok?`Saved to slot ${i}.`:'Could not save: this browser’s storage is full or blocked. Try a save file instead.'); }
     else if(a==='load'){ const s=slotRead(i); if(s && confirm(`Load slot ${i}? Your current game will be replaced (save it to another slot first if you want to keep it).`)){ applySnap(s); close(); toast(G.half,`Loaded slot ${i}.`,'abil'); } }
     else if(a==='del'){ if(confirm(`Delete the save in slot ${i}?`)){ lsDel('fdl-slot-'+i); draw(`Slot ${i} cleared.`); } }
@@ -3180,7 +3189,7 @@ function closeMenu(){
 }
 $('mPlay').addEventListener('click',()=>{ closeMenu(); sfx.power(); });
 document.querySelector('.mlinks').addEventListener('click',e=>{
-  const b=e.target.closest('[data-m]'); if(!b) return; const m=b.dataset.m; closeMenu(); pendingToast='';
+  const b=e.target.closest('[data-m]'); if(!b) return; const m=b.dataset.m; if(m==='qsave'){ quickSaveNow(b); return; } closeMenu(); pendingToast='';
   if(m==='quick'){ if(frMode) quickGame(); else { startExhibition(); toast(G.half,'New quick game. Press Roll to play ball.','abil'); } }
   else if(m==='fr'){ if(F&&F.live&&!frMode) frResume(); else openHub(); }
   else if(m==='saves') openSaves();
