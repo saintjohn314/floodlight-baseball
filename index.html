@@ -944,7 +944,7 @@ button,select,input{font:inherit;color:inherit}
 <li><b>Single:</b> runners on second and third score. Runner on first goes to second.</li>
 <li><b>Double:</b> runners on second and third score. Runner on first goes to third.</li>
 <li><b>Triple or home run:</b> everyone on base scores.</li>
-<li id="hrRule"><b>Roll for Home Run:</b> roll the D12 again. K, Out or Double Play means it's caught at the wall (batter out, runners stay). Anything else is a home run. A <b>Slugger</b> can skip the second roll once a game.</li>
+<li id="hrRule"><b>Roll for Home Run:</b> roll the D12 again. K, Out, Double Play or Walk means it's caught at the wall (batter out, runners stay). Anything else is a home run. A <b>Slugger</b> can skip the second roll once a game.</li>
 <li id="triRule"><b>Roll for Triple:</b> roll the D12 again. Roll for Triple again means a triple. Anything else, the batter is thrown out at third.</li>
 <li id="dpRule"><b>Double play:</b> with a runner on first and fewer than 2 outs, the batter and the runner on first are both out. Otherwise it's a normal out.</li>
 <li><b>K and Out:</b> runners stay put.</li>
@@ -1010,7 +1010,7 @@ const isRoll = o => o==='T?'||o==='H?';
 const kind = o => isRoll(o)?'try':o==='K'?'k':(isOut(o)||o==='FC')?'out':o==='BB'?'walk':'hit';
 const MODES = {
   sim:{name:'Simulation · D12', die:'d12', faces:['T?','K','K','OUT','OUT','OUT','OUT','DP','BB','1B','2B','H?'],
-    how:'A 12-sided die with a result on every face. Two faces make you roll again. Roll for Triple: land it a second time for a triple, anything else and the batter is thrown out at third. Roll for Home Run: roll a K, Out or Double Play and it is caught at the wall; anything else is gone.'},
+    how:'A 12-sided die with a result on every face. Two faces make you roll again. Roll for Triple: land it a second time for a triple, anything else and the batter is thrown out at third. Roll for Home Run: roll a K, Out, Double Play or Walk and it is caught at the wall; anything else is gone.'},
   arcade:{name:'Arcade · D8', die:'d8', faces:['K','OUT','OUT','OUT','OUT','1B','2B','HR'],
     how:'An 8-sided die with a result on every face. Half the faces are outs and one in eight is a home run, so games run fast and score big.'}
 };
@@ -1252,7 +1252,7 @@ const abOf = (G,t,name) => G.teams[t].ab[name]||null;
 const abReady = (G,t,name,k) => !!name && abOf(G,t,name)===k && !G.abUsed[t][name];
 function resolveFaces(o,o2){
   if(o==='T?'){ const made=o2==='T?'; return {eff:made?'3B':'OUT', tri:{second:o2,made}}; }
-  if(o==='H?'){ const made=!isOut(o2); return {eff:made?'HR':'OUT', hrr:{second:o2,made}}; }
+  if(o==='H?'){ const made=!isOut(o2)&&o2!=='BB'; return {eff:made?'HR':'OUT', hrr:{second:o2,made}}; } // on the home run reroll a Walk is caught at the wall too
   return {eff:o};
 }
 function forceUp(b,sc){ if(!b[0]) return; if(b[1]){ if(b[2]) sc.push(b[2]); b[2]=b[1]; } b[1]=b[0]; b[0]=null; } // batter out, forced runners move up
@@ -2445,7 +2445,7 @@ async function liveRoll(t,batter){
   }
   if(isRoll(o)){
     res.className='result hit'; res.textContent=o==='T?'?'Roll for triple!':'Roll for home run!';
-    $('detail').innerHTML= o==='T?' ? 'Rolling again. Land on Roll for Triple a second time to get the triple.' : 'Rolling again. Anything but K, Out or Double Play and it\'s gone.';
+    $('detail').innerHTML= o==='T?' ? 'Rolling again. Land on Roll for Triple a second time to get the triple.' : 'Rolling again. Anything but K, Out, Double Play or Walk and it\'s gone.';
     await sleep(reduce?0:550); await tossP(1,o2); G.dice=[o,o2];
   }
   const r=resolveFaces(o,o2); return {o,eff:r.eff,info:{tri:r.tri,hrr:r.hrr}};
@@ -2568,7 +2568,7 @@ function renderFaces(){
   const outs=c(isOut), hits=c(f=>kind(f)==='hit'), bb=c(f=>f==='BB'), hr=c(f=>f==='HR'), tr=c(f=>f==='T?'), hq=c(f=>f==='H?');
   const pct=x=>(x/n*100).toFixed(1)+'%';
   if(tr||hq){
-    const hrIn=hq*(n-outs), pHR=hr/n+hrIn/(n*n);
+    const hrIn=hq*(n-outs-bb), pHR=hr/n+hrIn/(n*n);
     $('summary').innerHTML=`Straight outs on <b>${outs} of ${n}</b> faces (${pct(outs)}). Single, Double and Walk on one face each (${pct(1)} apiece).`+
       (hq?` Roll for Home Run ends in a home run <b>${hrIn} times in ${n*n}</b> (${(pHR*100).toFixed(1)}% of at-bats); real MLB is about 3%.`:'')+
       (tr?` Roll for Triple ends in a triple <b>1 time in ${n*n}</b> (${(100/(n*n)).toFixed(1)}%); real MLB is about 0.4%.`:'');
