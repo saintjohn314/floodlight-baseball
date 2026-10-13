@@ -1,0 +1,11 @@
+Crowd sounds for Floodlight Baseball
+
+crowd-bed.mp3    48-second loop of ballpark chatter (the file repeats its first 2 s at the end; loop it from 1 s to 49 s)
+crowd-cheer.mp3  a cheer with applause
+crowd-big.mp3    a home-run roar with applause and whistles
+crowd-groan.mp3  a groan
+
+Made by layering hundreds of different voices from the Piper "en-us-libritts-high" voice model
+(904 speakers, https://github.com/rhasspy/piper), mixed with stadium echo, crowd murmur and synthesized applause.
+The voice model is trained on the LibriTTS corpus by Heiga Zen et al. (https://www.openslr.org/60/),
+licensed under Creative Commons Attribution 4.0 (CC BY 4.0, https://creativecommons.org/licenses/by/4.0/).

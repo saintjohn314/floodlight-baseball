@@ -197,6 +197,12 @@ button,select,input{font:inherit;color:inherit}
 .annpop select{background:#071021;color:var(--cream);border:1px solid var(--line);border-radius:8px;padding:7px}
 .annpop .row{display:flex;gap:8px;flex-wrap:wrap}
 .annpop small{color:var(--muted);font-size:12px;line-height:1.4}
+.annpop .atitle{font-size:15px;letter-spacing:.02em}
+.annpop .arow{display:grid;grid-template-columns:1fr auto;align-items:center;gap:6px 10px;padding-top:10px;border-top:1px solid var(--line)}
+.annpop .alab{font-weight:600}.annpop .arow .btn{min-width:56px}
+.annpop .arng{grid-column:1/-1;display:flex;align-items:center;gap:10px}.annpop .arng input{flex:1;min-width:0}
+.annpop .anum{min-width:2.4em;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+.annpop .arow.off .arng{opacity:.45}
 .cutsc{position:fixed;inset:0;z-index:9300;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;background:radial-gradient(ellipse 90% 60% at 50% -5%,rgba(255,200,97,.22),transparent 70%),linear-gradient(180deg,#060b18,#0d1a33 70%,#14264a);animation:cutIn .45s ease-out both}
 .cutsc.out{animation:cutOut .4s ease-in both}
 .cutsc .beam{position:absolute;top:-12%;width:34%;height:130%;background:linear-gradient(180deg,rgba(255,240,198,.2),rgba(255,240,198,0) 75%);clip-path:polygon(44% 0,56% 0,100% 100%,0 100%);pointer-events:none;animation:sweep 4s ease-in-out infinite alternate}
@@ -768,6 +774,7 @@ button,select,input{font:inherit;color:inherit}
 
 /* campaign links bar (public build only) */
 .links{border-top:1px solid var(--line);padding-top:18px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px}
+.links .credit{flex-basis:100%;margin:0;font-size:12px;color:var(--muted)}.links .credit a{color:inherit}
 .links p{color:var(--muted);font-size:14px;max-width:60ch}
 .links p b{color:var(--cream);font-weight:600}
 .links nav{display:flex;flex-wrap:wrap;gap:8px}
@@ -872,8 +879,7 @@ button,select,input{font:inherit;color:inherit}
 <button class="btn small" id="saves" type="button" title="Save slots, save files and save codes to move your game to another device">Save / Load</button>
 <button class="btn small" id="tips" type="button" aria-pressed="true" title="Show hints about what you can do right now">Tips on</button>
 <button class="btn small" id="lights" type="button" aria-pressed="true">Lights on</button>
-<button class="btn small" id="sound" type="button" aria-pressed="true">Sound on</button>
-<button class="btn small" id="annBtn" type="button" aria-pressed="true" title="Announcer: turn it on or off, set the volume">Announcer on</button>
+<button class="btn small" id="annBtn" type="button" aria-haspopup="dialog" title="Audio: announcer, sound effects and crowd">Audio</button>
 <button class="btn small" id="fs" type="button" hidden>Full screen</button>
 </div>
 </header>
@@ -998,6 +1004,7 @@ button,select,input{font:inherit;color:inherit}
 <a href="https://discord.gg/9GAWTtvnt" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.3 4.4A19.6 19.6 0 0 0 15.4 3l-.6 1.3a18 18 0 0 0-5.6 0L8.6 3a19.5 19.5 0 0 0-4.9 1.5C.6 9.1-.3 13.6.2 18.1a19.8 19.8 0 0 0 6 3l1.3-2.1-2-1 .5-.4a14 14 0 0 0 12 0l.5.4-2 1 1.3 2.1a19.7 19.7 0 0 0 6-3c.5-5.2-.9-9.7-3.5-13.7ZM8 15.3c-1.2 0-2.1-1.1-2.1-2.4S6.8 10.5 8 10.5s2.2 1.1 2.1 2.4c0 1.3-.9 2.4-2.1 2.4Zm8 0c-1.2 0-2.1-1.1-2.1-2.4s.9-2.4 2.1-2.4 2.2 1.1 2.1 2.4c0 1.3-.9 2.4-2.1 2.4Z"/></svg>Join the Discord</a>
 <a href="https://x.com/Floodlightbb" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.8 2.5h3.3l-7.2 8.2 8.4 11.1h-6.6l-5.2-6.8-5.9 6.8H1.3l7.7-8.8L1 2.5h6.8l4.7 6.2 5.3-6.2Zm-1.2 17.3h1.8L6.6 4.4H4.6l12 15.4Z"/></svg>Follow on X</a>
 </nav>
+<p class="credit">Crowd sounds made with the Piper LibriTTS voice model (LibriTTS corpus by Zen et al., <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>).</p>
 </footer>
 </div>
 
@@ -1616,18 +1623,22 @@ const TN = t => G.teams[t].name;
 
 /* ---------- sound: everything is synthesized, nothing to download ---------- */
 const sfx=(()=>{
-  /* every sound is built live with Web Audio: a wood bat, a leather mitt, a real crowd with claps and whistles, a ballpark organ */
-  let ctx=null, on=true, buf=null, pink=null, out=null, room=null, bed=null;
-  try{ on=localStorage.getItem('fdl-sound')!=='off'; }catch(e){}
-  function ac(){
-    if(!on) return null;
+  /* the sound effects are built live with Web Audio: a wood bat, a leather mitt, a ballpark organ. The crowd is recorded:
+     hundreds of real voices (audio/crowd-*.mp3) on its own volume, heard only while a game is on screen. */
+  let ctx=null, on=true, vol=.9, buf=null, pink=null, out=null, room=null;
+  let crowdOn=true, crowdVol=.7, cbus=null, bedSrc=null, bedG=null, bedAt=-1, cLoad=null; const CB={};
+  try{ on=localStorage.getItem('fdl-sound')!=='off'; crowdOn=localStorage.getItem('fdl-crowd')!=='off';
+    const v=parseFloat(localStorage.getItem('fdl-sfx-vol')); if(v>=0&&v<=1) vol=v; const c=parseFloat(localStorage.getItem('fdl-crowd-vol')); if(c>=0&&c<=1) crowdVol=c; }catch(e){}
+  function ac(){ return on?ctxOK():null; }
+  function ctxOK(){
     try{
       if(!ctx){ const C=window.AudioContext||window.webkitAudioContext; if(!C) return null; ctx=new C();
         const n=ctx.sampleRate; buf=ctx.createBuffer(1,n*2,n); const d=buf.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
         pink=ctx.createBuffer(1,n*4,n); const p=pink.getChannelData(0); let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
         for(let i=0;i<p.length;i++){ const w=Math.random()*2-1; b0=.99886*b0+w*.0555179; b1=.99332*b1+w*.0750759; b2=.969*b2+w*.153852; b3=.8665*b3+w*.3104856; b4=.55*b4+w*.5329522; b5=-.7616*b5-w*.016898; p[i]=(b0+b1+b2+b3+b4+b5+b6+w*.5362)*.11; b6=w*.115926; }
         const comp=ctx.createDynamicsCompressor(); comp.threshold.value=-14; comp.ratio.value=4; comp.attack.value=.003; comp.release.value=.25; comp.connect(ctx.destination);
-        out=ctx.createGain(); out.gain.value=.9; out.connect(comp);
+        out=ctx.createGain(); out.gain.value=vol; out.connect(comp);
+        cbus=ctx.createGain(); cbus.gain.value=crowdVol; cbus.connect(ctx.destination);
         // the stadium: a short slap-back off the stands
         room=ctx.createGain(); room.gain.value=.22; const dl=ctx.createDelay(1); dl.delayTime.value=.16; const fb=ctx.createGain(); fb.gain.value=.28; const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=2600;
         room.connect(dl); dl.connect(lp); lp.connect(fb); fb.connect(dl); lp.connect(out);
@@ -1637,6 +1648,29 @@ const sfx=(()=>{
     return ctx;
   }
   const dest=(wet)=>{ const g=ctx.createGain(); g.connect(out); if(wet) g.connect(room); return g; };
+  /* the recorded crowd: a looping bed of chatter, and cheers, a roar and groans that play on top of it */
+  const CROWD=['bed','cheer','big','groan'], AUD=(/^https?:$/.test(location.protocol)?['audio/']:[]).concat(SITE_URL+'/audio/');
+  async function getBuf(k){ let err=null;
+    for(const base of AUD){ try{ const r=await fetch(base+'crowd-'+k+'.mp3'); if(!r.ok) throw new Error('crowd '+r.status); const ab=await r.arrayBuffer();
+      return await new Promise((res,rej)=>ctx.decodeAudioData(ab,res,rej)); }catch(e){ err=e; } }
+    throw err; }
+  function loadCrowd(){ if(cLoad) return cLoad; if(!ctxOK()) return Promise.reject(new Error('no audio'));
+    cLoad=(async()=>{ for(const k of CROWD) if(!CB[k]) CB[k]=await getBuf(k); })(); cLoad.catch(()=>{ setTimeout(()=>{ cLoad=null; },30000); }); return cLoad; }
+  const glide=(g,v,sec)=>{ const t=ctx.currentTime; g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(Math.max(.0001,g.gain.value),t); g.gain.linearRampToValueAtTime(Math.max(.0001,v),t+sec); };
+  /* level: 0 = silent, 1 = full; the bed glides there and stops once it has faded out */
+  function bedTo(level,sec){
+    if(level>0){ if(!crowdOn||!ctxOK()) return; if(!CB.bed){ loadCrowd().catch(()=>{}); return; }
+      if(!bedSrc){ bedG=ctx.createGain(); bedG.gain.value=.0001; bedG.connect(cbus); bedSrc=ctx.createBufferSource(); bedSrc.buffer=CB.bed; bedSrc.loop=true;
+        // the file holds a 48 s loop plus its first 2 s again: looping from 1 s to 49 s stays seamless whatever start offset the decoder adds
+        if(CB.bed.duration>49.5){ bedSrc.loopStart=1; bedSrc.loopEnd=49; } bedSrc.connect(bedG); bedSrc.start(0,bedSrc.loopEnd?1+Math.random()*48:Math.random()*CB.bed.duration); bedAt=-1; }
+      if(Math.abs(level-bedAt)>.01){ glide(bedG,level,sec); bedAt=level; } return; }
+    if(!bedSrc) return; const src=bedSrc, g=bedG; bedSrc=null; bedG=null; bedAt=-1; glide(g,.0001,sec); setTimeout(()=>{ try{ src.stop(); }catch(e){} try{ g.disconnect(); }catch(e){} },sec*1000+200); }
+  /* a reaction on top of the bed: 'big' (home run roar), 'cheer', 'groan'; lvl scales it */
+  function react(kind,lvl=1){
+    if(!crowdOn||!ctxOK()) return; const b=CB[kind];
+    if(!b){ loadCrowd().catch(()=>{}); return; }
+    const t=ctx.currentTime+.04, src=ctx.createBufferSource(), g=ctx.createGain(); src.buffer=b; src.playbackRate.value=.97+Math.random()*.06; g.gain.value=lvl; src.connect(g); g.connect(cbus); src.start(t);
+    if(bedG&&bedAt>0){ const top=Math.min(1.6,bedAt*(kind==='big'?1.5:1.2)); bedG.gain.cancelScheduledValues(t); bedG.gain.setValueAtTime(Math.max(.0001,bedG.gain.value),t); bedG.gain.linearRampToValueAtTime(top,t+.5); bedG.gain.linearRampToValueAtTime(bedAt,t+b.duration*.9); } }
   function noise(t0,dur,o){
     const c=ac(); if(!c) return; o=Object.assign({type:'bandpass',f:1000,q:1,gain:.3,attack:.005,src:buf,wet:true},o);
     const src=c.createBufferSource(); src.buffer=o.src; src.loop=true;
@@ -1650,12 +1684,6 @@ const sfx=(()=>{
     g.gain.setValueAtTime(0.0001,t0); g.gain.linearRampToValueAtTime(o.gain,t0+(o.attack||.012)); g.gain.setValueAtTime(o.gain,t0+dur*(o.hold||.7)); g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
     osc.connect(g); g.connect(dest(o.wet)); osc.start(t0); osc.stop(t0+dur+.03); return osc;
   }
-  /* a crowd reaction: thousands of voices (formant-shaped noise), hand claps and a few whistles */
-  function crowd(t,d,lvl,big){
-    for(const [f,q,k] of [[520,1.1,1],[1250,1.6,.55],[2600,2.2,.25]]) noise(t,d,{src:pink,f,q,gain:lvl*k,attack:big?.35:.2,hold:d*.45});
-    const n=big?110:30; for(let i=0;i<n;i++){ const ct=t+.15+Math.random()*d*.75; noise(ct,.05,{type:'bandpass',f:1100+Math.random()*1500,q:1.4,gain:(.05+Math.random()*.08)*(big?1:.8),attack:.001}); }
-    if(big) for(let i=0;i<3;i++){ const wt=t+.3+Math.random()*1.4, f=2500+Math.random()*700; tone(wt,f,.35+Math.random()*.3,{type:'sine',gain:.022,f2:f*(Math.random()<.5?1.18:.86),attack:.03}); }
-  }
   /* the ballpark organ: drawbar partials, a Leslie wobble */
   function organNote(t,f,d,lvl=.03){
     const c=ac(); if(!c) return; const g=c.createGain(); g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(lvl,t+.012); g.gain.setValueAtTime(lvl,t+d); g.gain.exponentialRampToValueAtTime(0.0001,t+d+.09);
@@ -1666,8 +1694,14 @@ const sfx=(()=>{
   const now=()=>{ const c=ac(); return c?c.currentTime+.01:0; };
   return {
     get on(){ return on; },
-    set(v){ on=v; try{ localStorage.setItem('fdl-sound',v?'on':'off'); }catch(e){} if(v) ac(); else if(ctx) ctx.suspend(); },
-    unlock(){ ac(); },
+    set(v){ on=v; try{ localStorage.setItem('fdl-sound',v?'on':'off'); }catch(e){} if(v) ac(); },
+    get vol(){ return vol; }, setVol(v){ vol=Math.max(0,Math.min(1,v)); if(out) out.gain.value=vol; try{ localStorage.setItem('fdl-sfx-vol',vol); }catch(e){} },
+    get crowdOn(){ return crowdOn; }, setCrowd(v){ crowdOn=v; try{ localStorage.setItem('fdl-crowd',v?'on':'off'); }catch(e){} if(!v) bedTo(0,.6); },
+    get crowdVol(){ return crowdVol; }, setCrowdVol(v){ crowdVol=Math.max(0,Math.min(1,v)); if(cbus) cbus.gain.value=crowdVol; try{ localStorage.setItem('fdl-crowd-vol',crowdVol); }catch(e){} },
+    /* the crowd is heard only during a game: the page calls this a couple of times a second (level 0 = fade it out) */
+    crowd(level,sec=1.5){ if(level>0&&!ctx&&navigator.userActivation&&!navigator.userActivation.hasBeenActive) return; if(level>0||bedSrc) bedTo(level,sec); },
+    react,
+    unlock(){ if(ctxOK()&&crowdOn) loadCrowd().catch(()=>{}); },
     dice(){ if(!ac()) return; const t=now(); for(let i=0;i<7;i++) noise(t+i*.085+Math.random()*.03,.05,{f:2200+Math.random()*1900,q:4,gain:.2,attack:.002,wet:false}); },
     /* a wood bat: the snap, the ring of the barrel, the thump */
     crack(){ if(!ac()) return; const t=now();
@@ -1676,7 +1710,7 @@ const sfx=(()=>{
       tone(t,150,.06,{type:'sine',gain:.35,f2:80,attack:.002,hold:.1}); },
     /* the pop of a catcher's mitt */
     pop(){ if(!ac()) return; const t=now(); noise(t,.07,{type:'lowpass',f:480,q:.9,gain:1,attack:.001}); noise(t,.022,{f:1900,q:1.2,gain:.35,attack:.0008}); tone(t,105,.07,{type:'sine',gain:.3,f2:70,attack:.002,hold:.1}); },
-    cheer(big){ if(!ac()) return; crowd(now()+.04,big?3.6:1.7,big?.5:.24,big); },
+    cheer(big){ react(big?'big':'cheer'); },
     flip(){ if(!ac()) return; const t=now(); noise(t,.2,{f:3200,f2:800,q:1.3,gain:.2,attack:.01,wet:false}); },
     power(){ if(!ac()) return; const t=now(); [523.25,659.25,783.99,1046.5].forEach((f,i)=>tone(t+i*.07,f,.16,{type:'triangle',gain:.05})); },
     /* "Charge!" on the organ */
@@ -1854,7 +1888,7 @@ onmessage=e=>{ const m=e.data; if(m.type==='cancel'){ cut=Math.max(cut,m.upto); 
   /* say(text, interrupt, onDone): onDone runs when the call has finished (or after a reading pause when nothing is spoken) */
   function say(t,big,done,quiet){
     if(!t){ if(done) done(); return; } if(!quiet) caption(t);
-    if(!on||!sfx.on){ fake(t,done); return; }
+    if(!on){ fake(t,done); return; }
     if(cloudOK()){ cloudSay(t,done); return; }
     if(studioOK()){ hush(); if(done) cbs[job]=done; actx(); lastA=Date.now(); const key=sv+'|'+t, c=cache.get(key), me=job;
       if(c){ c.live=job; c.chunks.forEach(m=>play(Object.assign({},m,{id:job,pcm:m.pcm.slice()}))); if(c.done) cache.delete(key); }
@@ -1871,9 +1905,9 @@ onmessage=e=>{ const m=e.data; if(m.type==='cancel'){ cut=Math.max(cut,m.upto); 
     set(v){ on=v; try{ localStorage.setItem('fdl-ann',v?'on':'off'); }catch(e){} if(!v) hush(); else warm(); },
     say, stop:hush, warm, caption, spoken,
     /* still talking (or about to): nothing should cut in */
-    get busy(){ if(!on||!sfx.on) return false; if(S&&(S.speaking||S.pending)) return true; return playing.length>0||(!!cbs[job]&&Date.now()-lastA<(cloudOK()?8000:4000)); },
+    get busy(){ if(!on) return false; if(S&&(S.speaking||S.pending)) return true; return playing.length>0||(!!cbs[job]&&Date.now()-lastA<(cloudOK()?8000:4000)); },
     /* get a line ready ahead of time (the studio voice renders it in the background) */
-    prefetch(t){ if(!t||!on||!sfx.on) return; if(cloudOK()){ cloudLine(t); return; } if(!studioOK()) return; const key=sv+'|'+t; if(cache.has(key)) return; if(cache.size>12){ const k=cache.keys().next().value; W.postMessage({type:'drop',keys:[k]}); cache.delete(k); }
+    prefetch(t){ if(!t||!on) return; if(cloudOK()){ cloudLine(t); return; } if(!studioOK()) return; const key=sv+'|'+t; if(cache.has(key)) return; if(cache.size>12){ const k=cache.keys().next().value; W.postMessage({type:'drop',keys:[k]}); cache.delete(k); }
       cache.set(key,{chunks:[],done:false,live:0}); W.postMessage({type:'say',id:0,pre:true,key,parts:parts(t),voice:sv,speed:SPEED}); },
     dropAll, unlock(){ actx(); try{ if(S&&!S.speaking){ const u=new SpeechSynthesisUtterance(' '); u.volume=0; S.speak(u); } }catch(e){} },
     avg:x=>'\u0001'+Math.round(Math.max(0,Math.min(1,x))*1000)+'\u0001',
@@ -2584,11 +2618,13 @@ function post(){
 }
 function playFx(){
   const fx=G.fx; G.fx=null; if(!fx) return;
-  if(fx==='HR'){ sfx.crack(); sfx.cheer(true); }
-  else if(fx==='1B'||fx==='2B'||fx==='3B'){ sfx.crack(); sfx.cheer(false); }
-  else if(fx==='SB'||fx==='SQ'){ sfx.cheer(false); }
-  else if(fx==='K'||fx==='OUT'||fx==='DP') sfx.pop();
-  if(G.over) setTimeout(()=>sfx.organ(), 500);
+  /* the crowd roots for the home team. An out that ends a half has already turned the inning over, so the side that batted is the other one */
+  const outFx=fx==='K'||fx==='OUT'||fx==='DP'||fx==='SQ', bat=outFx&&G.outs===0&&!G.over?1-G.half:G.half, home=bat===1;
+  if(fx==='HR'){ sfx.crack(); sfx.react(home?'big':'groan'); }
+  else if(fx==='1B'||fx==='2B'||fx==='3B'){ sfx.crack(); if(home) sfx.react('cheer'); else if(fx!=='1B') sfx.react('groan',.6); }
+  else if(fx==='SB'||fx==='SQ'){ if(home) sfx.react('cheer',.8); }
+  else if(fx==='K'||fx==='OUT'||fx==='DP'){ sfx.pop(); if(!home&&(fx!=='OUT'||G.outs===0)) sfx.react('cheer',fx==='OUT'?.6:.8); else if(home&&fx==='DP') sfx.react('groan',.6); }
+  if(G.over){ setTimeout(()=>sfx.organ(), 500); if(fx!=='HR') sfx.react(total(G,1)>total(G,0)?'big':'groan'); }
 }
 function callout(text,gold){ const c=$('callout'); c.textContent=text; c.classList.remove('show'); c.classList.toggle('gold',!!gold); void c.offsetWidth; c.classList.add('show'); }
 /* fireworks over the stadium (or any box): bursts of sparks, plus falling confetti when conf is set */
@@ -3972,24 +4008,27 @@ function setOpp(o,fresh){
   try{ localStorage.setItem('fdl-opp',o); }catch(e){}
   if(fresh) startExhibition();
 }
-const soundBtn=$('sound');
-function paintSound(){ soundBtn.setAttribute('aria-pressed',sfx.on); soundBtn.textContent=sfx.on?'Sound on':'Sound off'; }
-soundBtn.addEventListener('click',()=>{ sfx.set(!sfx.on); paintSound(); if(sfx.on) sfx.pop(); else ann.stop(); });
-paintSound();
-function paintAnn(){ const b=$('annBtn'), st=ann.status; b.setAttribute('aria-pressed',ann.on);
-  b.textContent=!ann.on?'Announcer off':ann.engine==='studio'&&st.state==='loading'?`Announcer · voice ${st.pct}%`:'Announcer on'; }
-ann.onStatus(paintAnn);
+function paintAnn(){ $('annBtn').textContent=ann.on||sfx.on||sfx.crowdOn?'Audio':'Audio off'; }
+paintAnn();
+/* the crowd is only heard while a game is on screen: not on the menu, the franchise hub or the TV show, and it fades out after the final out */
+const crowdLive=()=>!!G&&!G.over&&$('menu').classList.contains('out')&&$('hub').hidden&&!document.querySelector('div.tv')&&!document.hidden;
+setInterval(()=>{ const live=crowdLive(); sfx.crowd(live?(ann.busy?.55:1):0, live?1.2:(G&&G.over?4:1.2)); },500);
 $('annBtn').addEventListener('click',e=>{ e.stopPropagation(); annPanel(); });
-/* announcer settings: on/off and how loud */
+/* audio settings: the announcer, the sound effects and the crowd, each with its own switch and volume */
 function annPanel(){
   let pop=document.querySelector('.annpop'); if(pop){ pop.remove(); return; }
-  pop=document.createElement('div'); pop.className='annpop'; pop.setAttribute('role','dialog'); pop.setAttribute('aria-label','Announcer');
-  pop.innerHTML=`<div class="row"><button class="btn small" type="button" id="apOn">${ann.on?'Turn announcer off':'Turn announcer on'}</button><button class="btn small" type="button" id="apX">Done</button></div>
-<label>Volume <span id="apVolN" style="text-transform:none">${Math.round(ann.vol*100)}</span><input type="range" id="apVol" min="0" max="100" step="5" value="${Math.round(ann.vol*100)}"></label>`;
+  pop=document.createElement('div'); pop.className='annpop'; pop.setAttribute('role','dialog'); pop.setAttribute('aria-label','Audio');
+  const row=(id,label,on,v)=>`<div class="arow${on?'':' off'}" id="${id}R"><span class="alab">${label}</span><button class="btn small" type="button" id="${id}" aria-pressed="${on}">${on?'On':'Off'}</button>
+<span class="arng"><input type="range" id="${id}V" min="0" max="100" step="5" value="${Math.round(v*100)}" aria-label="${label} volume"><span class="anum" id="${id}N">${Math.round(v*100)}</span></span></div>`;
+  pop.innerHTML=`<b class="atitle">Audio</b>${row('apAnn','Announcer',ann.on,ann.vol)}${row('apFx','Sound effects',sfx.on,sfx.vol)}${row('apCr','Crowd',sfx.crowdOn,sfx.crowdVol)}
+<div class="row"><button class="btn small" type="button" id="apX">Done</button></div>`;
   document.body.appendChild(pop);
   const r=$('annBtn').getBoundingClientRect(); pop.style.top=Math.max(8,Math.min(r.bottom+8,innerHeight-pop.offsetHeight-8))+'px'; pop.style.left=Math.max(16,Math.min(r.left,innerWidth-pop.offsetWidth-16))+'px';
-  $('apOn').onclick=()=>{ ann.set(!ann.on); paintAnn(); $('apOn').textContent=ann.on?'Turn announcer off':'Turn announcer on'; };
-  $('apVol').oninput=e=>{ ann.setVol(e.target.value/100); $('apVolN').textContent=e.target.value; };
+  const flip=(id,on)=>{ $(id).textContent=on?'On':'Off'; $(id).setAttribute('aria-pressed',on); $(id+'R').classList.toggle('off',!on); paintAnn(); };
+  const vol=(id,set)=>{ $(id+'V').oninput=e=>{ set(e.target.value/100); $(id+'N').textContent=e.target.value; }; };
+  $('apAnn').onclick=()=>{ ann.set(!ann.on); flip('apAnn',ann.on); }; vol('apAnn',v=>ann.setVol(v));
+  $('apFx').onclick=()=>{ sfx.set(!sfx.on); flip('apFx',sfx.on); if(sfx.on) sfx.pop(); }; vol('apFx',v=>sfx.setVol(v)); $('apFxV').onchange=()=>sfx.pop();
+  $('apCr').onclick=()=>{ sfx.setCrowd(!sfx.crowdOn); flip('apCr',sfx.crowdOn); if(sfx.crowdOn) sfx.unlock(); }; vol('apCr',v=>sfx.setCrowdVol(v));
   $('apX').onclick=()=>pop.remove();
   setTimeout(()=>document.addEventListener('click',function out(ev){ if(!pop.isConnected){ document.removeEventListener('click',out); return; } if(!pop.contains(ev.target)){ pop.remove(); document.removeEventListener('click',out); } }),0);
 }

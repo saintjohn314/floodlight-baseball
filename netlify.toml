@@ -10,3 +10,10 @@
   [headers.values]
     Cross-Origin-Opener-Policy = "same-origin"
     Cross-Origin-Embedder-Policy = "credentialless"
+
+# The crowd recordings: cached for a week, and readable when the game is opened from another address.
+[[headers]]
+  for = "/audio/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Cache-Control = "public, max-age=604800"
