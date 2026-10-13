@@ -1760,6 +1760,7 @@ onmessage=e=>{ const m=e.data; if(m.type==='cancel'){ cut=Math.max(cut,m.upto); 
   const studioOK=()=>!autoDev()&&engine==='studio'&&status.state==='ready'&&status.rtf>=1.05&&!status.slow&&!(status.blocked&&(!ac||ac.state!=='running'));
   function fail(msg){ status.state='failed'; status.err=msg||'The studio voice could not load.'; clearTimeout(wTimer); if(W){ try{ W.terminate(); }catch(e){} W=null; } notify(); }
   function warm(){
+    if(cloud.state!=='off'){ probeCloud(()=>{ if(cloud.state==='off') warm(); }); return; }
     if(W||status.state==='failed'||engine!=='studio'||!on||autoDev()) return;
     try{ const url=URL.createObjectURL(new Blob([WORKER],{type:'text/javascript'})); W=new Worker(url,{type:'module'}); }catch(e){ fail('This browser can’t run the studio voice.'); return; }
     status.state='loading'; status.pct=0; notify();
@@ -1780,6 +1781,35 @@ onmessage=e=>{ const m=e.data; if(m.type==='cancel'){ cut=Math.max(cut,m.upto); 
     const t=Math.max(c.currentTime+.05,tEnd); s.start(t); tEnd=t+b.duration/DEEP+.18; playing.push(s);
     s.onended=()=>{ playing=playing.filter(x=>x!==s); if(m.last&&m.id===job&&cbs[m.id]){ const d=cbs[m.id]; delete cbs[m.id]; d(); } };
   }
+  /* the broadcast voice: lines spoken on the site's server (a Microsoft neural voice), so every browser and
+     phone hears the same announcer. The game checks once whether the site has it set up. */
+  const TTS_API=(/\.netlify\.app$/.test(location.hostname)?location.origin:SITE_URL)+'/api/tts';
+  const cloud={state:'unknown',voice:'',fails:0}, ccache=new Map();
+  const cloudOK=()=>cloud.state==='on';
+  function probeCloud(then){
+    if(cloud.state!=='unknown'){ if(then) then(); return; } cloud.state='checking';
+    const end=st=>{ cloud.state=st; notify(); if(then) then(); };
+    fetch(TTS_API+'?probe=1',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{ cloud.voice=j&&j.voice||''; end(j&&j.ok?'on':'off'); }).catch(()=>end('off'));
+  }
+  function cloudGet(text){
+    return fetch(TTS_API,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({text})})
+      .then(r=>{ if(!r.ok) throw new Error('voice '+r.status); return r.arrayBuffer(); })
+      .then(b=>new Promise((res,rej)=>{ const c=actx(); if(!c) return rej(new Error('no audio')); c.decodeAudioData(b,res,rej); }));
+  }
+  function cloudLine(t){ let e=ccache.get(t); if(!e){ e=parts(t,90,220).map(p=>{ const pr=cloudGet(p); pr.catch(()=>{}); return pr; }); ccache.set(t,e); if(ccache.size>40) ccache.delete(ccache.keys().next().value); } return e; }
+  function playBuf(b,id,last,rate=1){
+    if(id!==job) return; const c=actx(); if(!c) return; lastA=Date.now(); heard=job;
+    const s=c.createBufferSource(); s.buffer=b; s.playbackRate.value=rate; s.connect(gain);
+    const t=Math.max(c.currentTime+.05,tEnd); s.start(t); tEnd=t+b.duration/rate+.15; playing.push(s);
+    s.onended=()=>{ playing=playing.filter(x=>x!==s); if(last&&id===job&&cbs[id]){ const d=cbs[id]; delete cbs[id]; d(); } };
+  }
+  function cloudSay(t,done){
+    hush(); if(done) cbs[job]=done; actx(); lastA=Date.now(); const me=job, list=cloudLine(t);
+    let chain=Promise.resolve(); list.forEach((pr,i)=>{ chain=chain.then(()=>pr).then(b=>playBuf(b,me,i===list.length-1)); });
+    chain.catch(()=>{ ccache.delete(t); if(++cloud.fails>=3){ cloud.state='off'; notify(); } if(job!==me) return; hush(); devSay(t,true,done); });
+    // nothing heard in 4 s (slow network, or the browser is holding audio): the device voice takes the line
+    firstT=setTimeout(()=>{ if(job!==me) return; if(heard===me&&ac&&ac.state==='running') return; hush(); devSay(t,true,done); },4000);
+  }
   function parts(t,max=60,rest=max*2){ const raw=spoken(t).match(/[^.!?]+[.!?]+["')]*\s*|[^.!?]+$/g)||[t], out=[]; let cur='';
     for(const r of raw){ const x=r.trim(); if(!x) continue; const lim=out.length?rest:max; if((cur+' '+x).length<lim||!cur) cur=(cur?cur+' ':'')+x; else { out.push(cur); cur=x; } } if(cur) out.push(cur);
     if(out.length>1&&out[out.length-1].length<40){ const l=out.pop(); out[out.length-1]+=' '+l; } return out; }
@@ -1790,6 +1820,7 @@ onmessage=e=>{ const m=e.data; if(m.type==='cancel'){ cut=Math.max(cut,m.upto); 
   function say(t,big,done,quiet){
     if(!t){ if(done) done(); return; } if(!quiet) caption(t);
     if(!on||!sfx.on){ fake(t,done); return; }
+    if(cloudOK()){ cloudSay(t,done); return; }
     if(studioOK()){ hush(); if(done) cbs[job]=done; actx(); lastA=Date.now(); const key=sv+'|'+t, c=cache.get(key), me=job;
       if(c){ c.live=job; c.chunks.forEach(m=>play(Object.assign({},m,{id:job,pcm:m.pcm.slice()}))); if(c.done) cache.delete(key); }
       else W.postMessage({type:'say',id:job,parts:parts(t),voice:sv,speed:SPEED});
@@ -1805,9 +1836,9 @@ onmessage=e=>{ const m=e.data; if(m.type==='cancel'){ cut=Math.max(cut,m.upto); 
     set(v){ on=v; try{ localStorage.setItem('fdl-ann',v?'on':'off'); }catch(e){} if(!v) hush(); else warm(); },
     say, stop:hush, warm, caption, spoken,
     /* still talking (or about to): nothing should cut in */
-    get busy(){ if(!on||!sfx.on) return false; if(S&&(S.speaking||S.pending)) return true; return playing.length>0||(!!cbs[job]&&Date.now()-lastA<4000); },
+    get busy(){ if(!on||!sfx.on) return false; if(S&&(S.speaking||S.pending)) return true; return playing.length>0||(!!cbs[job]&&Date.now()-lastA<(cloudOK()?8000:4000)); },
     /* get a line ready ahead of time (the studio voice renders it in the background) */
-    prefetch(t){ if(!t||!on||!sfx.on||!studioOK()) return; const key=sv+'|'+t; if(cache.has(key)) return; if(cache.size>12){ const k=cache.keys().next().value; W.postMessage({type:'drop',keys:[k]}); cache.delete(k); }
+    prefetch(t){ if(!t||!on||!sfx.on) return; if(cloudOK()){ cloudLine(t); return; } if(!studioOK()) return; const key=sv+'|'+t; if(cache.has(key)) return; if(cache.size>12){ const k=cache.keys().next().value; W.postMessage({type:'drop',keys:[k]}); cache.delete(k); }
       cache.set(key,{chunks:[],done:false,live:0}); W.postMessage({type:'say',id:0,pre:true,key,parts:parts(t),voice:sv,speed:SPEED}); },
     dropAll, unlock(){ actx(); try{ if(S&&!S.speaking){ const u=new SpeechSynthesisUtterance(' '); u.volume=0; S.speak(u); } }catch(e){} },
     avg:x=>'\u0001'+Math.round(Math.max(0,Math.min(1,x))*1000)+'\u0001',
@@ -1817,7 +1848,7 @@ onmessage=e=>{ const m=e.data; if(m.type==='cancel'){ cut=Math.max(cut,m.upto); 
     setVoice(n){ want=n; try{ localStorage.setItem('fdl-ann-voice',n); }catch(e){} pickVoice(); },
     get engine(){ return autoDev()?'device':engine; }, setEngine(e){ engine=e; engineChosen=true; hush(); dropAll(); try{ localStorage.setItem('fdl-ann-engine',e); }catch(x){} if(e==='studio'){ if(status.state==='failed'){ status.state='idle'; status.err=''; } warm(); } notify(); },
     studio:STUDIO, get studioVoice(){ return sv; }, setStudioVoice(v){ sv=v; dropAll(); try{ localStorage.setItem('fdl-ann-sv',v); }catch(e){} },
-    status, onStatus(f){ subs.add(f); return ()=>subs.delete(f); },
+    status, onStatus(f){ subs.add(f); return ()=>subs.delete(f); }, cloud,
     ok:!!S
   };
 })();
@@ -3926,7 +3957,9 @@ function annPanel(){
 <label>Volume <span id="apVolN" style="text-transform:none">${Math.round(ann.vol*100)}</span><input type="range" id="apVol" min="0" max="100" step="5" value="${Math.round(ann.vol*100)}"></label>
 <small id="apSt"></small>`;
   document.body.appendChild(pop);
-  const paint=()=>{ if(!pop.isConnected){ off(); return; } const e=ann.engine, s=ann.status; $('apSvW').hidden=e!=='studio'; $('apVoiceW').hidden=e==='studio';
+  const paint=()=>{ if(!pop.isConnected){ off(); return; } const e=ann.engine, s=ann.status, cl=ann.cloud.state==='on';
+    pop.querySelector('.eng').hidden=cl; $('apSvW').hidden=cl||e!=='studio'; $('apVoiceW').hidden=cl||e==='studio';
+    if(cl){ $('apSt').textContent=`Calling the games: the broadcast voice (${(ann.cloud.voice||'').replace(/^en-US-|Neural$/g,'')||'Christopher'}), spoken by this site's server. Same announcer on every browser and phone.`; place(); return; }
     const vn=ann.voiceName, nat=/natural|neural|online|premium|enhanced/i.test(vn);
     $('apSt').textContent= e!=='studio' ? (nat?`Calling the games: ${vn.replace(/^Microsoft /,'').replace(/ - .*$/,'').replace(/(Multilingual)? Online \(Natural\)/,'')}, a natural voice built into your browser.`:'Your browser only has robotic built-in voices. For a natural-sounding announcer, open the game in Microsoft Edge (free), or pick the studio voice above.')
       : s.state==='ready' ? (s.slow?`This computer renders the studio voice too slowly${s.rtf?` (${s.rtf.toFixed(1)}× real time)`:''}, so your device’s voice is calling the games. For a natural free voice, open the game in Microsoft Edge.`:s.rtf?`Studio voice is ready, running on your ${s.device==='webgpu'?'graphics chip':'processor'} (${s.rtf.toFixed(1)}× real time).`:'Studio voice is ready. Checking its speed…') : s.state==='loading' ? `Downloading the studio voice${s.device==='webgpu'?' for your graphics chip':''}… ${s.pct}%. Until it’s ready you’ll hear your device’s voice.`
