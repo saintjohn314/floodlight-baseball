@@ -1700,11 +1700,12 @@ const ann=(()=>{
   const HUMAN=/natural|neural|online|premium|enhanced|wavenet|studio|siri/i, ROBOT=/espeak|fred|albert|bad news|bahh|bells|boing|bubbles|cellos|jester|organ|superstar|trinoids|whisper|wobble|zarvox|microsoft david|microsoft mark|microsoft george|microsoft james|microsoft richard|microsoft sean/i;
   const GOOD=/andrew|brian|guy|christopher|eric|roger|davis|steffan|ryan|thomas|evan|nathan|aaron|reed|tom|alex|daniel|arthur|oliver|google uk english male|lee|jason|tony/i;
   /* the studio voices: Kokoro, an open-source neural voice model that runs right in the browser */
-  const STUDIO=[['am_michael','Michael · American'],['am_puck','Puck · American, upbeat'],['am_fenrir','Fenrir · American, deep'],['am_eric','Eric · American'],['am_echo','Echo · American'],['am_liam','Liam · American'],['am_onyx','Onyx · American'],['bm_george','George · British'],['bm_fable','Fable · British'],['bm_lewis','Lewis · British']];
+  const STUDIO=[['am_michael','Michael · American, mature (default)'],['am_puck','Puck · American, upbeat'],['am_fenrir','Fenrir · American, deep'],['am_eric','Eric · American'],['am_echo','Echo · American'],['am_liam','Liam · American'],['am_onyx','Onyx · American'],['bm_george','George · British'],['bm_fable','Fable · British'],['bm_lewis','Lewis · British']];
   const mobile=/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent||'');
   let voice=null, next=null, vol=0.8, want='', engine=mobile?'device':'studio', sv='am_michael', devTok=0, fakeT=0;
   try{ const v=parseFloat(localStorage.getItem('fdl-ann-vol')); if(v>=0&&v<=1) vol=v; want=localStorage.getItem('fdl-ann-voice')||''; const e=localStorage.getItem('fdl-ann-engine'); if(e==='studio'||e==='device') engine=e; const s=localStorage.getItem('fdl-ann-sv'); if(STUDIO.some(x=>x[0]===s)) sv=s; }catch(e){}
-  const score=v=>(HUMAN.test(v.name)?100:0)+(MALE.test(v.name)||GOOD.test(v.name)?40:FEMALE.test(v.name)?-200:0)+(GOOD.test(v.name)?15:0)+(ROBOT.test(v.name)?-80:0)+(/en[-_]US/i.test(v.lang)?6:/en[-_](GB|AU|CA|IE)/i.test(v.lang)?3:0)+(v.localService?0:2);
+  const MATURE=/guy|christopher|roger|davis|andrew|eric|steffan|evan|nathan|aaron|tom\b/i;
+  const score=v=>(HUMAN.test(v.name)?100:0)+(MALE.test(v.name)||GOOD.test(v.name)?40:FEMALE.test(v.name)?-200:0)+(GOOD.test(v.name)?15:0)+(MATURE.test(v.name)?10:0)+(ROBOT.test(v.name)?-80:0)+(/en[-_]US/i.test(v.lang)?30:/en[-_](GB|AU|CA|IE)/i.test(v.lang)?3:0)+(v.localService?0:2);
   function list(){ return S?S.getVoices().filter(v=>/^en/i.test(v.lang)&&!FEMALE.test(v.name)).sort((a,b)=>score(b)-score(a)):[]; }
   function pickVoice(){ if(!S) return; const vs=list(); voice=(want&&vs.find(v=>v.name===want))||vs[0]||null; }
   if(S){ pickVoice(); try{ S.addEventListener('voiceschanged',pickVoice); }catch(e){ S.onvoiceschanged=pickVoice; } }
@@ -1713,16 +1714,18 @@ const ann=(()=>{
   function avgWords(d){ if(d>=1000) return 'a thousand'; if(d===0) return 'zero'; const a=Math.floor(d/100), b=d%100; return a? `${a} ${b===0?'hundred':b<10?'oh '+b:b}` : (b<10?'oh oh '+b:'oh '+b); }
   const status={state:'idle',pct:0,err:''}, subs=new Set(); const notify=()=>subs.forEach(f=>{ try{ f(status); }catch(e){} });
   /* device voice */
+  let keep=0;
   function devSay(t,big,done){
     if(!S){ fake(t,done); return; }
-    if(big||!(S.speaking||S.pending)){ next=null; S.cancel(); } else { next={t,cb:done}; return; }
-    const tok=++devTok, q=parts(t); let wd=0;
-    const step=()=>{ clearTimeout(wd); if(tok!==devTok) return;
-      if(!q.length){ if(next){ const n=next; next=null; devSay(n.t,true,n.cb); } else if(done) done(); return; }
-      const txt=q.shift(), u=new SpeechSynthesisUtterance(txt); if(voice){ u.voice=voice; u.lang=voice.lang; } else u.lang='en-US';
-      u.volume=vol; u.rate=1; u.pitch=voice&&(MALE.test(voice.name)||GOOD.test(voice.name))?1:0.85;
-      let fired=false; const fin=()=>{ if(fired) return; fired=true; step(); }; u.onend=u.onerror=fin; wd=setTimeout(fin,txt.length*95+3500); S.speak(u); };
-    step();
+    if(!big&&(S.speaking||S.pending)){ next={t,cb:done}; return; }
+    next=null; S.cancel(); clearInterval(keep); const tok=++devTok, chunks=parts(t,170,170), cap=Date.now()+t.length*170+10000; let wd=0, over=false;
+    const finish=()=>{ if(over||tok!==devTok) return; over=true; clearInterval(keep); clearTimeout(wd); if(next){ const n=next; next=null; devSay(n.t,true,n.cb); } else if(done) done(); };
+    chunks.forEach((txt,i)=>{ const u=new SpeechSynthesisUtterance(txt); if(voice){ u.voice=voice; u.lang=voice.lang; } else u.lang='en-US';
+      u.volume=vol; u.rate=1.12; u.pitch=voice&&(MALE.test(voice.name)||GOOD.test(voice.name))?1:0.85;
+      if(i===chunks.length-1) u.onend=finish; u.onerror=e=>{ if(e&&e.error!=='interrupted'&&e.error!=='canceled') finish(); }; S.speak(u); });
+    if(voice&&!voice.localService&&!mobile) keep=setInterval(()=>{ if(tok!==devTok){ clearInterval(keep); return; } if(S.speaking&&!S.paused){ S.pause(); S.resume(); } },9000);
+    const watch=()=>{ if(tok!==devTok) return; if((S.speaking||S.pending)&&Date.now()<cap){ wd=setTimeout(watch,1000); return; } finish(); };
+    wd=setTimeout(watch,t.length*80+2500);
   }
   function fake(t,done){ clearTimeout(fakeT); if(done) fakeT=setTimeout(done,Math.max(3500,Math.min(16000,t.length*60))); }
   /* studio voice: a module worker loads Kokoro from jsDelivr and the model from Hugging Face (cached by the browser after the first time) */
@@ -1731,12 +1734,12 @@ let tts=null, loading=null, cut=0, chain=Promise.resolve();
 function load(){ if(!loading) loading=KokoroTTS.from_pretrained('onnx-community/Kokoro-82M-v1.0-ONNX',{dtype:'q8',device:'wasm',progress_callback:p=>{ if(p&&p.status==='progress'&&/onnx/.test(p.file||'')) postMessage({type:'progress',pct:p.progress}); }}).then(t=>{ tts=t; postMessage({type:'ready'}); return t; }); return loading; }
 async function run(m){
   try{ await load(); if(m.type!=='say') return;
-    for(let i=0;i<m.parts.length;i++){ if(m.id<=cut) return; const a=await tts.generate(m.parts[i],{voice:m.voice,speed:m.speed}); if(m.id<=cut) return;
-      const pcm=new Float32Array(a.audio); postMessage({type:'audio',id:m.id,last:i===m.parts.length-1,pcm,sr:a.sampling_rate},[pcm.buffer]); }
+    for(let i=0;i<m.parts.length;i++){ if(!m.pre&&m.id<=cut) return; const a=await tts.generate(m.parts[i],{voice:m.voice,speed:m.speed}); if(!m.pre&&m.id<=cut) return;
+      const pcm=new Float32Array(a.audio); postMessage({type:'audio',id:m.id,pre:m.pre,key:m.key,last:i===m.parts.length-1,pcm,sr:a.sampling_rate},[pcm.buffer]); }
   }catch(err){ postMessage({type:'error',id:m.id,msg:String(err&&err.message||err)}); }
 }
 onmessage=e=>{ const m=e.data; if(m.type==='cancel'){ cut=Math.max(cut,m.upto); return; } chain=chain.then(()=>run(m)); };`;
-  let W=null, wTimer=0, ac=null, gain=null, playing=[], tEnd=0, job=0, cbs={};
+  let W=null, wTimer=0, ac=null, gain=null, playing=[], tEnd=0, job=0, cbs={}, lastA=0; const cache=new Map();
   function fail(msg){ status.state='failed'; status.err=msg||'The studio voice could not load.'; clearTimeout(wTimer); if(W){ try{ W.terminate(); }catch(e){} W=null; } notify(); }
   function warm(){
     if(W||status.state==='failed'||engine!=='studio'||!on) return;
@@ -1745,7 +1748,7 @@ onmessage=e=>{ const m=e.data; if(m.type==='cancel'){ cut=Math.max(cut,m.upto); 
     W.onmessage=e=>{ const m=e.data;
       if(m.type==='progress'){ status.pct=Math.round(m.pct||0); notify(); clearTimeout(wTimer); wTimer=setTimeout(()=>{ if(status.state==='loading') fail('The studio voice download stalled.'); },60000); }
       else if(m.type==='ready'){ clearTimeout(wTimer); status.state='ready'; status.pct=100; notify(); }
-      else if(m.type==='audio') play(m);
+      else if(m.type==='audio'){ if(m.pre){ const c=cache.get(m.key); if(c){ c.chunks.push(m); if(m.last) c.done=true; } } else play(m); }
       else if(m.type==='error') fail(m.msg); };
     W.onerror=e=>{ e.preventDefault&&e.preventDefault(); fail('The studio voice could not load here.'); };
     W.postMessage({type:'load'});
@@ -1753,13 +1756,13 @@ onmessage=e=>{ const m=e.data; if(m.type==='cancel'){ cut=Math.max(cut,m.upto); 
   }
   function actx(){ try{ if(!ac){ const C=window.AudioContext||window.webkitAudioContext; if(!C) return null; ac=new C(); gain=ac.createGain(); gain.connect(ac.destination); } if(ac.state==='suspended') ac.resume(); gain.gain.value=vol; return ac; }catch(e){ return null; } }
   function play(m){
-    if(m.id!==job) return; const c=actx(); if(!c) return;
+    if(m.id!==job) return; const c=actx(); if(!c) return; lastA=Date.now();
     const b=c.createBuffer(1,m.pcm.length,m.sr); b.copyToChannel(m.pcm,0); const s=c.createBufferSource(); s.buffer=b; s.connect(gain);
     const t=Math.max(c.currentTime+.05,tEnd); s.start(t); tEnd=t+b.duration+.18; playing.push(s);
     s.onended=()=>{ playing=playing.filter(x=>x!==s); if(m.last&&m.id===job&&cbs[m.id]){ const d=cbs[m.id]; delete cbs[m.id]; d(); } };
   }
-  function parts(t){ const raw=spoken(t).match(/[^.!?]+[.!?]+["')]*\s*|[^.!?]+$/g)||[t], out=[]; let cur='';
-    for(const r of raw){ const x=r.trim(); if(!x) continue; if((cur+' '+x).length<60||!cur) cur=(cur?cur+' ':'')+x; else { out.push(cur); cur=x; } } if(cur) out.push(cur);
+  function parts(t,max=60,rest=max*2){ const raw=spoken(t).match(/[^.!?]+[.!?]+["')]*\s*|[^.!?]+$/g)||[t], out=[]; let cur='';
+    for(const r of raw){ const x=r.trim(); if(!x) continue; const lim=out.length?rest:max; if((cur+' '+x).length<lim||!cur) cur=(cur?cur+' ':'')+x; else { out.push(cur); cur=x; } } if(cur) out.push(cur);
     if(out.length>1&&out[out.length-1].length<40){ const l=out.pop(); out[out.length-1]+=' '+l; } return out; }
   function hush(){ job++; if(W) W.postMessage({type:'cancel',upto:job-1}); for(const s of playing){ try{ s.stop(); }catch(e){} } playing=[]; tEnd=0; cbs={}; next=null; devTok++; if(S) S.cancel(); clearTimeout(fakeT); }
   function caption(t){ const cap=$('anncap'); if(cap){ cap.hidden=false; cap.innerHTML=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-3.1A7 7 0 0 0 19 11z"/></svg><span>${esc(shown(t))}</span>`; } }
@@ -1768,14 +1771,21 @@ onmessage=e=>{ const m=e.data; if(m.type==='cancel'){ cut=Math.max(cut,m.upto); 
     if(!t){ if(done) done(); return; } if(!quiet) caption(t);
     if(!on||!sfx.on){ fake(t,done); return; }
     if(engine==='studio'&&status.state!=='failed'){
-      if(status.state==='ready'){ hush(); cbs[job]=done||null; if(!done) delete cbs[job]; actx(); W.postMessage({type:'say',id:job,parts:parts(t),voice:sv,speed:1}); return; }
-      warm(); fake(t,done); return; }
+      if(status.state==='ready'){ hush(); if(done) cbs[job]=done; actx(); lastA=Date.now(); const key=sv+'|'+t, c=cache.get(key);
+        if(c&&c.done){ cache.delete(key); c.chunks.forEach(m=>play(Object.assign({},m,{id:job,pcm:m.pcm.slice()}))); return; }
+        W.postMessage({type:'say',id:job,parts:parts(t),voice:sv,speed:1.12}); return; }
+      warm(); }
     if(big) hush(); devSay(t,big,done);
   }
   return {
     get on(){ return on; },
     set(v){ on=v; try{ localStorage.setItem('fdl-ann',v?'on':'off'); }catch(e){} if(!v) hush(); else warm(); },
     say, stop:hush, warm, caption,
+    /* still talking (or about to): nothing should cut in */
+    get busy(){ if(!on||!sfx.on) return false; if(engine==='studio'&&status.state==='ready') return playing.length>0||(!!cbs[job]&&Date.now()-lastA<20000); return !!S&&(S.speaking||S.pending); },
+    /* get a line ready ahead of time (the studio voice renders it in the background) */
+    prefetch(t){ if(!t||!on||!sfx.on||engine!=='studio'||status.state!=='ready') return; const key=sv+'|'+t; if(cache.has(key)) return; if(cache.size>12) cache.delete(cache.keys().next().value);
+      cache.set(key,{chunks:[],done:false}); W.postMessage({type:'say',id:0,pre:true,key,parts:parts(t),voice:sv,speed:1.12}); },
     avg:x=>'\u0001'+Math.round(Math.max(0,Math.min(1,x))*1000)+'\u0001',
     get voiceName(){ return voice?voice.name:''; },
     get vol(){ return vol; }, setVol(v){ vol=Math.max(0,Math.min(1,v)); if(gain) gain.gain.value=vol; try{ localStorage.setItem('fdl-ann-vol',vol); }catch(e){} },
@@ -1959,18 +1969,18 @@ function tvShow(m){
 <div class="tvlower"><span class="tvtag" id="tvTag"></span><p id="tvCap"></p></div>
 <footer class="tvfoot"><div class="tvtick"><b>Floodlight</b><div class="tvrun"><div>${tick}<span>•</span>${tick}</div></div></div><div class="tvctl"><span class="tvdots">${segs.map(()=>'<i></i>').join('')}</span><button class="btn small" type="button" id="tvNext">Next ›</button><button class="btn small" type="button" id="tvSkip">Skip show</button></div></footer>`;
   document.body.appendChild(el); ann.stop(); sfx.tvOpen&&sfx.tvOpen();
-  const go=()=>{ if(gone) return; clearTimeout(t1); clearTimeout(t2); i++; if(i>=segs.length){ close(); return; }
+  const go=()=>{ if(gone) return; clearTimeout(t1); clearTimeout(t2); i++; if(i>=segs.length||!el.isConnected){ close(); return; }
     const S=segs[i], seg=$('tvSeg'); seg.classList.remove('in'); void seg.offsetWidth;
     seg.innerHTML=`<h4 class="tvh"><span>${esc(S.title)}</span></h4>${S.html}`; seg.classList.add('in');
     $('tvTag').textContent=S.tag; $('tvCap').textContent=S.say.replace(/\u0001(\d+)\u0001/g,(x,d)=>'.'+String(d).padStart(3,'0'));
-    el.querySelectorAll('.tvdots i').forEach((d,k)=>d.classList.toggle('on',k<=i)); if(i&&sfx.whoosh) sfx.whoosh();
-    let said=false, min=false; const adv=()=>{ if(said&&min) go(); };
-    t1=setTimeout(()=>{ min=true; adv(); },4500); t2=setTimeout(()=>{ said=true; min=true; adv(); },30000);
-    ann.say(S.say,true,()=>{ said=true; setTimeout(adv,900); },true); };
+    el.querySelectorAll('.tvdots i').forEach((d,k)=>d.classList.toggle('on',k<=i)); if(i){ sfx.crack(); sfx.whoosh(); }
+    let said=false, min=false; const me=i; const adv=()=>{ if(said&&min&&i===me&&!gone) go(); };
+    t1=setTimeout(()=>{ min=true; adv(); },1800); const cap=Date.now()+S.say.length*170+12000, quiet=()=>{ if(ann.busy&&Date.now()<cap){ t2=setTimeout(quiet,1000); return; } said=true; min=true; adv(); }; t2=setTimeout(quiet,Math.max(9000,S.say.length*90));
+    ann.say(S.say,true,()=>{ said=true; setTimeout(adv,250); },true); if(segs[i+1]) ann.prefetch(segs[i+1].say); };
   const close=()=>{ if(gone) return; gone=true; clearTimeout(t1); clearTimeout(t2); ann.stop(); el.classList.add('out'); setTimeout(()=>el.remove(),reduce?0:400); };
   $('tvNext').onclick=()=>{ ann.stop(); go(); }; $('tvSkip').onclick=close;
   el.addEventListener('keydown',e=>{ if(e.key==='Escape') close(); }); $('tvNext').focus();
-  setTimeout(go, reduce?0:900);
+  ann.prefetch(segs[0].say); setTimeout(go, reduce?0:600);
 }
 function annStart(){ if(G) G.annPrev={inning:G.inning,half:G.half,outs:G.outs,a:total(G,0),h:total(G,1)}; const c=$('anncap'); if(c){ c.hidden=true; c.innerHTML=''; } }
 
@@ -1992,8 +2002,8 @@ ${st.length?`<p class="story">${st.map(esc).join('<br>')}</p>`:''}<span class="s
   document.body.appendChild(el); sfx.organ();
   let gone=false, min=false, said=false; const done=()=>{ if(gone) return; gone=true; el.classList.add('out'); setTimeout(()=>el.remove(),reduce?0:400); };
   const adv=()=>{ if(min&&said) done(); };
-  ann.say(`Good evening, and welcome to the ballpark! ${fr?kicker.replace(/\s*·/g,',')+'. ':''}${TheTeam(A.name)}${fr&&recA?`, ${recA},`:''} take on ${theTeam(H.name)}${fr&&recH?`, ${recH}`:''}. ${story.slice(0,5).join(' ')} ${annLeadoff()}`,true,()=>{ said=true; setTimeout(adv,500); });
-  el.addEventListener('click',()=>done()); setTimeout(()=>{ min=true; adv(); }, reduce?1500:6000); setTimeout(done, 30000);
+  ann.say(`Good evening, and welcome to the ballpark. ${fr?kicker.replace(/\s*·/g,',')+'. ':''}${TheTeam(A.name)}${fr&&recA?`, ${recA},`:''} take on ${theTeam(H.name)}${fr&&recH?`, ${recH}`:''}. ${story.slice(0,3).join(' ')} ${annLeadoff()}`,true,()=>{ said=true; setTimeout(adv,200); });
+  el.addEventListener('click',()=>done()); setTimeout(()=>{ min=true; adv(); }, reduce?1200:3500); setTimeout(done, 30000);
 }
 
 /* ---------- trophy presentation when your club wins the Floodlight Series ---------- */
@@ -2795,7 +2805,7 @@ function frPregame(){
   const M=me(), O=F.teams[nx.opp], rec=id=>`${F.rec[id].w}–${F.rec[id].l}`;
   closeHub();
   openPregame({kicker:nx.label, title:`${M.name} vs ${O.name}`,
-    sub:`<b>${esc(M.abbr)}</b> ${rec(M.id)} · <b>${esc(O.abbr)}</b> ${rec(O.id)}${nx.series?` · ${esc(seriesText(nx.series))}`:''}`,
+    sub:`<b>${esc(M.name)}</b> ${rec(M.id)} · <b>${esc(O.name)}</b> ${rec(O.id)}${nx.series?` · ${esc(seriesText(nx.series))}`:''}`,
     homeLabel:`${M.abbr} plays`, home:nx.home,
     cols:[{T:M,editable:true,stat:statLineShort},{T:O,editable:false,stat:statLineShort,note:'Scouting report'}],
     cancel:()=>openHub(),
@@ -2872,7 +2882,7 @@ function frHonors(n,tid,a,b){
   return o;
 }
 function honorsText(o){ const t=[], p=(k,one,many)=>{ if(o[k]) t.push(o[k]===1?one:`${o[k]}× ${many}`); };
-  p('mvp','MVP','MVP'); p('hrk','Home run title','home run champ'); p('bat','Batting title','batting champ'); p('smvp','Series MVP','Series MVP'); if(o.rings) t.push(o.rings===1?'1 title':`${o.rings} titles`); return t; }
+  p('mvp','MVP','MVP'); p('smvp','Series MVP','Series MVP'); if(o.hrk) t.push(o.hrk===1?'Home run title':`${o.hrk} home run titles`); if(o.bat) t.push(o.bat===1?'Batting title':`${o.bat} batting titles`); if(o.rings) t.push(o.rings===1?'1 title':`${o.rings} titles`); return t; }
 /* the Hall of Fame: at each retirement stage the best HOF_CLASS careers among the retirees get in */
 function frInduct(gone){
   F.hof=F.hof||[]; if(!gone.length) return [];
@@ -2994,7 +3004,7 @@ function homeHTML(){
 }
 function standingsHTML(mini){
   const st=frStandings(), u=F.userId;
-  return `<div class="tscroll"><table class="tbl"><thead><tr><th class="l">Team</th><th>W</th><th>L</th><th>Pct</th><th>GB</th>${mini?'':'<th>RS</th><th>RA</th>'}<th>Diff</th></tr></thead><tbody>${st.map((r,i)=>`<tr class="${r.id===u?'me':''}${i===3?' cut':''}"><td class="l">${tdot(r.id)}<b>${esc(mini?F.teams[r.id].abbr+' · '+lastWord(tname(r.id)):tname(r.id))}</b>${F.phase!=='reg'&&i<4?`<span class="seed">#${i+1}</span>`:''}</td><td>${r.w}</td><td>${r.l}</td><td>${pct(r.w,r.l)}</td><td>${r.gb?r.gb.toFixed(1).replace('.0',''):'–'}</td>${mini?'':`<td>${r.rs}</td><td>${r.ra}</td>`}<td>${r.rs-r.ra>0?'+':''}${r.rs-r.ra}</td></tr>`).join('')}</tbody></table></div>`;
+  return `<div class="tscroll"><table class="tbl"><thead><tr><th class="l">Team</th><th>W</th><th>L</th><th>Pct</th><th>GB</th>${mini?'':'<th>RS</th><th>RA</th>'}<th>Diff</th></tr></thead><tbody>${st.map((r,i)=>`<tr class="${r.id===u?'me':''}${i===3?' cut':''}"><td class="l">${tdot(r.id)}<b>${esc(tname(r.id))}</b>${F.phase!=='reg'&&i<4?`<span class="seed">#${i+1}</span>`:''}</td><td>${r.w}</td><td>${r.l}</td><td>${pct(r.w,r.l)}</td><td>${r.gb?r.gb.toFixed(1).replace('.0',''):'–'}</td>${mini?'':`<td>${r.rs}</td><td>${r.ra}</td>`}<td>${r.rs-r.ra>0?'+':''}${r.rs-r.ra}</td></tr>`).join('')}</tbody></table></div>`;
 }
 const lastWord=s=>{ const w=s.split(' '); return w.length>2?w.slice(-2).join(' '):w.slice(-1)[0]; };
 function bracketHTML(){
@@ -3748,7 +3758,9 @@ const soundBtn=$('sound');
 function paintSound(){ soundBtn.setAttribute('aria-pressed',sfx.on); soundBtn.textContent=sfx.on?'Sound on':'Sound off'; }
 soundBtn.addEventListener('click',()=>{ sfx.set(!sfx.on); paintSound(); if(sfx.on) sfx.pop(); else ann.stop(); });
 paintSound();
-function paintAnn(){ const b=$('annBtn'); b.setAttribute('aria-pressed',ann.on); b.textContent=ann.on?'Announcer on':'Announcer off'; }
+function paintAnn(){ const b=$('annBtn'), st=ann.status; b.setAttribute('aria-pressed',ann.on);
+  b.textContent=!ann.on?'Announcer off':ann.engine==='studio'&&st.state==='loading'?`Announcer · voice ${st.pct}%`:'Announcer on'; }
+ann.onStatus(paintAnn);
 $('annBtn').addEventListener('click',e=>{ e.stopPropagation(); annPanel(); });
 /* announcer settings: on/off, which voice, how loud */
 function annPanel(){
@@ -3765,7 +3777,7 @@ function annPanel(){
   document.body.appendChild(pop);
   const paint=()=>{ if(!pop.isConnected){ off(); return; } const e=ann.engine, s=ann.status; $('apSvW').hidden=e!=='studio'; $('apVoiceW').hidden=e==='studio';
     $('apSt').textContent= e!=='studio' ? '★ = natural-sounding voice. Which ones you get depends on your browser and device.'
-      : s.state==='ready' ? 'Studio voice is ready.' : s.state==='loading' ? `Downloading the studio voice… ${s.pct}%. You’ll see the captions until it’s ready.`
+      : s.state==='ready' ? 'Studio voice is ready.' : s.state==='loading' ? `Downloading the studio voice… ${s.pct}%. Until it’s ready you’ll hear your device’s voice.`
       : s.state==='failed' ? `The studio voice couldn’t load here (${s.err}) so the device voice fills in.` : 'The studio voice downloads the first time it’s needed.';
     place(); };
   const place=()=>{ const r=$('annBtn').getBoundingClientRect(); pop.style.top=Math.max(8,Math.min(r.bottom+8,innerHeight-pop.offsetHeight-8))+'px'; pop.style.left=Math.max(16,Math.min(r.left,innerWidth-pop.offsetWidth-16))+'px'; };
