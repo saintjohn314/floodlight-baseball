@@ -1725,13 +1725,16 @@ const ann=(()=>{
   /* studio voice: a module worker loads Kokoro from jsDelivr and the model from Hugging Face (cached by the browser after the first time) */
   const WORKER=`import { KokoroTTS } from 'https://cdn.jsdelivr.net/npm/kokoro-js@1.2.1/dist/kokoro.web.js';
 let tts=null, loading=null, cut=0, chain=Promise.resolve(); const drop=new Set();
-function load(){ if(!loading) loading=KokoroTTS.from_pretrained('onnx-community/Kokoro-82M-v1.0-ONNX',{dtype:'q8',device:'wasm',progress_callback:p=>{ if(p&&p.status==='progress'&&/onnx/.test(p.file||'')) postMessage({type:'progress',pct:p.progress}); }}).then(t=>{ tts=t; postMessage({type:'ready'}); return t; }); return loading; }
+let device='wasm';
+async function gpu(){ try{ if(self.navigator&&navigator.gpu){ const a=await navigator.gpu.requestAdapter(); return !!a; } }catch(e){} return false; }
+function open(dev){ device=dev; postMessage({type:'device',device:dev}); return KokoroTTS.from_pretrained('onnx-community/Kokoro-82M-v1.0-ONNX',{dtype:dev==='webgpu'?'fp32':'q8',device:dev,progress_callback:p=>{ if(p&&p.status==='progress'&&/onnx/.test(p.file||'')) postMessage({type:'progress',pct:p.progress}); }}); }
+function load(){ if(!loading) loading=(async()=>{ let t=null; if(await gpu()){ try{ t=await open('webgpu'); }catch(e){ t=null; } } if(!t) t=await open('wasm'); tts=t; postMessage({type:'ready',device}); return t; })(); return loading; }
 const gone=m=>m.pre?drop.has(m.key):m.id<=cut;
 async function run(m){
   try{ await load();
     if(m.type==='load'){ if(!m.voice) return; await tts.generate('Play ball.',{voice:m.voice,speed:m.speed});
       const t0=performance.now(), a=await tts.generate('Good evening, and welcome to the ballpark. It is a beautiful night for baseball.',{voice:m.voice,speed:m.speed});
-      postMessage({type:'speed',rtf:(a.audio.length/a.sampling_rate)/((performance.now()-t0)/1000)}); return; }
+      postMessage({type:'speed',device,rtf:(a.audio.length/a.sampling_rate)/((performance.now()-t0)/1000)}); return; }
     if(m.type!=='say') return;
     for(let i=0;i<m.parts.length;i++){ if(gone(m)) return; const a=await tts.generate(m.parts[i],{voice:m.voice,speed:m.speed}); if(gone(m)) return;
       const pcm=new Float32Array(a.audio); postMessage({type:'audio',id:m.id,pre:m.pre,key:m.key,last:i===m.parts.length-1,pcm,sr:a.sampling_rate},[pcm.buffer]); }
@@ -1740,21 +1743,21 @@ async function run(m){
 onmessage=e=>{ const m=e.data; if(m.type==='cancel'){ cut=Math.max(cut,m.upto); return; } if(m.type==='drop'){ m.keys.forEach(k=>drop.add(k)); return; } chain=chain.then(()=>run(m)); };`;
   let W=null, wTimer=0, ac=null, gain=null, playing=[], tEnd=0, job=0, cbs={}, lastA=0, firstT=0, heard=0, slowHits=0; const cache=new Map(), SPEED=1.12;
   /* the studio voice is only used where this computer renders it faster than it's spoken */
-  const studioOK=()=>engine==='studio'&&status.state==='ready'&&status.rtf>=1.25&&!status.slow&&!(status.blocked&&(!ac||ac.state!=='running'));
+  const studioOK=()=>engine==='studio'&&status.state==='ready'&&status.rtf>=1.05&&!status.slow&&!(status.blocked&&(!ac||ac.state!=='running'));
   function fail(msg){ status.state='failed'; status.err=msg||'The studio voice could not load.'; clearTimeout(wTimer); if(W){ try{ W.terminate(); }catch(e){} W=null; } notify(); }
   function warm(){
     if(W||status.state==='failed'||engine!=='studio'||!on) return;
     try{ const url=URL.createObjectURL(new Blob([WORKER],{type:'text/javascript'})); W=new Worker(url,{type:'module'}); }catch(e){ fail('This browser can’t run the studio voice.'); return; }
     status.state='loading'; status.pct=0; notify();
     W.onmessage=e=>{ const m=e.data;
-      if(m.type==='progress'){ status.pct=Math.round(m.pct||0); notify(); clearTimeout(wTimer); wTimer=setTimeout(()=>{ if(status.state==='loading') fail('The studio voice download stalled.'); },60000); }
+      if(m.type==='progress'){ status.pct=Math.round(m.pct||0); notify(); }
       else if(m.type==='ready'){ clearTimeout(wTimer); status.state='ready'; status.pct=100; notify(); }
-      else if(m.type==='speed'){ status.rtf=m.rtf; if(m.rtf<1.25){ status.slow=true; dropAll(); } notify(); }
+      else if(m.type==='device'){ status.device=m.device; notify(); }
+      else if(m.type==='speed'){ status.rtf=m.rtf; status.device=m.device||status.device; if(m.rtf<1.05){ status.slow=true; dropAll(); } notify(); }
       else if(m.type==='audio'){ if(m.pre){ const c=cache.get(m.key); if(c){ c.chunks.push(m); if(m.last) c.done=true; if(c.live===job) play(Object.assign({},m,{id:job,pcm:m.pcm.slice()})); } } else play(m); }
       else if(m.type==='error') fail(m.msg); };
     W.onerror=e=>{ e.preventDefault&&e.preventDefault(); fail('The studio voice could not load here.'); };
     W.postMessage({type:'load',voice:sv,speed:SPEED});
-    wTimer=setTimeout(()=>{ if(status.state==='loading'&&!status.pct) fail('The studio voice download did not start.'); },45000);
   }
   function actx(){ try{ if(!ac){ const C=window.AudioContext||window.webkitAudioContext; if(!C) return null; ac=new C(); gain=ac.createGain(); gain.connect(ac.destination); } if(ac.state==='suspended') ac.resume(); gain.gain.value=vol; return ac; }catch(e){ return null; } }
   function play(m){
@@ -3831,7 +3834,7 @@ function annPanel(){
   pop=document.createElement('div'); pop.className='annpop'; pop.setAttribute('role','dialog'); pop.setAttribute('aria-label','Announcer');
   const vs=ann.voices(), cur=ann.voiceName, st=ann.status;
   pop.innerHTML=`<div class="row"><button class="btn small" type="button" id="apOn">${ann.on?'Turn announcer off':'Turn announcer on'}</button><button class="btn small" type="button" id="apTest">Test voice</button><button class="btn small" type="button" id="apX">Done</button></div>
-<div class="eng" role="radiogroup" aria-label="Voice type"><label class="opt"><input type="radio" name="apEng" value="studio"${ann.engine==='studio'?' checked':''}><span><b>Studio voice</b> · human-sounding AI voice, free. One-time download of about 90 MB, then it’s saved in your browser.</span></label>
+<div class="eng" role="radiogroup" aria-label="Voice type"><label class="opt"><input type="radio" name="apEng" value="studio"${ann.engine==='studio'?' checked':''}><span><b>Studio voice</b> · human-sounding AI voice, free. One-time download (about 90 MB, or 330 MB to run on your graphics chip), then it’s saved in your browser.</span></label>
 <label class="opt"><input type="radio" name="apEng" value="device"${ann.engine==='device'?' checked':''}><span><b>Device voice</b> · your browser’s built-in voice. No download.</span></label></div>
 <label id="apSvW">Announcer<select id="apSv">${ann.studio.map(([id,n])=>`<option value="${id}"${id===ann.studioVoice?' selected':''}>${esc(n)}</option>`).join('')}</select></label>
 <label id="apVoiceW">Device voice<select id="apVoice">${vs.length?vs.map(v=>`<option value="${esc(v.name)}"${v.name===cur?' selected':''}>${v.human?'★ ':''}${esc(v.name)}</option>`).join(''):'<option>No voices on this device</option>'}</select></label>
@@ -3840,7 +3843,7 @@ function annPanel(){
   document.body.appendChild(pop);
   const paint=()=>{ if(!pop.isConnected){ off(); return; } const e=ann.engine, s=ann.status; $('apSvW').hidden=e!=='studio'; $('apVoiceW').hidden=e==='studio';
     $('apSt').textContent= e!=='studio' ? '★ = natural-sounding voice. Which ones you get depends on your browser and device.'
-      : s.state==='ready' ? (s.slow?'This computer can’t render the studio voice fast enough, so your device’s American voice is calling the games.':'Studio voice is ready.') : s.state==='loading' ? `Downloading the studio voice… ${s.pct}%. Until it’s ready you’ll hear your device’s voice.`
+      : s.state==='ready' ? (s.slow?`This computer renders the studio voice too slowly${s.rtf?` (${s.rtf.toFixed(1)}× real time)`:''}, so your device’s voice is calling the games. For a natural free voice, open the game in Microsoft Edge.`:s.rtf?`Studio voice is ready, running on your ${s.device==='webgpu'?'graphics chip':'processor'} (${s.rtf.toFixed(1)}× real time).`:'Studio voice is ready. Checking its speed…') : s.state==='loading' ? `Downloading the studio voice${s.device==='webgpu'?' for your graphics chip':''}… ${s.pct}%. Until it’s ready you’ll hear your device’s voice.`
       : s.state==='failed' ? `The studio voice couldn’t load here (${s.err}) so the device voice fills in.` : 'The studio voice downloads the first time it’s needed.';
     place(); };
   const place=()=>{ const r=$('annBtn').getBoundingClientRect(); pop.style.top=Math.max(8,Math.min(r.bottom+8,innerHeight-pop.offsetHeight-8))+'px'; pop.style.left=Math.max(16,Math.min(r.left,innerWidth-pop.offsetWidth-16))+'px'; };

@@ -2,3 +2,11 @@
 [build]
   publish = "."
   functions = "netlify/functions"
+
+# Cross-origin isolation lets the in-browser studio voice run on several processor cores.
+# "credentialless" keeps Google Fonts and other public files loading normally.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cross-Origin-Opener-Policy = "same-origin"
+    Cross-Origin-Embedder-Policy = "credentialless"
