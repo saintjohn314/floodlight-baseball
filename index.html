@@ -191,7 +191,7 @@ button,select,input{font:inherit;color:inherit}
 .annpop .eng{display:flex;flex-direction:column;gap:6px}.annpop .opt{flex-direction:row;align-items:flex-start;gap:8px;text-transform:none;letter-spacing:0;font-size:13px;color:var(--cream);cursor:pointer}.annpop .opt input{margin-top:3px}
 .prerow .venue{font-weight:600;color:var(--cream)}
 .svbig{display:inline-block;font-family:var(--f-led,monospace);font-size:30px;letter-spacing:.18em;color:#ffd77e;padding:4px 10px;margin:4px 0;border:1px solid rgba(255,200,97,.45);border-radius:8px;background:rgba(0,0,0,.3);user-select:all}
-.annpop{position:fixed;z-index:9400;width:min(320px,calc(100vw - 32px));padding:14px;border-radius:14px;border:1px solid var(--line);background:#0d1628;box-shadow:0 18px 50px rgba(0,0,0,.55);display:flex;flex-direction:column;gap:10px;color:var(--cream);font-size:14px}
+.annpop{position:fixed;z-index:9400;box-sizing:border-box;width:min(350px,calc(100vw - 32px));padding:14px;border-radius:14px;border:1px solid var(--line);background:#0d1628;box-shadow:0 18px 50px rgba(0,0,0,.55);display:flex;flex-direction:column;gap:10px;color:var(--cream);font-size:14px}
 .annpop label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
 .annpop select,.annpop input[type=range]{width:100%}
 .annpop select{background:#071021;color:var(--cream);border:1px solid var(--line);border-radius:8px;padding:7px}
@@ -231,7 +231,7 @@ button,select,input{font:inherit;color:inherit}
 .stretch .bug .k{font-family:var(--f-head);font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:var(--flood);font-size:clamp(11px,1.5vw,14px)}
 .stretch .bug b{font-family:var(--f-logo);font-weight:400;font-size:clamp(26px,4.6vw,50px);color:var(--cream);text-shadow:3px 3px 0 #9e2f28,0 0 26px rgba(255,200,97,.5);line-height:1.1}
 .stretch .board{position:absolute;left:50%;bottom:max(7vh,54px);transform:translateX(-50%);width:min(94vw,940px);padding:14px 18px 16px;border-radius:14px;background:rgba(4,8,18,.62);border:1px solid rgba(255,215,122,.22);box-shadow:0 0 40px rgba(0,0,0,.5);text-align:center;pointer-events:none;backdrop-filter:blur(3px)}
-.stretch .lyr{position:relative;font-family:var(--f-head);font-weight:700;font-size:clamp(21px,4.4vw,44px);line-height:1.2;color:rgba(255,255,255,.42);min-height:1.2em;padding-top:22px}
+.stretch .lyr{position:relative;font-family:var(--f-head);font-weight:700;font-size:clamp(16px,5vw,44px);line-height:1.2;color:rgba(255,255,255,.42);min-height:1.2em;padding-top:22px}
 .stretch .lyr .w{transition:color .1s}.stretch .lyr .w.on,.stretch .lyr .w.done{color:#fff}.stretch .lyr .w.on{color:#ffd77a;text-shadow:0 0 18px rgba(255,200,97,.65)}
 .stretch .ball{position:absolute;top:0;left:0;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,#ffd77a 60%,#e0a43a);box-shadow:0 0 12px rgba(255,215,122,.8);transition:left .16s ease-out;opacity:0}
 .stretch .ball.hop{animation:stHop var(--d,.34s) ease-in-out}
@@ -2677,7 +2677,7 @@ function stretchScene(){
     const i=cam(Math.max(0,tt)); if(i!==shot){ if(shot>=0&&i<4&&!reduce){ flash.classList.remove('go'); void flash.offsetWidth; flash.classList.add('go'); } shot=i; }
     while(cue+1<cues.length&&tt>=cues[cue+1].t){ cue++; const c=cues[cue]; if(c.li!==line){ line=c.li; showLine(line); }
       const ws=lyr.querySelectorAll('.w'); ws.forEach((w,k)=>{ w.classList.toggle('on',k===c.wi); w.classList.toggle('done',k<c.wi); });
-      const w=ws[c.wi]; if(w){ ball.style.opacity=1; ball.style.left=(w.offsetLeft+w.offsetWidth/2-lyr.offsetLeft+lyr.offsetLeft)+'px'; ball.style.setProperty('--d',Math.max(.25,c.d)+'s'); ball.classList.remove('hop'); void ball.offsetWidth; ball.classList.add('hop'); } }
+      const w=ws[c.wi]; if(w){ ball.style.opacity=1; ball.style.left=(w.offsetLeft+w.offsetWidth/2)+'px'; ball.style.top=Math.max(0,w.offsetTop-22)+'px'; ball.style.setProperty('--d',Math.max(.25,c.d)+'s'); ball.classList.remove('hop'); void ball.offsetWidth; ball.classList.add('hop'); } }
     if(tt>=SONG&&line!==4){ line=4; lyr.querySelectorAll('.w').forEach(w=>{ w.classList.remove('on'); w.classList.add('done'); }); ball.style.opacity=0; }
     if(tt>=END+.4){ close(false); return; }
     raf=requestAnimationFrame(tick); };
