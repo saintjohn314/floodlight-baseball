@@ -107,6 +107,53 @@ button,select,input{font:inherit;color:inherit}
 @keyframes shadowIn{0%,40%{opacity:0;transform:scale(.4)}100%{opacity:1;transform:none}}
 .callout{position:absolute;left:50%;top:6%;transform:translate(-50%,0);font-family:var(--f-logo);font-size:clamp(28px,8cqw,92px);line-height:1;color:var(--cream);text-shadow:3px 3px 0 #9e2f28,0 0 30px rgba(255,200,97,.7);white-space:nowrap;pointer-events:none;opacity:0;z-index:3000}
 .callout.show{animation:callout 1.9s ease-out both}
+.callout.gold{color:#ffe08a;text-shadow:3px 3px 0 #7a4d00,0 0 36px rgba(255,210,90,.95),0 0 80px rgba(255,170,40,.6)}
+.callout.gold.show{animation:callout 2.8s ease-out both}
+/* fireworks and confetti for grand slams, walk-off homers and the trophy */
+.fw{position:absolute;inset:0;pointer-events:none;z-index:2900;overflow:hidden}
+.fw i{position:absolute;left:var(--x);top:var(--y);width:6px;height:6px;margin:-3px;border-radius:50%;background:var(--c);box-shadow:0 0 8px 1px var(--c);opacity:0;animation:fwb 1.4s cubic-bezier(.12,.75,.3,1) var(--d) both}
+@keyframes fwb{0%{transform:translate(0,0) scale(.3);opacity:1}75%{opacity:1}100%{transform:translate(var(--dx),calc(var(--dy) + 30px)) scale(.5);opacity:0}}
+.fw u{position:absolute;left:var(--x);top:var(--y);width:var(--s);height:var(--s);margin:calc(var(--s)/-2);border-radius:50%;background:radial-gradient(circle,#fff8e0,var(--c) 40%,transparent 70%);opacity:0;animation:fwf .55s ease-out var(--d) both}
+@keyframes fwf{0%{transform:scale(.2);opacity:1}100%{transform:scale(1.4);opacity:0}}
+.fw b{position:absolute;left:var(--x);top:-6%;width:7px;height:12px;background:var(--c);border-radius:2px;animation:conf var(--t) linear var(--d) both}
+@keyframes conf{0%{top:-6%;transform:rotate(0) translateX(0)}50%{transform:rotate(360deg) translateX(18px)}100%{top:106%;transform:rotate(720deg) translateX(-12px)}}
+/* the announcer's call, shown under the result */
+.anncall{display:flex;gap:7px;align-items:flex-start;font-size:13px;line-height:1.4;color:#e6dcc2;background:rgba(255,200,97,.07);border:1px solid rgba(255,200,97,.25);border-radius:10px;padding:6px 10px;font-style:italic}
+.anncall[hidden]{display:none}
+.anncall svg{width:15px;height:15px;flex:none;margin-top:2px;fill:var(--flood)}
+/* pregame cutscene */
+.cut{position:fixed;inset:0;z-index:9300;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;background:radial-gradient(ellipse 90% 60% at 50% -5%,rgba(255,200,97,.22),transparent 70%),linear-gradient(180deg,#060b18,#0d1a33 70%,#14264a);animation:cutIn .45s ease-out both}
+.cut.out{animation:cutOut .4s ease-in both}
+.cut .beam{position:absolute;top:-12%;width:34%;height:130%;background:linear-gradient(180deg,rgba(255,240,198,.2),rgba(255,240,198,0) 75%);clip-path:polygon(44% 0,56% 0,100% 100%,0 100%);pointer-events:none;animation:sweep 4s ease-in-out infinite alternate}
+.cut .beam.l{left:2%;transform-origin:50% 0;--r0:-24deg;--r1:-6deg}.cut .beam.r{right:2%;transform-origin:50% 0;--r0:24deg;--r1:6deg}
+@keyframes sweep{from{transform:rotate(var(--r0))}to{transform:rotate(var(--r1))}}
+.cutin{position:relative;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;padding:24px 16px;max-width:920px}
+.cut .k{font-family:var(--f-head);font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--flood);font-size:clamp(12px,1.8vw,16px);animation:cutUp .6s .15s both}
+.cut .logo{font-family:var(--f-logo);font-size:clamp(26px,5vw,48px);color:var(--cream);text-shadow:3px 3px 0 #9e2f28,0 0 24px rgba(255,200,97,.4);animation:cutUp .6s both}
+.cut .vs{display:flex;align-items:center;justify-content:center;gap:clamp(10px,4vw,48px);flex-wrap:wrap}
+.cut .tm{display:flex;flex-direction:column;align-items:center;gap:4px;animation:cutL .7s .35s both}
+.cut .tm.h{animation-name:cutR}
+.cut .tm b{font-family:var(--f-head);font-weight:700;font-size:clamp(30px,6.5vw,68px);line-height:1;letter-spacing:.02em;text-shadow:0 0 30px rgba(0,0,0,.6)}
+.cut .tm span{font-family:var(--f-num);color:var(--muted);font-size:13px}
+.cut .at{font-family:var(--f-logo);font-size:clamp(26px,5vw,50px);color:var(--cream);animation:cutUp .6s .6s both}
+.cut .story{color:#d8dfec;font-size:clamp(14px,1.8vw,17px);max-width:58ch;animation:cutUp .6s .9s both}
+.cut .skip{color:var(--muted);font-size:12px;letter-spacing:.12em;text-transform:uppercase;margin-top:6px;animation:cutUp .6s 1.3s both}
+@keyframes cutIn{from{opacity:0}to{opacity:1}}
+@keyframes cutOut{to{opacity:0;transform:scale(1.04)}}
+@keyframes cutUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes cutL{from{opacity:0;transform:translateX(-60px)}to{opacity:1;transform:none}}
+@keyframes cutR{from{opacity:0;transform:translateX(60px)}to{opacity:1;transform:none}}
+/* trophy presentation */
+.troph{position:relative;width:min(520px,100%);display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:22px 18px 20px;border-radius:18px;overflow:hidden;background:radial-gradient(ellipse 80% 55% at 50% 0%,rgba(255,200,97,.35),transparent 70%),linear-gradient(180deg,#1a2b4d,#0e1830);border:1px solid rgba(255,200,97,.55);box-shadow:0 30px 80px -20px rgba(0,0,0,.9),0 0 60px -10px rgba(255,200,97,.45);animation:popIn .4s ease-out both}
+.troph .cup{width:min(210px,48vw);filter:drop-shadow(0 10px 24px rgba(255,190,80,.55));animation:raise 1.6s cubic-bezier(.2,.8,.3,1) .2s both}
+@keyframes raise{0%{transform:translateY(60px) scale(.7);opacity:0}60%{transform:translateY(-8px) scale(1.04);opacity:1}100%{transform:none}}
+.troph .shine{animation:shine 2.6s ease-in-out 1.4s infinite}
+@keyframes shine{0%,100%{opacity:0}50%{opacity:.85}}
+.troph .aside{color:var(--flood)}
+.troph h3{font-family:var(--f-logo);font-weight:400;font-size:clamp(34px,7vw,52px);line-height:1.05;margin:0;color:var(--cream);text-shadow:3px 3px 0 #9e2f28,0 0 26px rgba(255,200,97,.5)}
+.troph p{color:#d8dfec;font-size:15px}
+.troph p b{color:var(--flood)}
+.troph .ovbtns{width:100%;margin-top:6px}
 @keyframes callout{0%{opacity:0;transform:translate(-50%,18px) scale(.7)}14%{opacity:1;transform:translate(-50%,0) scale(1.06)}24%{transform:translate(-50%,0) scale(1)}78%{opacity:1}100%{opacity:0;transform:translate(-50%,-8px)}}
 
 /* play area: stadium left, game console right, all on one screen */
@@ -747,6 +794,7 @@ button,select,input{font:inherit;color:inherit}
 <button class="btn small" id="tips" type="button" aria-pressed="true" title="Show hints about what you can do right now">Tips on</button>
 <button class="btn small" id="lights" type="button" aria-pressed="true">Lights on</button>
 <button class="btn small" id="sound" type="button" aria-pressed="true">Sound on</button>
+<button class="btn small" id="annBtn" type="button" aria-pressed="true" title="A play-by-play announcer calls the game out loud">Announcer on</button>
 <button class="btn small" id="fs" type="button" hidden>Full screen</button>
 </div>
 </header>
@@ -777,6 +825,7 @@ button,select,input{font:inherit;color:inherit}
 <div class="call" aria-live="polite">
 <div class="result idle" id="result">Ready</div>
 <p class="detail" id="detail">Press Roll to start the game.</p>
+<p class="anncall" id="anncap" hidden></p>
 </div>
 <button class="btn primary roll" id="roll" type="button" title="Space bar rolls too">Roll the dice</button>
 <p class="tip" id="tip" hidden></p>
@@ -949,8 +998,8 @@ const ACTIONS = {
 const DECK = Object.keys(ACTIONS).flatMap(k=>[k,k]); // 24 cards: two of each
 const DHS = [
   {name:'Ned Corrigan',o:'BB'}, {name:'Felix Duran',o:'BB'},
-  {name:'Otis Wilder',o:'1B'}, {name:'Josie Kincaid',o:'1B'}, {name:'Gil Petrakis',o:'1B'}, {name:'Lyle Brannock',o:'1B'},
-  {name:'Royce Tanner',o:'2B'}, {name:'Zeke Holloway',o:'2B'}, {name:'Rosie Callahan',o:'2B'},
+  {name:'Otis Wilder',o:'1B'}, {name:'Josie Kincaid',o:'1B',f:1}, {name:'Gil Petrakis',o:'1B'}, {name:'Lyle Brannock',o:'1B'},
+  {name:'Royce Tanner',o:'2B'}, {name:'Zeke Holloway',o:'2B'}, {name:'Rosie Callahan',o:'2B',f:1},
   {name:'Clint Marlowe',o:'3B'}, {name:'Brock Mallory',o:'HR'}, {name:'Moose Ellery',o:'HR'}
 ];
 const DRAW_INNINGS = [1,4,7];
@@ -1172,7 +1221,8 @@ function applyPA(G,eff,info={}){
   const ev={o:eff,batter,runs:sc.length,team:t,dp,tri:info.tri||null,hrr:info.hrr||null,text:info.text||'',dh:!!info.dh};
   G.last=ev; G.fx=eff==='FC'?'OUT':eff;
   setEvent(G, info.title || (eff==='DP'&&!dp?'Out':LABEL[eff]), info.cls || kind(eff), describePA(ev));
-  G.big = info.big!==undefined ? info.big : (eff==='HR'?'Home Run!':eff==='3B'?'Triple!':dp?'Double Play':null);
+  G.big = info.big!==undefined ? info.big : (eff==='HR'?(sc.length===4?'Grand Slam!':'Home Run!'):eff==='3B'?'Triple!':dp?'Double Play':null);
+  if(eff==='HR' && sc.length===4 && info.big!==undefined) G.big='Grand Slam!';
   if(log) G.log.push({tag:tagOf(G),team:t,text:info.logText||paLine(ev),runs:sc.length,out:(isOut(eff)||eff==='FC')?Math.min(G.outs,3):null});
   G.hitRun=false; // a hit and run only lasts for one plate appearance
   afterPlay(G,log);
@@ -1523,6 +1573,158 @@ const sfx=(()=>{
 })();
 /* a run cell, packed a little tighter when it needs two digits */
 const lsCell=(v,cls='')=>{ const dd=v!=null&&String(v).length>1; return `<td class="${cls}${dd?(cls?' ':'')+'dd':''}">${v==null?'':v}</td>`; };
+/* ---------- the announcer: a man's voice calling the game from what actually happened on the field ---------- */
+const ann=(()=>{
+  let on=true; try{ on=localStorage.getItem('fdl-ann')!=='off'; }catch(e){}
+  const S=window.speechSynthesis||null;
+  const MALE=/\b(male|man|david|daniel|alex|fred|guy|mark|james|george|arthur|aaron|tom|ryan|oliver|thomas|reed|eddy|ralph|bruce|gordon|lee|rishi|junior|christopher|eric|roger|andrew|brian|davis|tony|jason)\b/i;
+  const FEMALE=/\b(female|woman|samantha|victoria|karen|moira|tessa|fiona|zira|susan|hazel|catherine|serena|ava|allison|kate|martha|nicky|joanna|salli|kimberly|ivy|emma|amy|aria|jenny|libby|sonia|natasha|michelle|sara|zoe|nora|shelley|sandy|flo|grandma|kathy|vicki|veena|anna|monica|paulina|amelie|alice|ellen|joana|laura|luciana|mei|yuna|zuzana|melina|alva|damayanti|kanya|kyoko|lekha|sinji|tingting|yelda|carmit|ioana|mariska|milena|sin-ji)\b/i;
+  let voice=null, next=null;
+  function pickVoice(){ if(!S) return; const vs=S.getVoices().filter(v=>/^en/i.test(v.lang)), us=v=>/en[-_]US/i.test(v.lang);
+    voice = vs.find(v=>MALE.test(v.name)&&us(v)) || vs.find(v=>MALE.test(v.name)) || vs.find(v=>!FEMALE.test(v.name)&&us(v)) || vs.find(v=>!FEMALE.test(v.name)) || null; }
+  if(S){ pickVoice(); try{ S.addEventListener('voiceschanged',pickVoice); }catch(e){ S.onvoiceschanged=pickVoice; } }
+  const spoken=t=>t.replace(/(\d)–(\d)/g,'$1 to $2').replace(/–/g,', ').replace(/\u0001(\d+)\u0001/g,(m,d)=>avgWords(+d)).replace(/\bRBI\b/g,'R B I').replace(/#(\d+)/g,'number $1').replace(/[“”"]/g,'');
+  const shown=t=>t.replace(/\u0001(\d+)\u0001/g,(m,d)=>'.'+String(d).padStart(3,'0').replace(/^1000$/,'1.000'));
+  function avgWords(d){ if(d>=1000) return 'a thousand'; if(d===0) return 'zero'; const a=Math.floor(d/100), b=d%100; return a? `${a} ${b===0?'hundred':b<10?'oh '+b:b}` : (b<10?'oh oh '+b:'oh '+b); }
+  function speak(t){ if(!S) return; const u=new SpeechSynthesisUtterance(spoken(t)); if(voice){ u.voice=voice; u.lang=voice.lang; } else u.lang='en-US';
+    u.rate=1.02; u.pitch=voice&&MALE.test(voice.name)?0.95:0.72; u.onend=()=>{ if(next){ const n=next; next=null; speak(n); } }; S.speak(u); }
+  function say(t,big){
+    if(!t) return; const cap=$('anncap');
+    if(cap){ cap.hidden=false; cap.innerHTML=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-3.1A7 7 0 0 0 19 11z"/></svg><span>${esc(shown(t))}</span>`; }
+    if(!on||!S||!sfx.on) return;
+    if(big){ next=null; S.cancel(); speak(t); } else if(S.speaking||S.pending) next=t; else speak(t);
+  }
+  return {
+    get on(){ return on; },
+    set(v){ on=v; try{ localStorage.setItem('fdl-ann',v?'on':'off'); }catch(e){} if(!v&&S){ next=null; S.cancel(); } },
+    say, stop(){ next=null; if(S) S.cancel(); },
+    avg:x=>'\u0001'+Math.round(Math.max(0,Math.min(1,x))*1000)+'\u0001',
+    get voiceName(){ return voice?voice.name:'' }
+  };
+})();
+/* who's who for the call: pronouns, numbers and the lore the franchise keeps */
+function annInfo(n){ for(let t=0;t<2;t++){ const I=G.teams[t].info&&G.teams[t].info[n]; if(I) return Object.assign({t},I); } const d=DHS.find(x=>x.name===n); return d?{dh:1,f:d.f}:{}; }
+const heOf=n=>annInfo(n).f?'she':'he', HeOf=n=>annInfo(n).f?'She':'He', hisOf=n=>annInfo(n).f?'her':'his', himOf=n=>annInfo(n).f?'her':'him';
+const plainText=h=>String(h).replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/\s+/g,' ').trim();
+function annScore(){ const a=total(G,0), h=total(G,1); if(a===h) return a?`We're tied at ${a}.`:'No score yet.'; return `It's ${G.teams[0].name} ${a}, ${G.teams[1].name} ${h}.`; }
+const annFr=()=>!!(G&&G.isFr&&F&&FR);
+const theTeam=n=>/\s/.test(n)?'the '+n:n, TheTeam=n=>/\s/.test(n)?'The '+n:n;
+const annPost=()=>annFr()&&FR.kind==='po';
+/* a player's season so far, including today's game (the season store is only updated after each game day) */
+function annSeason(n){ if(!annFr()) return null; const st=(annPost()?F.pstats:F.stats)[n], b=G.box[n], o=blank(''); for(const k of STATK){ o[k]=(st?st[k]:0)+(b&&k!=='G'?b[k]||0:0); } return o; }
+function annHR(n){
+  if(!annFr()) return ''; const s=annSeason(n), tot=s.HR, his=hisOf(n);
+  let t= tot>1 ? ` That's number ${tot} ${annPost()?'this postseason':'on the season'} for ${lastName(n)}.` : ` That's ${his} first ${annPost()?'of the postseason':'of the season'}.`;
+  const R=F.records&&F.records.HR;
+  if(R && !annPost()){
+    if(tot===R.v+1) t+=` That's a new league record! The old mark was ${R.v}, by ${R.name} in Season ${R.season}.`;
+    else if(tot>R.v+1) t+=` ${HeOf(n)} keeps adding to ${his} new league record.`;
+    else if(tot===R.v) t+=` That ties the league record of ${R.v}, set by ${R.name} in Season ${R.season}.`;
+    else if(tot>=10 && R.v-tot<=3) t+=` ${HeOf(n)}'s ${R.v-tot} shy of the league record.`;
+  }
+  return t;
+}
+function annStreak(n){
+  if(!annFr()||annPost()||!F.nx) return ''; const b=G.box[n], hs=F.nx.hs[n]||0;
+  return b&&b.H===1&&hs>=4 ? ` That extends ${hisOf(n)} hitting streak to ${hs+1} games.` : '';
+}
+function annLeadoff(){
+  if(!G||G.over) return ''; const t=G.half, n=curBatter(G), I=annInfo(n), T=G.teams[t];
+  let s=`Leading off the ${t?'bottom':'top'} of the ${ordinal(G.inning)} for ${T.name}${I.n?`, #${I.n}`:''}, ${n}.`;
+  if(isInjured(G,t,n)) return s+` ${HeOf(n)}'s injured, so that's an automatic out.`;
+  const facts=[], he=HeOf(n), b=G.box[n];
+  if(annFr()){
+    const ss=annSeason(n), hs=!annPost()&&F.nx?F.nx.hs[n]||0:0;
+    if(hs>=5) facts.push(`${he} came into today with a ${hs}-game hitting streak.`);
+    if(ss&&ss.PA>=8) facts.push(`${he}'s hitting ${ann.avg(avg(ss))} with ${ss.HR} home run${ss.HR===1?'':'s'} ${annPost()?'this postseason':'on the season'}.`);
+    if(nwInfo(n)){ const B=nwBio(n); facts.push(`They call ${himOf(n)} “${B.nick}.” ${he}'s ${B.age}, from ${B.town}.`); }
+  }
+  if(b&&b.AB) facts.push(`${he}'s ${b.H} for ${b.AB} today.`);
+  if(!facts.length) return s;
+  return s+' '+facts[(G.inning+t+G.idx[t])%facts.length];
+}
+const ANN_PRE={'Home run':['There it goes!','Way back... and gone!','Swung on and belted!'],'Grand slam':['Grand slam!'],'Strikeout':['Strike three!'],'Single':['Base hit!','Into the outfield for a hit!'],'Double':['Two-base hit!'],'Triple':['A three-bagger!'],'Walk':['Ball four.'],'Double play':['Two for the price of one!'],'Diving catch':['What a play!'],'Gold Glove':['Robbed!'],'Robbed':['At the wall... robbed!'],'Stolen base':['There goes the runner!'],'Steals home!':['Here comes the runner!'],'Picked off':['Picked off!']};
+function annResult(){
+  const E=G.event, L=G.last; if(!E) return '';
+  const gs=L&&L.o==='HR'&&L.runs===4&&/home run|gone/i.test(plainText(E.html));
+  const wo=G.over&&G.walkoff&&L&&L.o==='HR';
+  const pool=wo?[gs?'A walk-off grand slam!':'A walk-off home run!']:ANN_PRE[gs?'Grand slam':E.title]; let s=pool?pool[(G.idx[0]+G.idx[1])%pool.length]+' ':'';
+  s+=plainText(E.html);
+  if(L&&L.o==='HR'&&!/caught|robbed/i.test(plainText(E.html))&&G.box[L.batter]) s+=annHR(L.batter);
+  if(L&&['1B','2B','3B','HR'].includes(L.o)&&G.box[L.batter]) s+=annStreak(L.batter);
+  return s;
+}
+function annFinal(){
+  const Fw=finalWords(), best=potg();
+  return `And that's the ballgame! ${Fw.head}`+(best?` Player of the game: ${best.name}, ${statLine(best.b)}.`:'');
+}
+/* call the play that just happened; post() runs this after every play */
+function annPlay(){
+  if(!G) return; const p=G.annPrev, a=total(G,0), h=total(G,1), out=[]; let big=false;
+  const res=annResult(); if(res) out.push(res);
+  const sameHalf=p&&p.inning===G.inning&&p.half===G.half;
+  if(G.over){ out.push(annFinal()); big=true; }
+  else if(p&&!sameHalf){ out.push(`That's the end of the ${p.half?'bottom':'top'} of the ${ordinal(p.inning)}. ${annScore()}`); const lo=annLeadoff(); if(lo) out.push(lo); }
+  else { if(p&&G.outs>p.outs) out.push(['','One out.','Two outs.'][G.outs]||''); if(p&&(a!==p.a||h!==p.h)) out.push(annScore()); }
+  if(G.last&&G.last.o==='HR'&&G.last.runs===4) big=true;
+  G.annPrev={inning:G.inning,half:G.half,outs:G.outs,a,h};
+  ann.say(out.filter(Boolean).join(' '),big);
+}
+function annStart(){ if(G) G.annPrev={inning:G.inning,half:G.half,outs:G.outs,a:total(G,0),h:total(G,1)}; const c=$('anncap'); if(c){ c.hidden=true; c.innerHTML=''; } }
+
+/* ---------- pregame cutscene: who's playing, what's at stake, then play ball ---------- */
+function cutscene(){
+  if(!G) return; ann.stop(); annStart();
+  const A=G.teams[0], H=G.teams[1], fr=annFr(), story=[];
+  let kicker='Tonight under the lights', recA='Visitors', recH='Home';
+  if(fr){
+    kicker=G.frLabel||`Season ${F.season}`;
+    const r=id=>F.rec[id]?`${F.rec[id].w}–${F.rec[id].l}`:''; recA=r(A.id); recH=r(H.id);
+    const u=F.userId, opp=A.id===u?H.id:A.id;
+    if(FR.kind==='po'){ const s=activeSeries().find(x=>(x.hi===u||x.lo===u)); if(s) story.push(s.g.length?`${seriesText(s)} in the ${s.need===4?'Floodlight Series':'semifinal'}.`:`Game 1 of the ${s.need===4?'Floodlight Series':'semifinal'}. First to ${s.need} wins.`); }
+    const last=F.history[F.history.length-1]; if(last&&(last.champ===A.id||last.champ===H.id)) story.push(`${TheTeam(tname(last.champ))} are the defending Floodlight Series champions.`);
+    const ts=F.nx&&F.nx.ts||{}; for(const T of [A,H]){ const v=ts[T.id]||0; if(v>=3) story.push(`${TheTeam(T.name)} have won ${v} straight.`); else if(v<=-3) story.push(`${TheTeam(T.name)} have lost ${-v} in a row.`); }
+    const hh=F.nx&&F.nx.h2h[opp]; if(hh&&hh.w+hh.l>0) story.push(`All-time, ${theTeam(tname(u))} are ${hh.w} and ${hh.l} against ${theTeam(tname(opp))}.`);
+  } else {
+    story.push(G.mode==='sim'?'Simulation rules: the D12, action cards, designated hitters and player abilities.':'Arcade rules: the D8 and nothing but the dice.');
+    const me=G.cpu[0]!==G.cpu[1]?(G.cpu[0]?1:0):-1; if(me>=0) story.push(`You manage ${G.teams[me].name}. The computer has ${G.teams[1-me].name}.`);
+  }
+  const st=story.slice(0,2);
+  const el=document.createElement('div'); el.className='cut'; el.setAttribute('role','dialog'); el.setAttribute('aria-label','Pregame');
+  el.innerHTML=`<span class="beam l"></span><span class="beam r"></span><div class="cutin"><span class="logo">Floodlight Baseball</span><span class="k">${esc(kicker)}</span>
+<div class="vs"><div class="tm"><b style="color:${A.color}">${esc(A.name)}</b><span>${esc(recA)}</span></div><span class="at">at</span><div class="tm h"><b style="color:${H.color}">${esc(H.name)}</b><span>${esc(recH)}</span></div></div>
+${st.length?`<p class="story">${st.map(esc).join('<br>')}</p>`:''}<span class="skip">Tap to play ball</span></div>`;
+  document.body.appendChild(el); sfx.power();
+  ann.say(`Good evening, and welcome to the ballpark! ${fr?kicker.replace(/\s*·/g,',')+'. ':''}${TheTeam(A.name)}${fr&&recA?`, ${recA},`:''} take on ${theTeam(H.name)}${fr&&recH?`, ${recH}`:''}. ${st.join(' ')} ${annLeadoff()}`,true);
+  let gone=false; const done=()=>{ if(gone) return; gone=true; el.classList.add('out'); setTimeout(()=>el.remove(),reduce?0:400); };
+  el.addEventListener('click',done); setTimeout(done, reduce?2500:7000);
+}
+
+/* ---------- trophy presentation when your club wins the Floodlight Series ---------- */
+const CUP_SVG=`<svg class="cup" viewBox="0 0 200 240" aria-hidden="true"><defs><linearGradient id="cupG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#a8741e"/><stop offset=".35" stop-color="#ffe7a3"/><stop offset=".55" stop-color="#f2c14e"/><stop offset="1" stop-color="#8a5a12"/></linearGradient><linearGradient id="cupB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a2a14"/><stop offset="1" stop-color="#1b130a"/></linearGradient><radialGradient id="cupS" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+<path d="M52 30 Q20 30 20 64 Q20 96 60 104" fill="none" stroke="url(#cupG)" stroke-width="11" stroke-linecap="round"/><path d="M148 30 Q180 30 180 64 Q180 96 140 104" fill="none" stroke="url(#cupG)" stroke-width="11" stroke-linecap="round"/>
+<path d="M44 20 H156 Q156 100 116 124 L112 150 H88 L84 124 Q44 100 44 20Z" fill="url(#cupG)" stroke="#6b4512" stroke-width="2"/>
+<path d="M44 20 H156" stroke="#fff3c8" stroke-width="5" stroke-linecap="round"/>
+<g fill="#fffbe9" stroke="#8a5a12" stroke-width="1"><circle cx="78" cy="58" r="7"/><circle cx="100" cy="58" r="7"/><circle cx="122" cy="58" r="7"/><circle cx="89" cy="78" r="7"/><circle cx="111" cy="78" r="7"/></g>
+<path d="M86 150 H114 L120 170 H80Z" fill="url(#cupG)" stroke="#6b4512" stroke-width="2"/>
+<rect x="56" y="170" width="88" height="22" rx="3" fill="url(#cupG)" stroke="#6b4512" stroke-width="2"/>
+<rect x="44" y="192" width="112" height="34" rx="4" fill="url(#cupB)" stroke="#c9a24f" stroke-width="2"/>
+<text x="100" y="214" text-anchor="middle" font-family="Barlow Condensed, Arial Narrow, sans-serif" font-weight="700" font-size="13" letter-spacing="2" fill="#f2c14e">FLOODLIGHT SERIES</text>
+<ellipse class="shine" cx="70" cy="42" rx="10" ry="22" fill="url(#cupS)" transform="rotate(-18 70 42)"/></svg>`;
+function showTrophy(h){
+  if(!F||!h) return; const ov=$('ov'), titles=F.history.filter(x=>x.champ===h.champ).length;
+  ov.onclick=null; ov.innerHTML=`<div class="troph" role="dialog" aria-modal="true" aria-labelledby="trT">${CUP_SVG}<span class="aside">Season ${h.season} · Floodlight Series champions</span><h3 id="trT">${esc(h.champName)}</h3>
+<p>Beat the ${esc(h.runnerName)} <b>${esc(h.score)}</b> in the Floodlight Series.</p>
+${h.smvp?`<p>Series MVP: <b>${esc(h.smvp.n)}</b>, ${esc(h.smvp.line)}</p>`:''}
+<p>Regular season ${h.user.w}–${h.user.l} · ${titles>1?`Title No. ${titles} for the franchise`:'The first title in franchise history'}</p>
+<div class="ovbtns"><button class="btn primary" type="button" id="trGo">Raise the trophy!</button></div></div>`;
+  ov.hidden=false; const card=ov.querySelector('.troph'); fireworks(card,true,8); sfx.cheer(true); setTimeout(()=>sfx.organ(),600);
+  ann.say(`${TheTeam(h.champName)} are your Floodlight Series champions! They beat ${theTeam(h.runnerName)}, ${h.score}.${h.smvp?` The Series MVP is ${h.smvp.n}.`:''} ${titles>1?`That's title number ${titles} for the franchise.`:'The first championship in franchise history!'}`,true);
+  $('trGo').onclick=()=>{ fireworks(card,true,6); setTimeout(()=>{ ov.hidden=true; ov.innerHTML=''; openHub(); }, reduce?0:900); };
+  $('trGo').focus();
+}
+function maybeTrophy(wasPhase){ if(!F||wasPhase!=='post'||F.phase!=='off') return; const h=F.history[F.history.length-1]; if(h&&h.champ===F.userId) setTimeout(()=>showTrophy(h),300); }
+
 function renderBoard(){
   const n=Math.max(9,G.inning), i0=n-9; // in extras the board rolls on, showing the latest 9 innings like a real one
   let h='<thead><tr><th scope="col"><span hidden>Team</span></th>';
@@ -1902,8 +2104,8 @@ async function doRoll(){
 }
 function post(){
   checkDH(); checkDraw(); busy=false;
-  if(G.over) G.big = G.walkoff ? 'Walk-off!' : (G.big||'Final');
-  renderGame(); celebrate(); playFx();
+  if(G.over) G.big = G.walkoff ? (G.last&&G.last.o==='HR'&&G.last.team===1 ? (G.last.runs===4?'Walk-off Grand Slam!':'Walk-off Home Run!') : 'Walk-off!') : (G.big||'Final');
+  renderGame(); celebrate(); playFx(); annPlay();
   autoSave();
   if(G.over && !G.shownFinal){ G.shownFinal=true; gameOver(); setTimeout(showFinal, reduce?250:1900); }
 }
@@ -1915,9 +2117,24 @@ function playFx(){
   else if(fx==='K'||fx==='OUT'||fx==='DP') sfx.pop();
   if(G.over) setTimeout(()=>sfx.organ(), 500);
 }
-function callout(text){ const c=$('callout'); c.textContent=text; c.classList.remove('show'); void c.offsetWidth; c.classList.add('show'); }
+function callout(text,gold){ const c=$('callout'); c.textContent=text; c.classList.remove('show'); c.classList.toggle('gold',!!gold); void c.offsetWidth; c.classList.add('show'); }
+/* fireworks over the stadium (or any box): bursts of sparks, plus falling confetti when conf is set */
+function fireworks(box,conf,n){
+  if(reduce||!box) return; const fw=document.createElement('div'); fw.className='fw'; let h='';
+  const cols=['#ffd77e','#ff7a45','#7cc4ff','#63d091','#ff9c8e','#fff3cf','#e65b50'];
+  for(let k=0;k<(n||7);k++){ const x=12+Math.random()*76, y=10+Math.random()*38, d=(k*0.32+Math.random()*0.15).toFixed(2), c=cols[k%cols.length];
+    h+=`<u style="--x:${x}%;--y:${y}%;--d:${d}s;--c:${c};--s:${(40+Math.random()*30).toFixed(0)}px"></u>`;
+    for(let i=0;i<20;i++){ const a=i/20*Math.PI*2, r=55+Math.random()*45; h+=`<i style="--x:${x}%;--y:${y}%;--d:${d}s;--c:${c};--dx:${(Math.cos(a)*r).toFixed(0)}px;--dy:${(Math.sin(a)*r).toFixed(0)}px"></i>`; } }
+  if(conf) for(let i=0;i<70;i++) h+=`<b style="--x:${(Math.random()*100).toFixed(1)}%;--d:${(Math.random()*1.6).toFixed(2)}s;--t:${(2.4+Math.random()*1.8).toFixed(2)}s;--c:${cols[i%cols.length]}"></b>`;
+  fw.innerHTML=h; box.appendChild(fw); setTimeout(()=>fw.remove(), conf?4800:3600);
+}
 function surge(){ const p=$('park'); if(p.classList.contains('off')) return; p.classList.remove('surge'); void p.offsetWidth; p.classList.add('surge'); }
-function celebrate(){ const b=G.big; G.big=null; if(!b||reduce) return; callout(b); if(b==='Home Run!'||b==='Walk-off!'||b==='Steals Home!') surge(); }
+function celebrate(){
+  const b=G.big; G.big=null; if(!b||reduce) return;
+  const gold=/Grand Slam|Walk-off Home/.test(b); callout(b,gold);
+  if(gold){ surge(); fireworks(document.querySelector('#park .stage'), /Walk-off/.test(b), /Walk-off/.test(b)?9:6); }
+  else if(b==='Home Run!'||b==='Walk-off!'||b==='Steals Home!') surge();
+}
 
 const freshGame = () => !G.over && G.inning===1 && G.half===0 && G.halfPA===0 && G.idx[0]===0 && !G.event;
 function renderGame(){
@@ -2066,10 +2283,10 @@ ${fr?`<p class="frnote">${fr}</p>`:''}
 <p class="fnote" id="fNote" hidden></p>
 </div>`;
   ov.hidden=false; ($('fHub')||$('fShare')).focus();
-  const close=()=>{ ov.hidden=true; ov.innerHTML=''; ov.onclick=null; };
+  const close=()=>{ ov.hidden=true; ov.innerHTML=''; ov.onclick=null; if(G.trophy && F){ G.trophy=false; showTrophy(F.history[F.history.length-1]); return true; } return false; };
   $('fClose').onclick=close;
   if($('fAgain')) $('fAgain').onclick=()=>{ close(); newGame(); };
-  if($('fHub')) $('fHub').onclick=()=>{ close(); openHub(); };
+  if($('fHub')) $('fHub').onclick=()=>{ if(!close()) openHub(); };
   ov.onclick=e=>{ if(e.target===ov) close(); };
   $('fShare').onclick=()=>{
     const text=F.share+(best?` Player of the game: ${best.name} (${statLine(best.b)}).`:''), full=text+' Play it: '+SITE_URL, note=$('fNote');
@@ -2083,7 +2300,7 @@ ${fr?`<p class="frnote">${fr}</p>`:''}
 function gameOver(){ if(FR) frGameOver(); }
 
 /* ---------- franchise mode: six teams, 32-game season, best-of-3 semis, best-of-7 Floodlight Series, saved in this browser ---------- */
-const LEAGUE_HISPANIC=20, LEAGUE_JAPANESE=2, FKEY='fdl-franchise-v1', SEASON_GAMES=32, MIN_PA=80;
+const LEAGUE_HISPANIC=20, LEAGUE_JAPANESE=2, ROOKIE_AGE=18, RETIRE_AGE=40, FKEY='fdl-franchise-v1', SEASON_GAMES=32, MIN_PA=80;
 const CITIES=['Tacoma','Spokane','Boise','Yakima','Eugene','Salem','Bellingham','Olympia','Missoula','Reno','Anchorage','Fresno','Bend','Medford','Billings','Juneau','Everett','Sacramento','Pocatello','Walla Walla'];
 const NICKS=['Night Owls','Lamplighters','Comets','Ospreys','Lumberjacks','Sea Lions','Bighorns','Rattlers','Riveters','Moonshots','Beacons','Fireflies','Grizzlies','Harbor Hawks','Ironworkers','Rockhounds','Timber Wolves','Bluebirds','Gold Miners','Starlights','Thunderheads','Switchbacks'];
 const FIRST_M=['Abe','Benny','Cal','Dutch','Eddie','Frankie','Gabe','Hal','Ike','Joey','Kip','Lou','Mickey','Nate','Ozzie','Pete','Rusty','Sal','Tex','Vic','Woody','Zack','Buck','Dom','Marcus','Dante','Ray','Bo','Cole','Finn','Ollie','Mack','Andre','Theo','Rocco','Jesse'];
@@ -2165,7 +2382,8 @@ function frCreate(name,abbr){
   const allyAt=1+Math.floor(Math.random()*4), jpAt=shuffle([1,2,3,4].filter(i=>i!==allyAt)).slice(0,LEAGUE_JAPANESE); used.add(ALLY.name);
   for(let i=1;i<=4;i++){ const ps=genPlayers(used,hs[i-1],jpAt.filter(x=>x===i).length,i===allyAt?ALLY:null), ab=abbrOf(cities[i],taken); taken.add(ab);
     teams['t'+i]={id:'t'+i,name:`${cities[i]} ${nicks[i]}`,abbr:ab,color:cols[i-1],lineup:ps.map(p=>p.name),roster:Object.fromEntries(ps.map(p=>[p.name,Object.assign({ab:p.ab,n:p.n,f:p.f},p.hi?{hi:1}:{},p.jp?{jp:1}:{})]))}; }
-  F={v:1,created:Date.now(),season:1,userId:'red',teams,ids:Object.keys(teams),history:[],records:{},career:{},live:null};
+  F={v:1,created:Date.now(),season:1,userId:'red',teams,ids:Object.keys(teams),history:[],records:{},career:{},live:null,retired:[]};
+  F.bio={}; for(const id of F.ids) for(const n of teams[id].lineup) F.bio[n]=Object.assign(nwBioNew(n),{a:ROOKIE_AGE}); // every career starts at 18
   frNewSeason(); frSave();
 }
 function makeSchedule(ids){
@@ -2292,12 +2510,12 @@ function frStart(nx,home){
   mode='sim'; renderFaces(); paintModeTabs();
   G=newState('sim',home?[O,M]:[M,O],home?[true,false]:[false,true]); G.isFr=true; G.frLabel=nx.label;
   FR={label:nx.label,kind:nx.kind,season:F.season,day:F.day}; frMode=true; setWhere('fr'); setFrUI();
-  checkDraw(); renderGame(); frSaveLive();
+  checkDraw(); annStart(); renderGame(); frSaveLive(); cutscene();
 }
 function frSaveLive(){ if(!F||!FR||!G) return; F.live={G,FR}; frSave(); }
 function frResume(){
   if(!F||!F.live) return; autoSave(); G=F.live.G; FR=F.live.FR; mode='sim'; busy=false; renderFaces(); paintModeTabs(); frMode=true; setWhere('fr'); setFrUI(); closeHub();
-  $('ov').hidden=true; $('pcard').dataset.nm=''; renderGame();
+  $('ov').hidden=true; $('pcard').dataset.nm=''; if(!G.annPrev) annStart(); renderGame();
   if(G.over && !G.frDone){ gameOver(); setTimeout(showFinal,300); }
 }
 function frGameOver(){
@@ -2308,18 +2526,58 @@ function frGameOver(){
   let note=`<b>${esc(M.name)}</b> ${F.phase==='post'||F.phase==='off'?'finished':'are'} ${r.w}–${r.l}.`;
   if(lines&&lines[0]&&F.phase!=='reg') note=lines[0]+'.';
   if(F.phase==='post' && !F.po.final && F.day>=SEASON_GAMES && F.po.series.every(s=>!s.g.length)) note+=` Regular season over: ${F.po.seeds.slice(0,4).includes(M.id)?'you made the playoffs!':'you missed the playoffs.'}`;
-  if(F.phase==='off'){ const h=F.history[F.history.length-1]; note=`<b>${esc(h.champName)}</b> win the Floodlight Series ${h.score}! ${h.champ===M.id?'That’s you. Champions!':''}`; }
+  if(F.phase==='off'){ const h=F.history[F.history.length-1]; note=`<b>${esc(h.champName)}</b> win the Floodlight Series ${h.score}! ${h.champ===M.id?'That’s you. Champions!':''}`; if(h.champ===M.id) G.trophy=true; }
   const hl=F.news&&F.news.find(x=>x.t.includes(M.id)); if(hl) note+=`<br><span class="gzline">Gazette: ${nwText(hl.h)}</span>`;
   G.frNote=note; frSave(); renderFbar();
 }
 function frSimUser(){
-  if(!F||F.live) return;
+  if(!F||F.live) return; const was=F.phase;
   const lines = F.phase==='reg' ? frFinishDay(null) : frPlayoffDay(null);
-  hubMsg = lines&&lines.length ? 'Simulated: '+lines.join(' · ') : 'Simulated the next game day.'; frSave(); renderHub();
+  hubMsg = lines&&lines.length ? 'Simulated: '+lines.join(' · ') : 'Simulated the next game day.'; frSave(); renderHub(); maybeTrophy(was);
 }
 function frSimToPlayoffs(){ if(!F||F.live) return; let w=0,l=0; const before=Object.assign({},F.rec[F.userId]); while(F.phase==='reg') frFinishDay(null); const r=F.rec[F.userId]; hubMsg=`Simulated the rest of the regular season: ${r.w-before.w}–${r.l-before.l} the rest of the way.`; frSave(); renderHub(); }
-function frSimPlayoffs(){ if(!F||F.live) return; let g=0; while(F.phase==='post' && g++<40) frPlayoffDay(null); hubMsg='Simulated the rest of the playoffs.'; frSave(); renderHub(); }
-function frNextSeason(){ F.season++; frNewSeason(); hubMsg=`Season ${F.season} is set. Same six teams, a fresh 32-game schedule.`; frSave(); renderHub(); }
+function frSimPlayoffs(){ if(!F||F.live) return; const was=F.phase; let g=0; while(F.phase==='post' && g++<40) frPlayoffDay(null); hubMsg='Simulated the rest of the playoffs.'; frSave(); renderHub(); maybeTrophy(was); }
+function frNextSeason(){
+  const gone=frRetire(); F.season++; frNewSeason(); nwRetire(gone); F.rookies=gone.map(g=>g.rookie);
+  hubMsg=`Season ${F.season} is set. Same six teams, a fresh 32-game schedule.`+(gone.length?` ${gone.length} player${gone.length===1?'':'s'} retired at ${RETIRE_AGE} and ${gone.length===1?'a rookie takes that spot':'rookies take their spots'}. <button class="btn small" type="button" data-act="rookies">Name the rookies</button>`:'');
+  frSave(); renderHub();
+}
+/* a new 18-year-old who replaces a retiring player: same team, same lineup spot and ability, and the same background so the league's makeup holds */
+function frRookie(T,old,used){
+  const info=T.roster[old]||{}, f=!!info.f, h=!!info.hi, j=!!info.jp, dk=!!info.dk||DARK_SKIN.has(old);
+  const nums=new Set(T.lineup.map(n=>T.roster[n]&&T.roster[n].n)); let name, fn, n, g=0;
+  do{ fn=pick(j?FIRST_JP:h?(f?FIRST_HF:FIRST_HM):(f?FIRST_F:FIRST_M)); name=fn+' '+pick(j?LASTS_JP:h?LASTS_H:LASTS); }while(used.has(name)&&g++<500); used.add(name);
+  do{ n=1+Math.floor(Math.random()*55); }while(nums.has(n));
+  return {name,info:Object.assign({ab:info.ab,n},f?{f:1}:{},h?{hi:1}:{},j?{jp:1}:{},dk?{dk:1}:{})};
+}
+function frRetire(){
+  nwInit(); const out=[], used=new Set([...Object.keys(F.bio||{}),...Object.keys(F.career||{}),...F.ids.flatMap(id=>F.teams[id].lineup),...RED_LINEUP,...BLUE_LINEUP,...DHS.map(d=>d.name),...(F.retired||[]).map(r=>r.name)]);
+  F.retired=F.retired||[];
+  for(const id of F.ids){ const T=F.teams[id];
+    T.lineup.forEach((n,i)=>{ const b=F.bio[n]||(F.bio[n]=nwBioNew(n));
+      if(b.a+1<RETIRE_AGE){ b.a++; return; }
+      const R=frRookie(T,n,used), c=F.career[n];
+      F.retired.push({name:n,tid:id,team:T.name,season:F.season,age:b.a,num:T.roster[n].n,ab:T.roster[n].ab,seasons:c?c.seasons:0});
+      T.lineup[i]=R.name; delete T.roster[n]; T.roster[R.name]=R.info; F.bio[R.name]=Object.assign(nwBioNew(R.name),{a:ROOKIE_AGE});
+      out.push({old:n,rookie:R.name,tid:id});
+    });
+  }
+  prepCards(F.ids.map(id=>F.teams[id]));
+  return out;
+}
+/* rename this year's rookies */
+function frEditRookies(){
+  const rk=new Set((F.rookies||[]).filter(n=>nwInfo(n))); if(!rk.size){ hubMsg='No rookies to name right now.'; renderHub(); return; }
+  const teams=F.ids.filter(id=>F.teams[id].lineup.some(n=>rk.has(n))).map(id=>{ const T=F.teams[id]; return {id,name:T.name,abbr:T.abbr,color:T.color,players:T.lineup.filter(n=>rk.has(n)).map(n=>({key:n,name:n,ab:T.roster[n].ab}))}; });
+  closeHub();
+  openNameEditor({kicker:`Franchise · Season ${F.season}`, title:'Name your rookies', teams, cancelText:'Keep these names',
+    sub:'This year’s 18-year-old rookies. Tap a name to change it. Their stats and cards follow the new name.',
+    onSave:out=>{ const taken=new Set([...F.ids.flatMap(id=>F.teams[id].lineup).filter(n=>!rk.has(n)),...Object.keys(F.career||{}),...(F.retired||[]).map(r=>r.name)]);
+      const clash=out.flatMap(t=>t.players).find(p=>p.name!==p.key&&taken.has(p.name));
+      if(clash){ hubMsg=`“${esc(clash.name)}” is already taken by another player, so nothing was changed.`; openHub(); return; }
+      frApplyNames(out); F.rookies=(F.rookies||[]).map(n=>{ for(const t of out) for(const p of t.players) if(p.key===n) return p.name; return n; }); frSave(); hubMsg='Rookie names saved.'; openHub(); },
+    onCancel:()=>openHub()});
+}
 
 /* ---------- franchise banner over the stadium ---------- */
 function setFrUI(){
@@ -2371,6 +2629,7 @@ function hubAct(a,el){
   else if(a==='rename'){ const n=$('frName').value.trim(), ab=$('frAbbr').value.trim().toUpperCase().slice(0,4); if(n){ me().name=n; if(ab) me().abbr=ab; frSave(); hubMsg='Team name saved.'; renderHub(); renderFbar(); } }
   else if(a==='export') openSaves();
   else if(a==='names') frEditNames();
+  else if(a==='rookies') frEditRookies();
   else if(a==='reset'){ if(confirm(`Delete Franchise ${frSlot} and all its seasons, stats and records? Your other franchises are not touched. This cannot be undone.`)){ try{ localStorage.removeItem(frKey(frSlot)); }catch(e){} F=null; frMode=false; FR=null; setFrUI(); startExhibition(); renderHub(); } }
   else if(a==='exit') frExit();
 }
@@ -2461,7 +2720,14 @@ function recordsHTML(){
     +(R.RS?`<div class="rec"><span class="aside">Most runs, team</span><b>${R.RS.v}</b><span>${esc(R.RS.name)}</span><small>Season ${R.RS.season}</small></div>`:'');
   return `<div class="hcard"><h4>Your franchise</h4><p><b>${titles}</b> Floodlight Series title${titles===1?'':'s'} · <b>${apps}</b> playoff trip${apps===1?'':'s'} in <b>${F.history.length}</b> finished season${F.history.length===1?'':'s'}.</p>
 ${mineH.length?`<div class="tscroll"><table class="tbl"><thead><tr><th class="l">Season</th><th class="l">Team</th><th>W</th><th>L</th><th>Finish</th><th class="l">Postseason</th></tr></thead><tbody>${mineH.map(h=>`<tr><td class="l">${h.season}</td><td class="l">${esc(h.user.name)}</td><td>${h.user.w}</td><td>${h.user.l}</td><td>${ordinal(h.user.rank)}</td><td class="l">${esc(h.user.result)}</td></tr>`).join('')}</tbody></table></div>`:'<p class="empty2">Finish a season to start your record book.</p>'}</div>
+${careerLeadersHTML()}
 <div class="hcard"><h4>League single-season records</h4>${cards?`<div class="recs">${cards}</div>`:'<p class="empty2">Records are set when a season ends.</p>'}<p class="legend">Average and OPS need ${MIN_PA} plate appearances.</p></div>`;
+}
+function careerLeadersHTML(){
+  const C=careerNow(), ret=new Set((F.retired||[]).map(r=>r.name)), act=new Set(F.ids.flatMap(id=>F.teams[id].lineup));
+  const col=(k,lbl)=>{ const top=Object.entries(C).filter(([,s])=>s[k]>0).sort((a,b)=>b[1][k]-a[1][k]).slice(0,5);
+    return `<div><span class="aside" style="color:var(--flood)">${lbl}</span>${top.length?top.map(([n,s],i)=>`<div>${i+1}. ${F.teams[s.team]?tdot(s.team):''}${esc(n)} <b>${s[k]}</b>${ret.has(n)?' <small style="color:var(--muted)">retired</small>':act.has(n)?'':''}</div>`).join(''):'<span class="empty2">None yet</span>'}</div>`; };
+  return `<div class="hcard"><h4>All-time career leaders</h4><div class="awards">${col('HR','Home runs')}${col('H','Hits')}${col('RBI','RBI')}</div><p class="legend">Every franchise player starts at ${ROOKIE_AGE} and retires at ${RETIRE_AGE}, so careers are the same length and comparable.</p></div>`;
 }
 function champsHTML(){
   if(!F.history.length) return '<div class="hcard"><h4>Floodlight Series champions</h4><p class="empty2">No champion yet. Finish Season 1 to crown the first one.</p></div>';
@@ -2667,8 +2933,9 @@ function nwArcs(){
   arcs.push({k:'rival',tid:nwRival()});
   if(last){ arcs.push({k:'defend',tid:last.champ});
     if(last.awards&&last.awards.mvp&&nwInfo(last.awards.mvp.name)) arcs.push({k:'mvp',n:last.awards.mvp.name}); }
-  const young=me().lineup.slice().sort((a,b)=>ages(a)-ages(b))[0]; if(young) arcs.push({k:'young',n:young});
-  const all=F.ids.flatMap(id=>F.teams[id].lineup), vet=all.slice().sort((a,b)=>ages(b)-ages(a))[0]; if(vet) arcs.push({k:'vet',n:vet});
+  const uniq=(list,fn)=>{ const s=list.slice().sort((a,b)=>fn(a)-fn(b)); return s.length>1&&fn(s[0])!==fn(s[1])?s[0]:null; };
+  const young=uniq(me().lineup,ages); if(young) arcs.push({k:'young',n:young});
+  const all=F.ids.flatMap(id=>F.teams[id].lineup), vet=uniq(all,n=>-ages(n)); if(vet) arcs.push({k:'vet',n:vet});
   if(F.records&&F.records.HR) arcs.push({k:'chase',v:F.records.HR.v,n:F.records.HR.name});
   const dry=F.ids.filter(id=>id!==u&&!H.some(h=>h.champ===id)); if(H.length>=2&&dry.length) arcs.push({k:'dry',tid:dry[nwHash(String(F.season))%dry.length]});
   F.nx.arcs=arcs.slice(0,5);
@@ -2691,7 +2958,6 @@ function nwArcHTML(a){
 function nwPreseason(){
   nwInit(); const N=F.nx, u=F.userId;
   N.hs={}; N.ts={}; N.lead=null; N.fs={}; N.hrm={}; N.feat=0;
-  if(F.season>1) for(const n of Object.keys(F.bio)) F.bio[n].a++;
   nwArcs();
   if(F.season===1){
     nwAdd('pre',`A new league under the lights`,`Six clubs, one 32-game season and a best-of-7 Floodlight Series at the end of it. ${nwT(u)} open play against ${F.ids.filter(i=>i!==u).map(nwT).join(', ')}. The rivalry to watch: ${nwN(u)} and ${nwN(nwRival())}.`,{w:'Preseason',t:[u],pr:3});
@@ -2702,6 +2968,13 @@ function nwPreseason(){
   const h=F.history[F.history.length-1], titles=id=>F.history.filter(x=>x.champ===id).length;
   nwAdd('pre',`Season ${F.season} preview: everyone is chasing the ${nwN(h.champ)}`,`${nwT(h.champ)} are the defending champions${titles(h.champ)>1?`, with ${titles(h.champ)} titles in ${F.history.length} seasons`:''}. ${h.awards&&h.awards.mvp?`${h.awards.mvp.name} is back after an MVP season. `:''}${h.champ===u?`The ${nwN(u)} open with a target on their backs.`:`The ${nwN(u)} went ${h.user.w}–${h.user.l} last year and ${h.user.result.toLowerCase()}. This year, the goal is simple.`}`,{w:'Preseason',t:[h.champ,u],pr:3});
   const vet=F.nx.arcs.find(a=>a.k==='vet'); if(vet&&nwInfo(vet.n)){ const B=nwBio(vet.n); nwAdd('club',`Still going at ${B.age}: ${vet.n}`,`The oldest player in the league reported to camp first again. ${B.quirk}. ${B.back}.`,{w:'Preseason',t:[nwInfo(vet.n).tid],p:{n:vet.n,tid:nwInfo(vet.n).tid},pr:2}); }
+}
+function nwRetire(gone){
+  if(!gone.length) return; const u=F.userId;
+  for(const g of gone){ const c=F.career[g.old], T=F.teams[g.tid], B=nwBio(g.rookie), R=F.retired.find(r=>r.name===g.old), yrs=c?c.seasons:0;
+    const line=c&&c.PA?` ${yrs} season${yrs===1?'':'s'}: ${c.H} hits, ${c.HR} home runs, ${c.RBI} RBI and a ${f3(avg(c))} career average.`:'';
+    nwAdd(g.tid===u?'lore':'league',`${g.old} retires`,`${g.old} hangs up the spikes at ${R?R.age:RETIRE_AGE}${R?`, after wearing #${R.num} for the ${nwN(g.tid)}`:''}.${line}\nRookie ${g.rookie}, ${ROOKIE_AGE}, from ${B.town}, takes the open spot. ${B.back}.`,{w:'Preseason',t:[g.tid],p:{n:g.rookie,tid:g.tid},pr:g.tid===u?4:2});
+  }
 }
 function nwPlayoffs(){
   nwInit(); const s=F.po.seeds, u=F.userId, A=F.awards||{}; F.nx.fs={};
@@ -2727,6 +3000,7 @@ function nwCrown(pre){
   const best=Object.entries(F.nx.fs).filter(([,o])=>o.tid===c).sort((a,b)=>(b[1].H+b[1].HR*3+b[1].RBI)-(a[1].H+a[1].HR*3+a[1].RBI))[0];
   let b=`${nwT(c)} beat ${nwT(h.runner)} ${h.score} in the Floodlight Series. ${titles===1?'The first title in franchise history.':`Title number ${titles} for the franchise${prev&&prev.champ===c?', and back-to-back at that':''}.`}`;
   if(best) b+=`\nSeries MVP: ${best[0]}, ${nwLine(best[1])}.`;
+  h.smvp=best?{n:best[0],line:nwLine(best[1]),tid:c}:null;
   nwAdd('champ',c===u?`CHAMPIONS! The ${nwN(c)} win the Floodlight Series`:`${nwN(c)} win the Floodlight Series`,b,{t:[c,h.runner],p:best?{n:best[0],tid:c}:null,pr:9});
   if(c===u&&!F.nx.firsts.title){ F.nx.firsts.title=F.season; nwAdd('lore',`Franchise first: a championship`,`Season ${F.season} goes up on the outfield wall forever. The first Floodlight Series title in ${nwN(u)} history.`,{t:[u],pr:5}); }
   else if(c!==u) nwAdd('game',`${nwN(u)} season review: ${h.user.w}–${h.user.l}`,`${nwT(u)} finished ${ordinal(h.user.rank)} and ${h.user.result.toLowerCase()}. ${h.user.rank<=2?'Close. The core is in place.':h.user.rank<=4?'A playoff team with work to do.':'Back to the drawing board.'}`,{t:[u],pr:3});
@@ -3055,18 +3329,19 @@ function loadLineups(){
 }
 function saveLineups(l){ try{ localStorage.setItem('fdl-lineups',JSON.stringify(l)); }catch(e){} } // stored by each player's original name
 function exhTeams(){ const l=loadLineups(), out={}; for(const id of ['red','blue']){ const T=namedTeam(id), N=loadNames(); out[id]=Object.assign(T,{lineup:l[id].map(n=>N.players[n]||n)}); } return out; }
-function startExhibition(){
+function startExhibition(intro){
   if(busy) return;
   const ov=$('ov'); ov.hidden=true; ov.innerHTML=''; ov.onclick=null; FR=null;
   const T=exhTeams(), R=gameTeam(T.red), B=gameTeam(T.blue);
   G=newState(mode, exhHome?[B,R]:[R,B], opp==='cpu' ? (exhHome?[true,false]:[false,true]) : [false,false]);
-  $('pcard').dataset.nm=''; setWhere('quick'); checkDraw(); renderGame(); quickSave();
+  $('pcard').dataset.nm=''; setWhere('quick'); checkDraw(); annStart(); renderGame(); quickSave();
+  if(intro) cutscene();
 }
 function quickGame(){
   if(busy) return;
   if(frMode){ frMode=false; FR=null; setFrUI(); closeHub(); setWhere('quick'); if(!resumeQuick(jparse(lsGet(QKEY)))||G.over) startExhibition(); return; }
   if(G && !G.isFr && !G.over && !freshGame() && !confirm('Start a new quick game? The one in progress will be replaced. (Use Save / Load first if you want to keep it.)')) return;
-  startExhibition(); toast(G.half,'New quick game. Press Roll to play ball.','abil');
+  startExhibition(true); toast(G.half,'New quick game. Press Roll to play ball.','abil');
 }
 function newGame(){
   if(busy) return;
@@ -3077,7 +3352,7 @@ function newGame(){
     homeLabel: two?'RED plays':'You play', home:exhHome,
     cols:[{T:T.red,editable:true,reset:namedTeam('red').lineup},{T:T.blue,editable:two,reset:namedTeam('blue').lineup,note:two?'':'Computer'}],
     extra:{label:'✎ Team & player names',onClick:()=>editQuickNames(newGame)},
-    onPlay:({lineups,home})=>{ exhHome=home; try{ localStorage.setItem('fdl-home',home?'1':'0'); }catch(e){} saveLineups({red:lineups[0].map(n=>T.red.orig[n]||n),blue:lineups[1].map(n=>T.blue.orig[n]||n)}); startExhibition(); }});
+    onPlay:({lineups,home})=>{ exhHome=home; try{ localStorage.setItem('fdl-home',home?'1':'0'); }catch(e){} saveLineups({red:lineups[0].map(n=>T.red.orig[n]||n),blue:lineups[1].map(n=>T.blue.orig[n]||n)}); startExhibition(true); }});
 }
 
 /* ---------- controls ---------- */
@@ -3092,7 +3367,7 @@ $('detail').addEventListener('click',e=>{ if(e.target.id==='setLU'){ if(frMode) 
 $('finish').addEventListener('click',()=>{
   if(busy||G.over) return;
   let g=0; while(!G.over && g++<4000){ const [o,o2]=rollAB(G.mode); atBat(G,o,true,o2); }
-  G.dice=[]; G.pinch=null; checkDH(); G.big=G.walkoff?'Walk-off!':'Final'; renderGame(); celebrate();
+  G.dice=[]; G.pinch=null; checkDH(); G.big=G.walkoff?'Walk-off!':'Final'; renderGame(); celebrate(); ann.say(annFinal(),true); annStart();
   if(!G.shownFinal){ G.shownFinal=true; sfx.organ(); gameOver(); setTimeout(showFinal, reduce?200:1500); }
 });
 $('newgame').addEventListener('click',newGame);
@@ -3130,8 +3405,11 @@ function setOpp(o,fresh){
 }
 const soundBtn=$('sound');
 function paintSound(){ soundBtn.setAttribute('aria-pressed',sfx.on); soundBtn.textContent=sfx.on?'Sound on':'Sound off'; }
-soundBtn.addEventListener('click',()=>{ sfx.set(!sfx.on); paintSound(); if(sfx.on) sfx.pop(); });
+soundBtn.addEventListener('click',()=>{ sfx.set(!sfx.on); paintSound(); if(sfx.on) sfx.pop(); else ann.stop(); });
 paintSound();
+function paintAnn(){ const b=$('annBtn'); b.setAttribute('aria-pressed',ann.on); b.textContent=ann.on?'Announcer on':'Announcer off'; }
+$('annBtn').addEventListener('click',()=>{ ann.set(!ann.on); paintAnn(); if(ann.on) ann.say('Announcer is on. Let\'s play some baseball!',true); });
+paintAnn();
 function paintModeTabs(){ document.querySelectorAll('.tab[data-mode]').forEach(b=>{ const on=b.dataset.mode===mode; b.setAttribute('aria-selected',on); b.tabIndex=on?0:-1; }); }
 function setMode(m){
   mode=m; paintModeTabs();
@@ -3190,7 +3468,7 @@ function closeMenu(){
 $('mPlay').addEventListener('click',()=>{ closeMenu(); sfx.power(); });
 document.querySelector('.mlinks').addEventListener('click',e=>{
   const b=e.target.closest('[data-m]'); if(!b) return; const m=b.dataset.m; if(m==='qsave'){ quickSaveNow(b); return; } closeMenu(); pendingToast='';
-  if(m==='quick'){ if(frMode) quickGame(); else { startExhibition(); toast(G.half,'New quick game. Press Roll to play ball.','abil'); } }
+  if(m==='quick'){ if(frMode) quickGame(); else { startExhibition(true); toast(G.half,'New quick game. Press Roll to play ball.','abil'); } }
   else if(m==='fr'){ if(F&&F.live&&!frMode) frResume(); else openHub(); }
   else if(m==='saves') openSaves();
   else if(m==='how') document.getElementById('guideTitle').scrollIntoView({behavior:reduce?'auto':'smooth'});
