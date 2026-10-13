@@ -122,22 +122,90 @@ button,select,input{font:inherit;color:inherit}
 .anncall[hidden]{display:none}
 .anncall svg{width:15px;height:15px;flex:none;margin-top:2px;fill:var(--flood)}
 /* pregame cutscene */
-.cut{position:fixed;inset:0;z-index:9300;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;background:radial-gradient(ellipse 90% 60% at 50% -5%,rgba(255,200,97,.22),transparent 70%),linear-gradient(180deg,#060b18,#0d1a33 70%,#14264a);animation:cutIn .45s ease-out both}
-.cut.out{animation:cutOut .4s ease-in both}
-.cut .beam{position:absolute;top:-12%;width:34%;height:130%;background:linear-gradient(180deg,rgba(255,240,198,.2),rgba(255,240,198,0) 75%);clip-path:polygon(44% 0,56% 0,100% 100%,0 100%);pointer-events:none;animation:sweep 4s ease-in-out infinite alternate}
-.cut .beam.l{left:2%;transform-origin:50% 0;--r0:-24deg;--r1:-6deg}.cut .beam.r{right:2%;transform-origin:50% 0;--r0:24deg;--r1:6deg}
+.tv{position:fixed;inset:0;z-index:9350;display:flex;flex-direction:column;color:#f4f1e8;background:#050b18;overflow:hidden;font-family:var(--f-body,system-ui);animation:tvIn .5s ease-out both}
+.tv.out{animation:tvOut .4s ease-in both}
+@keyframes tvIn{from{opacity:0;transform:scale(1.03)}to{opacity:1;transform:none}}
+@keyframes tvOut{to{opacity:0}}
+.tvbg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 18% 0%,rgba(214,48,49,.32),transparent 70%),radial-gradient(ellipse 60% 55% at 100% 100%,rgba(255,200,97,.16),transparent 70%),repeating-linear-gradient(115deg,rgba(255,255,255,.025) 0 2px,transparent 2px 22px),linear-gradient(180deg,#0a1530,#050b18);pointer-events:none}
+.tvbg::after{content:"";position:absolute;inset:-20%;background:linear-gradient(100deg,transparent 40%,rgba(255,255,255,.07) 50%,transparent 60%);animation:tvSweep 6s linear infinite}
+@keyframes tvSweep{from{transform:translateX(-60%)}to{transform:translateX(60%)}}
+.tvbug{position:relative;display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:16px clamp(16px,4vw,40px) 0}
+.tvlogo{display:inline-flex;align-items:stretch;transform:skewX(-12deg);box-shadow:0 6px 20px rgba(0,0,0,.4)}
+.tvlogo b,.tvlogo em{display:block;padding:6px 14px;font-family:var(--f-head);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-style:normal;font-size:clamp(14px,2.2vw,20px)}
+.tvlogo b{background:#d63031;color:#fff}.tvlogo em{background:#f4f1e8;color:#0a1530}
+.tvlive{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-head);font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:#fff}
+.tvlive::before{content:"";width:9px;height:9px;border-radius:50%;background:#ff3b3b;box-shadow:0 0 10px #ff3b3b;animation:tvBlink 1.2s infinite}
+@keyframes tvBlink{50%{opacity:.25}}
+.tvsub{margin-left:auto;font-family:var(--f-head);letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#aab6cc}
+.tvstage{position:relative;flex:1;display:flex;align-items:center;justify-content:center;padding:16px clamp(16px,4vw,40px);min-height:0;overflow:auto}
+.tvseg{width:min(980px,100%)}
+.tvseg.in>*{animation:tvWipe .55s cubic-bezier(.2,.8,.2,1) both}.tvseg.in>*:nth-child(2){animation-delay:.12s}.tvseg.in>*:nth-child(3){animation-delay:.24s}
+@keyframes tvWipe{from{opacity:0;transform:translateX(-36px);clip-path:inset(0 100% 0 0)}to{opacity:1;transform:none;clip-path:inset(0 0 0 0)}}
+.tvh{margin:0 0 14px;display:inline-block;transform:skewX(-12deg);background:linear-gradient(90deg,#d63031,#a51f22);padding:7px 18px;box-shadow:0 8px 24px rgba(214,48,49,.25)}
+.tvh span{display:block;transform:skewX(12deg);font-family:var(--f-head);font-weight:700;text-transform:uppercase;letter-spacing:.1em;font-size:clamp(15px,2.4vw,22px)}
+.tvopen{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:10px 0}
+.tvbig{font-family:var(--f-head);font-weight:700;text-transform:uppercase;font-size:clamp(34px,7vw,76px);line-height:1;letter-spacing:.02em;text-shadow:0 0 40px rgba(255,200,97,.25)}
+.tvk{font-family:var(--f-head);letter-spacing:.2em;text-transform:uppercase;color:#ffc861;font-size:clamp(12px,1.6vw,15px)}
+.tvstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;width:100%;margin-top:12px}
+.tvstats div,.tvc{display:flex;flex-direction:column;gap:3px;padding:12px 14px;border-left:4px solid #d63031;background:rgba(255,255,255,.06);text-align:left}
+.tvstats span,.tvc span{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#aab6cc}
+.tvstats b,.tvc b{font-size:clamp(16px,2.2vw,20px)}.tvstats small,.tvc small{color:#ffd77e;font-family:var(--f-num);font-size:13px}
+.tvtbl{width:100%;border-collapse:collapse;font-size:clamp(14px,1.9vw,18px);background:rgba(0,0,0,.25)}
+.tvtbl th{font-family:var(--f-head);letter-spacing:.1em;text-transform:uppercase;font-size:12px;color:#aab6cc;padding:8px 10px;text-align:center;border-bottom:2px solid #d63031}
+.tvtbl td{padding:9px 10px;text-align:center;border-bottom:1px solid rgba(255,255,255,.08);font-family:var(--f-num)}
+.tvtbl .l{text-align:left;font-family:var(--f-body,system-ui)}.tvtbl tr.me td{background:rgba(255,200,97,.12)}.tvtbl tr.line td{border-bottom:2px dashed #ffc861}
+.tvtbl em{font-style:normal;font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:#2e8b57;color:#fff;padding:1px 6px;border-radius:3px;margin-left:6px}
+.tvnote{margin:10px 0 0;color:#aab6cc;font-size:13px}
+.tvlead{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.tvlead>div{background:rgba(255,255,255,.05);border-top:3px solid #d63031;padding:10px 12px}
+.tvlead h5{margin:0 0 6px;font-family:var(--f-head);letter-spacing:.12em;text-transform:uppercase;font-size:13px;color:#ffc861}
+.tvlead ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.tvlead li{display:flex;align-items:center;gap:6px;font-size:15px}.tvlead li i{font-style:normal;color:#aab6cc;width:14px}.tvlead li span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tvlead li b{font-family:var(--f-num);color:#ffd77e}.tvlead li.none{color:#aab6cc}
+.tv .dot{flex:none;width:10px;height:10px;display:inline-block;border-radius:50%;margin-right:6px;vertical-align:middle}
+.tvcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.tvc{position:relative;padding:16px}.tvc i{font-style:normal;font-family:var(--f-head);font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#d63031;font-size:14px}
+.tvc.one{border-left-color:#ffc861;background:linear-gradient(120deg,rgba(255,200,97,.18),rgba(255,255,255,.04))}.tvc.one i{color:#ffc861}
+.tvlist{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
+.tvlist li{padding:12px 14px;border-left:4px solid #ffc861;background:rgba(255,255,255,.06);font-size:clamp(15px,2vw,18px)}
+.tvbr{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.tvm{display:flex;flex-direction:column;gap:6px;padding:12px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.25)}
+.tvm>div{display:flex;align-items:center;gap:8px;font-size:17px;padding:6px 8px;background:rgba(255,255,255,.05)}.tvm i{font-style:normal;font-family:var(--f-head);color:#ffc861;width:16px}.tvm small{margin-left:auto;color:#aab6cc;font-family:var(--f-num)}
+.tvlower{position:relative;margin:0 clamp(16px,4vw,40px) 10px;display:flex;align-items:stretch;min-height:54px;background:rgba(5,11,24,.86);border-left:6px solid #d63031;box-shadow:0 10px 30px rgba(0,0,0,.45)}
+.tvtag{display:flex;align-items:center;padding:0 14px;background:#f4f1e8;color:#0a1530;font-family:var(--f-head);font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:13px;white-space:nowrap}
+.tvlower p{margin:0;padding:8px 14px;font-size:clamp(13px,1.7vw,16px);line-height:1.4;max-height:4.3em;overflow:auto}
+.tvfoot{position:relative;display:flex;flex-direction:column}
+.tvtick{display:flex;align-items:center;background:#d63031;color:#fff;font-family:var(--f-head);letter-spacing:.06em;font-size:14px;overflow:hidden}
+.tvtick>b{padding:7px 12px;background:#0a1530;text-transform:uppercase;letter-spacing:.12em;white-space:nowrap;z-index:1}
+.tvrun{flex:1;overflow:hidden;white-space:nowrap}.tvrun>div{display:inline-block;padding-left:100%;animation:tvRun 40s linear infinite}.tvrun span{margin:0 14px;opacity:.7}
+@keyframes tvRun{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+.tvctl{display:flex;align-items:center;gap:8px;padding:8px clamp(16px,4vw,40px) 12px;background:#050b18}
+.tvdots{display:flex;gap:6px;margin-right:auto}.tvdots i{width:18px;height:4px;background:rgba(255,255,255,.2)}.tvdots i.on{background:#ffc861}
+@media (prefers-reduced-motion:reduce){.tv,.tvseg.in>*,.tvbg::after,.tvrun>div,.tvlive::before{animation:none!important}}
+@media (max-width:620px){.tvsub{margin-left:0;width:100%}.tvtbl td,.tvtbl th{padding:6px 5px}.tvtag{padding:0 8px;font-size:11px}.tvlower p{max-height:6.6em;font-size:13px}}
+.annpop .eng{display:flex;flex-direction:column;gap:6px}.annpop .opt{flex-direction:row;align-items:flex-start;gap:8px;text-transform:none;letter-spacing:0;font-size:13px;color:var(--cream);cursor:pointer}.annpop .opt input{margin-top:3px}
+.svbig{display:inline-block;font-family:var(--f-led,monospace);font-size:30px;letter-spacing:.18em;color:#ffd77e;padding:4px 10px;margin:4px 0;border:1px solid rgba(255,200,97,.45);border-radius:8px;background:rgba(0,0,0,.3);user-select:all}
+.annpop{position:fixed;z-index:9400;width:min(320px,calc(100vw - 32px));padding:14px;border-radius:14px;border:1px solid var(--line);background:#0d1628;box-shadow:0 18px 50px rgba(0,0,0,.55);display:flex;flex-direction:column;gap:10px;color:var(--cream);font-size:14px}
+.annpop label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.annpop select,.annpop input[type=range]{width:100%}
+.annpop select{background:#071021;color:var(--cream);border:1px solid var(--line);border-radius:8px;padding:7px}
+.annpop .row{display:flex;gap:8px;flex-wrap:wrap}
+.annpop small{color:var(--muted);font-size:12px;line-height:1.4}
+.cutsc{position:fixed;inset:0;z-index:9300;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;background:radial-gradient(ellipse 90% 60% at 50% -5%,rgba(255,200,97,.22),transparent 70%),linear-gradient(180deg,#060b18,#0d1a33 70%,#14264a);animation:cutIn .45s ease-out both}
+.cutsc.out{animation:cutOut .4s ease-in both}
+.cutsc .beam{position:absolute;top:-12%;width:34%;height:130%;background:linear-gradient(180deg,rgba(255,240,198,.2),rgba(255,240,198,0) 75%);clip-path:polygon(44% 0,56% 0,100% 100%,0 100%);pointer-events:none;animation:sweep 4s ease-in-out infinite alternate}
+.cutsc .beam.l{left:2%;transform-origin:50% 0;--r0:-24deg;--r1:-6deg}.cutsc .beam.r{right:2%;transform-origin:50% 0;--r0:24deg;--r1:6deg}
 @keyframes sweep{from{transform:rotate(var(--r0))}to{transform:rotate(var(--r1))}}
 .cutin{position:relative;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;padding:24px 16px;max-width:920px}
-.cut .k{font-family:var(--f-head);font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--flood);font-size:clamp(12px,1.8vw,16px);animation:cutUp .6s .15s both}
-.cut .logo{font-family:var(--f-logo);font-size:clamp(26px,5vw,48px);color:var(--cream);text-shadow:3px 3px 0 #9e2f28,0 0 24px rgba(255,200,97,.4);animation:cutUp .6s both}
-.cut .vs{display:flex;align-items:center;justify-content:center;gap:clamp(10px,4vw,48px);flex-wrap:wrap}
-.cut .tm{display:flex;flex-direction:column;align-items:center;gap:4px;animation:cutL .7s .35s both}
-.cut .tm.h{animation-name:cutR}
-.cut .tm b{font-family:var(--f-head);font-weight:700;font-size:clamp(30px,6.5vw,68px);line-height:1;letter-spacing:.02em;text-shadow:0 0 30px rgba(0,0,0,.6)}
-.cut .tm span{font-family:var(--f-num);color:var(--muted);font-size:13px}
-.cut .at{font-family:var(--f-logo);font-size:clamp(26px,5vw,50px);color:var(--cream);animation:cutUp .6s .6s both}
-.cut .story{color:#d8dfec;font-size:clamp(14px,1.8vw,17px);max-width:58ch;animation:cutUp .6s .9s both}
-.cut .skip{color:var(--muted);font-size:12px;letter-spacing:.12em;text-transform:uppercase;margin-top:6px;animation:cutUp .6s 1.3s both}
+.cutsc .k{font-family:var(--f-head);font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--flood);font-size:clamp(12px,1.8vw,16px);animation:cutUp .6s .15s both}
+.cutsc .logo{font-family:var(--f-logo);font-size:clamp(26px,5vw,48px);color:var(--cream);text-shadow:3px 3px 0 #9e2f28,0 0 24px rgba(255,200,97,.4);animation:cutUp .6s both}
+.cutsc .vs{display:flex;align-items:center;justify-content:center;gap:clamp(10px,4vw,48px);flex-wrap:wrap}
+.cutsc .tm{display:flex;flex-direction:column;align-items:center;gap:4px;animation:cutL .7s .35s both}
+.cutsc .tm.h{animation-name:cutR}
+.cutsc .tm b{font-family:var(--f-head);font-weight:700;font-size:clamp(30px,6.5vw,68px);line-height:1;letter-spacing:.02em;text-shadow:0 0 30px rgba(0,0,0,.6)}
+.cutsc .tm span{font-family:var(--f-num);color:var(--muted);font-size:13px}
+.cutsc .at{font-family:var(--f-logo);font-size:clamp(26px,5vw,50px);color:var(--cream);animation:cutUp .6s .6s both}
+.cutsc .story{color:#d8dfec;font-size:clamp(14px,1.8vw,17px);max-width:58ch;animation:cutUp .6s .9s both}
+.cutsc .skip{color:var(--muted);font-size:12px;letter-spacing:.12em;text-transform:uppercase;margin-top:6px;animation:cutUp .6s 1.3s both}
 @keyframes cutIn{from{opacity:0}to{opacity:1}}
 @keyframes cutOut{to{opacity:0;transform:scale(1.04)}}
 @keyframes cutUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -798,7 +866,7 @@ button,select,input{font:inherit;color:inherit}
 <button class="btn small" id="tips" type="button" aria-pressed="true" title="Show hints about what you can do right now">Tips on</button>
 <button class="btn small" id="lights" type="button" aria-pressed="true">Lights on</button>
 <button class="btn small" id="sound" type="button" aria-pressed="true">Sound on</button>
-<button class="btn small" id="annBtn" type="button" aria-pressed="true" title="A play-by-play announcer calls the game out loud">Announcer on</button>
+<button class="btn small" id="annBtn" type="button" aria-pressed="true" title="Announcer: turn it on or off, pick a voice, set the volume">Announcer on</button>
 <button class="btn small" id="fs" type="button" hidden>Full screen</button>
 </div>
 </header>
@@ -1009,6 +1077,8 @@ const DHS = [
 const DRAW_INNINGS = [1,4,7];
 const BASE_N = ['first','second','third','home'];
 const SITE_URL = 'https://floodlight-baseball-dice-lab.netlify.app';
+/* short save codes live on the site's save function; copies of the game hosted anywhere else use the main site's */
+const SAVE_API = (/\.netlify\.app$/.test(location.hostname)?location.origin:SITE_URL)+'/api/save';
 const PHOTO={}; // painted photo cards retired: every player card is drawn in the cartoon style
 const DERIVE={}; // photo cards built from another photo card (none in use)
 const ALLY={name:'Ally Nico',ab:'GLV',n:8,f:1}; // left RED so each team has one woman; plays for a computer team in franchises
@@ -1537,42 +1607,86 @@ const TN = t => G.teams[t].name;
 
 /* ---------- sound: everything is synthesized, nothing to download ---------- */
 const sfx=(()=>{
-  let ctx=null, on=true, buf=null;
+  /* every sound is built live with Web Audio: a wood bat, a leather mitt, a real crowd with claps and whistles, a ballpark organ */
+  let ctx=null, on=true, buf=null, pink=null, out=null, room=null, bed=null;
   try{ on=localStorage.getItem('fdl-sound')!=='off'; }catch(e){}
   function ac(){
     if(!on) return null;
     try{
       if(!ctx){ const C=window.AudioContext||window.webkitAudioContext; if(!C) return null; ctx=new C();
-        const n=ctx.sampleRate; buf=ctx.createBuffer(1,n,n); const d=buf.getChannelData(0); for(let i=0;i<n;i++) d[i]=Math.random()*2-1; }
+        const n=ctx.sampleRate; buf=ctx.createBuffer(1,n*2,n); const d=buf.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+        pink=ctx.createBuffer(1,n*4,n); const p=pink.getChannelData(0); let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+        for(let i=0;i<p.length;i++){ const w=Math.random()*2-1; b0=.99886*b0+w*.0555179; b1=.99332*b1+w*.0750759; b2=.969*b2+w*.153852; b3=.8665*b3+w*.3104856; b4=.55*b4+w*.5329522; b5=-.7616*b5-w*.016898; p[i]=(b0+b1+b2+b3+b4+b5+b6+w*.5362)*.11; b6=w*.115926; }
+        const comp=ctx.createDynamicsCompressor(); comp.threshold.value=-14; comp.ratio.value=4; comp.attack.value=.003; comp.release.value=.25; comp.connect(ctx.destination);
+        out=ctx.createGain(); out.gain.value=.9; out.connect(comp);
+        // the stadium: a short slap-back off the stands
+        room=ctx.createGain(); room.gain.value=.22; const dl=ctx.createDelay(1); dl.delayTime.value=.16; const fb=ctx.createGain(); fb.gain.value=.28; const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=2600;
+        room.connect(dl); dl.connect(lp); lp.connect(fb); fb.connect(dl); lp.connect(out);
+        ambience(); }
       if(ctx.state==='suspended') ctx.resume();
     }catch(e){ return null; }
     return ctx;
   }
+  const dest=(wet)=>{ const g=ctx.createGain(); g.connect(out); if(wet) g.connect(room); return g; };
   function noise(t0,dur,o){
-    const c=ac(); if(!c) return; o=Object.assign({type:'bandpass',f:1000,q:1,gain:.3,attack:.005},o);
-    const src=c.createBufferSource(); src.buffer=buf; src.loop=true;
+    const c=ac(); if(!c) return; o=Object.assign({type:'bandpass',f:1000,q:1,gain:.3,attack:.005,src:buf,wet:true},o);
+    const src=c.createBufferSource(); src.buffer=o.src; src.loop=true;
     const fl=c.createBiquadFilter(); fl.type=o.type; fl.frequency.setValueAtTime(o.f,t0); if(o.f2) fl.frequency.exponentialRampToValueAtTime(o.f2,t0+dur); fl.Q.value=o.q;
-    const g=c.createGain(); g.gain.setValueAtTime(0.0001,t0); g.gain.linearRampToValueAtTime(o.gain,t0+o.attack); g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
-    src.connect(fl); fl.connect(g); g.connect(c.destination); src.start(t0,Math.random()*.5); src.stop(t0+dur+.05);
+    const g=c.createGain(); g.gain.setValueAtTime(0.0001,t0); g.gain.linearRampToValueAtTime(o.gain,t0+o.attack); if(o.hold) g.gain.setValueAtTime(o.gain,t0+o.hold); g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+    src.connect(fl); fl.connect(g); g.connect(dest(o.wet)); src.start(t0,Math.random()*1.5); src.stop(t0+dur+.05); return g;
   }
   function tone(t0,freq,dur,o){
-    const c=ac(); if(!c) return; o=Object.assign({type:'square',gain:.06},o);
-    const osc=c.createOscillator(); osc.type=o.type; osc.frequency.value=freq; const g=c.createGain();
-    g.gain.setValueAtTime(0.0001,t0); g.gain.linearRampToValueAtTime(o.gain,t0+.012); g.gain.setValueAtTime(o.gain,t0+dur*.7); g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
-    osc.connect(g); g.connect(c.destination); osc.start(t0); osc.stop(t0+dur+.03);
+    const c=ac(); if(!c) return; o=Object.assign({type:'square',gain:.06,wet:true},o);
+    const osc=c.createOscillator(); osc.type=o.type; osc.frequency.setValueAtTime(freq,t0); if(o.f2) osc.frequency.exponentialRampToValueAtTime(o.f2,t0+dur); const g=c.createGain();
+    g.gain.setValueAtTime(0.0001,t0); g.gain.linearRampToValueAtTime(o.gain,t0+(o.attack||.012)); g.gain.setValueAtTime(o.gain,t0+dur*(o.hold||.7)); g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+    osc.connect(g); g.connect(dest(o.wet)); osc.start(t0); osc.stop(t0+dur+.03); return osc;
+  }
+  /* the crowd that's always there: a low murmur that breathes */
+  function ambience(){
+    if(bed||!ctx) return; const c=ctx, src=c.createBufferSource(); src.buffer=pink; src.loop=true;
+    const bp=c.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=650; bp.Q.value=.6; const lp=c.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=2200;
+    const g=c.createGain(); g.gain.value=.05; const lfo=c.createOscillator(); lfo.frequency.value=.09; const lg=c.createGain(); lg.gain.value=.018; lfo.connect(lg); lg.connect(g.gain);
+    const v=c.createBufferSource(); v.buffer=pink; v.loop=true; const vf=c.createBiquadFilter(); vf.type='bandpass'; vf.frequency.value=1150; vf.Q.value=2.5; const vg=c.createGain(); vg.gain.value=.012;
+    const l2=c.createOscillator(); l2.frequency.value=.31; const l2g=c.createGain(); l2g.gain.value=.008; l2.connect(l2g); l2g.connect(vg.gain);
+    src.connect(bp); bp.connect(lp); lp.connect(g); g.connect(out); v.connect(vf); vf.connect(vg); vg.connect(out);
+    src.start(); v.start(.7); lfo.start(); l2.start(); bed=g;
+  }
+  /* a crowd reaction: thousands of voices (formant-shaped noise), hand claps and a few whistles */
+  function crowd(t,d,lvl,big){
+    for(const [f,q,k] of [[520,1.1,1],[1250,1.6,.55],[2600,2.2,.25]]) noise(t,d,{src:pink,f,q,gain:lvl*k,attack:big?.35:.2,hold:d*.45});
+    const n=big?110:30; for(let i=0;i<n;i++){ const ct=t+.15+Math.random()*d*.75; noise(ct,.05,{type:'bandpass',f:1100+Math.random()*1500,q:1.4,gain:(.05+Math.random()*.08)*(big?1:.8),attack:.001}); }
+    if(big) for(let i=0;i<3;i++){ const wt=t+.3+Math.random()*1.4, f=2500+Math.random()*700; tone(wt,f,.35+Math.random()*.3,{type:'sine',gain:.022,f2:f*(Math.random()<.5?1.18:.86),attack:.03}); }
+  }
+  /* the ballpark organ: drawbar partials, a Leslie wobble */
+  function organNote(t,f,d,lvl=.03){
+    const c=ac(); if(!c) return; const g=c.createGain(); g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(lvl,t+.012); g.gain.setValueAtTime(lvl,t+d); g.gain.exponentialRampToValueAtTime(0.0001,t+d+.09);
+    const lp=c.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=3800; const trem=c.createGain(); trem.gain.value=1; const lfo=c.createOscillator(); lfo.frequency.value=6.4; const lg=c.createGain(); lg.gain.value=.14; lfo.connect(lg); lg.connect(trem.gain);
+    for(const [m,a] of [[.5,.45],[1,1],[2,.7],[3,.35],[4,.28],[6,.12]]){ const o=c.createOscillator(); o.type='sine'; o.frequency.value=f*m; const og=c.createGain(); og.gain.value=a; o.connect(og); og.connect(lp); o.start(t); o.stop(t+d+.12); }
+    lp.connect(trem); trem.connect(g); g.connect(dest(true)); lfo.start(t); lfo.stop(t+d+.12);
   }
   const now=()=>{ const c=ac(); return c?c.currentTime+.01:0; };
   return {
     get on(){ return on; },
     set(v){ on=v; try{ localStorage.setItem('fdl-sound',v?'on':'off'); }catch(e){} if(v) ac(); else if(ctx) ctx.suspend(); },
     unlock(){ ac(); },
-    dice(){ if(!ac()) return; const t=now(); for(let i=0;i<7;i++) noise(t+i*.085+Math.random()*.03,.05,{f:2200+Math.random()*1900,q:4,gain:.2,attack:.002}); },
-    crack(){ if(!ac()) return; const t=now(); noise(t,.13,{type:'highpass',f:1700,q:.7,gain:.75,attack:.001}); tone(t,1400,.06,{type:'triangle',gain:.14}); },
-    pop(){ if(!ac()) return; const t=now(); noise(t,.1,{type:'lowpass',f:850,q:.8,gain:.7,attack:.002}); },
-    cheer(big){ if(!ac()) return; const t=now()+.05, d=big?2.8:1.4; noise(t,d,{f:850,q:.6,gain:big?.34:.17,attack:big?.3:.18}); noise(t+.05,d,{f:2300,q:.9,gain:big?.13:.06,attack:.35}); },
-    flip(){ if(!ac()) return; const t=now(); noise(t,.2,{f:3200,f2:800,q:1.3,gain:.2,attack:.01}); },
+    dice(){ if(!ac()) return; const t=now(); for(let i=0;i<7;i++) noise(t+i*.085+Math.random()*.03,.05,{f:2200+Math.random()*1900,q:4,gain:.2,attack:.002,wet:false}); },
+    /* a wood bat: the snap, the ring of the barrel, the thump */
+    crack(){ if(!ac()) return; const t=now();
+      noise(t,.012,{type:'highpass',f:2400,q:.7,gain:.9,attack:.0005});
+      for(const [f,q,d,g] of [[930,16,.11,1.6],[1680,20,.07,1.2],[2950,24,.045,.8]]) noise(t,d,{f,q,gain:g,attack:.0008});
+      tone(t,150,.06,{type:'sine',gain:.35,f2:80,attack:.002,hold:.1}); },
+    /* the pop of a catcher's mitt */
+    pop(){ if(!ac()) return; const t=now(); noise(t,.07,{type:'lowpass',f:480,q:.9,gain:1,attack:.001}); noise(t,.022,{f:1900,q:1.2,gain:.35,attack:.0008}); tone(t,105,.07,{type:'sine',gain:.3,f2:70,attack:.002,hold:.1}); },
+    cheer(big){ if(!ac()) return; crowd(now()+.04,big?3.6:1.7,big?.5:.24,big); },
+    flip(){ if(!ac()) return; const t=now(); noise(t,.2,{f:3200,f2:800,q:1.3,gain:.2,attack:.01,wet:false}); },
     power(){ if(!ac()) return; const t=now(); [523.25,659.25,783.99,1046.5].forEach((f,i)=>tone(t+i*.07,f,.16,{type:'triangle',gain:.05})); },
-    organ(){ if(!ac()) return; const t=now(); [392,523.25,659.25,783.99].forEach((f,i)=>{ const d=i===3?.6:.15; tone(t+i*.17,f,d,{gain:.045}); tone(t+i*.17,f*2,d,{type:'triangle',gain:.03}); }); }
+    /* "Charge!" on the organ */
+    organ(){ if(!ac()) return; const t=now()+.02; [[392,0,.12],[523.25,.16,.12],[659.25,.32,.12],[783.99,.48,.3],[659.25,.86,.1],[783.99,1.0,.7]].forEach(([f,o,d])=>organNote(t+o,f,d)); },
+    /* the studio show's opening sting, and the swoosh between segments */
+    tvOpen(){ if(!ac()) return; const t=now(); noise(t,.7,{f:300,f2:4200,q:1.5,gain:.25,attack:.5,wet:false});
+      tone(t+.62,62,.9,{type:'sine',gain:.5,f2:45,attack:.003,hold:.05});
+      [261.63,392,523.25,659.25].forEach(f=>{ tone(t+.62,f,1.3,{type:'sawtooth',gain:.028,attack:.02,hold:.5}); tone(t+.62,f*1.005,1.3,{type:'sawtooth',gain:.02,attack:.02,hold:.5}); }); },
+    whoosh(){ if(!ac()) return; const t=now(); noise(t,.4,{f:3400,f2:500,q:1.1,gain:.22,attack:.12,wet:false}); }
   };
 })();
 /* a run cell, packed a little tighter when it needs two digits */
@@ -1583,55 +1697,105 @@ const ann=(()=>{
   const S=window.speechSynthesis||null;
   const MALE=/\b(male|man|david|daniel|alex|fred|guy|mark|james|george|arthur|aaron|tom|ryan|oliver|thomas|reed|eddy|ralph|bruce|gordon|lee|rishi|junior|christopher|eric|roger|andrew|brian|davis|tony|jason)\b/i;
   const FEMALE=/\b(female|woman|samantha|victoria|karen|moira|tessa|fiona|zira|susan|hazel|catherine|serena|ava|allison|kate|martha|nicky|joanna|salli|kimberly|ivy|emma|amy|aria|jenny|libby|sonia|natasha|michelle|sara|zoe|nora|shelley|sandy|flo|grandma|kathy|vicki|veena|anna|monica|paulina|amelie|alice|ellen|joana|laura|luciana|mei|yuna|zuzana|melina|alva|damayanti|kanya|kyoko|lekha|sinji|tingting|yelda|carmit|ioana|mariska|milena|sin-ji)\b/i;
-  let voice=null, next=null;
-  function pickVoice(){ if(!S) return; const vs=S.getVoices().filter(v=>/^en/i.test(v.lang)), us=v=>/en[-_]US/i.test(v.lang);
-    voice = vs.find(v=>MALE.test(v.name)&&us(v)) || vs.find(v=>MALE.test(v.name)) || vs.find(v=>!FEMALE.test(v.name)&&us(v)) || vs.find(v=>!FEMALE.test(v.name)) || null; }
+  const HUMAN=/natural|neural|online|premium|enhanced|wavenet|studio|siri/i, ROBOT=/espeak|fred|albert|bad news|bahh|bells|boing|bubbles|cellos|jester|organ|superstar|trinoids|whisper|wobble|zarvox|microsoft david|microsoft mark|microsoft george|microsoft james|microsoft richard|microsoft sean/i;
+  const GOOD=/andrew|brian|guy|christopher|eric|roger|davis|steffan|ryan|thomas|evan|nathan|aaron|reed|tom|alex|daniel|arthur|oliver|google uk english male|lee|jason|tony/i;
+  /* the studio voices: Kokoro, an open-source neural voice model that runs right in the browser */
+  const STUDIO=[['am_michael','Michael · American'],['am_puck','Puck · American, upbeat'],['am_fenrir','Fenrir · American, deep'],['am_eric','Eric · American'],['am_echo','Echo · American'],['am_liam','Liam · American'],['am_onyx','Onyx · American'],['bm_george','George · British'],['bm_fable','Fable · British'],['bm_lewis','Lewis · British']];
+  const mobile=/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent||'');
+  let voice=null, next=null, vol=0.8, want='', engine=mobile?'device':'studio', sv='am_michael', devTok=0, fakeT=0;
+  try{ const v=parseFloat(localStorage.getItem('fdl-ann-vol')); if(v>=0&&v<=1) vol=v; want=localStorage.getItem('fdl-ann-voice')||''; const e=localStorage.getItem('fdl-ann-engine'); if(e==='studio'||e==='device') engine=e; const s=localStorage.getItem('fdl-ann-sv'); if(STUDIO.some(x=>x[0]===s)) sv=s; }catch(e){}
+  const score=v=>(HUMAN.test(v.name)?100:0)+(MALE.test(v.name)||GOOD.test(v.name)?40:FEMALE.test(v.name)?-200:0)+(GOOD.test(v.name)?15:0)+(ROBOT.test(v.name)?-80:0)+(/en[-_]US/i.test(v.lang)?6:/en[-_](GB|AU|CA|IE)/i.test(v.lang)?3:0)+(v.localService?0:2);
+  function list(){ return S?S.getVoices().filter(v=>/^en/i.test(v.lang)&&!FEMALE.test(v.name)).sort((a,b)=>score(b)-score(a)):[]; }
+  function pickVoice(){ if(!S) return; const vs=list(); voice=(want&&vs.find(v=>v.name===want))||vs[0]||null; }
   if(S){ pickVoice(); try{ S.addEventListener('voiceschanged',pickVoice); }catch(e){ S.onvoiceschanged=pickVoice; } }
-  const spoken=t=>t.replace(/(\d)–(\d)/g,'$1 to $2').replace(/–/g,', ').replace(/\u0001(\d+)\u0001/g,(m,d)=>avgWords(+d)).replace(/\bRBI\b/g,'R B I').replace(/#(\d+)/g,'number $1').replace(/[“”"]/g,'');
+  const spoken=t=>t.replace(/(\d)–(\d)/g,'$1 to $2').replace(/–/g,', ').replace(/\u0001(\d+)\u0001/g,(m,d)=>avgWords(+d)).replace(/\bRBI\b/g,'R B I').replace(/\bMVP\b/g,'M V P').replace(/#(\d+)/g,'number $1').replace(/\bNo\. (\d)/g,'number $1').replace(/[“”"]/g,'');
   const shown=t=>t.replace(/\u0001(\d+)\u0001/g,(m,d)=>'.'+String(d).padStart(3,'0').replace(/^1000$/,'1.000'));
   function avgWords(d){ if(d>=1000) return 'a thousand'; if(d===0) return 'zero'; const a=Math.floor(d/100), b=d%100; return a? `${a} ${b===0?'hundred':b<10?'oh '+b:b}` : (b<10?'oh oh '+b:'oh '+b); }
-  function speak(t){ if(!S) return; const u=new SpeechSynthesisUtterance(spoken(t)); if(voice){ u.voice=voice; u.lang=voice.lang; } else u.lang='en-US';
-    u.rate=1.02; u.pitch=voice&&MALE.test(voice.name)?0.95:0.72; u.onend=()=>{ if(next){ const n=next; next=null; speak(n); } }; S.speak(u); }
-  function say(t,big){
-    if(!t) return; const cap=$('anncap');
-    if(cap){ cap.hidden=false; cap.innerHTML=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-3.1A7 7 0 0 0 19 11z"/></svg><span>${esc(shown(t))}</span>`; }
-    if(!on||!S||!sfx.on) return;
-    if(big){ next=null; S.cancel(); speak(t); } else if(S.speaking||S.pending) next=t; else speak(t);
+  const status={state:'idle',pct:0,err:''}, subs=new Set(); const notify=()=>subs.forEach(f=>{ try{ f(status); }catch(e){} });
+  /* device voice */
+  function devSay(t,big,done){
+    if(!S){ fake(t,done); return; }
+    if(big||!(S.speaking||S.pending)){ next=null; S.cancel(); } else { next={t,cb:done}; return; }
+    const tok=++devTok, q=parts(t); let wd=0;
+    const step=()=>{ clearTimeout(wd); if(tok!==devTok) return;
+      if(!q.length){ if(next){ const n=next; next=null; devSay(n.t,true,n.cb); } else if(done) done(); return; }
+      const txt=q.shift(), u=new SpeechSynthesisUtterance(txt); if(voice){ u.voice=voice; u.lang=voice.lang; } else u.lang='en-US';
+      u.volume=vol; u.rate=1; u.pitch=voice&&(MALE.test(voice.name)||GOOD.test(voice.name))?1:0.85;
+      let fired=false; const fin=()=>{ if(fired) return; fired=true; step(); }; u.onend=u.onerror=fin; wd=setTimeout(fin,txt.length*95+3500); S.speak(u); };
+    step();
+  }
+  function fake(t,done){ clearTimeout(fakeT); if(done) fakeT=setTimeout(done,Math.max(3500,Math.min(16000,t.length*60))); }
+  /* studio voice: a module worker loads Kokoro from jsDelivr and the model from Hugging Face (cached by the browser after the first time) */
+  const WORKER=`import { KokoroTTS } from 'https://cdn.jsdelivr.net/npm/kokoro-js@1.2.1/dist/kokoro.web.js';
+let tts=null, loading=null, cut=0, chain=Promise.resolve();
+function load(){ if(!loading) loading=KokoroTTS.from_pretrained('onnx-community/Kokoro-82M-v1.0-ONNX',{dtype:'q8',device:'wasm',progress_callback:p=>{ if(p&&p.status==='progress'&&/onnx/.test(p.file||'')) postMessage({type:'progress',pct:p.progress}); }}).then(t=>{ tts=t; postMessage({type:'ready'}); return t; }); return loading; }
+async function run(m){
+  try{ await load(); if(m.type!=='say') return;
+    for(let i=0;i<m.parts.length;i++){ if(m.id<=cut) return; const a=await tts.generate(m.parts[i],{voice:m.voice,speed:m.speed}); if(m.id<=cut) return;
+      const pcm=new Float32Array(a.audio); postMessage({type:'audio',id:m.id,last:i===m.parts.length-1,pcm,sr:a.sampling_rate},[pcm.buffer]); }
+  }catch(err){ postMessage({type:'error',id:m.id,msg:String(err&&err.message||err)}); }
+}
+onmessage=e=>{ const m=e.data; if(m.type==='cancel'){ cut=Math.max(cut,m.upto); return; } chain=chain.then(()=>run(m)); };`;
+  let W=null, wTimer=0, ac=null, gain=null, playing=[], tEnd=0, job=0, cbs={};
+  function fail(msg){ status.state='failed'; status.err=msg||'The studio voice could not load.'; clearTimeout(wTimer); if(W){ try{ W.terminate(); }catch(e){} W=null; } notify(); }
+  function warm(){
+    if(W||status.state==='failed'||engine!=='studio'||!on) return;
+    try{ const url=URL.createObjectURL(new Blob([WORKER],{type:'text/javascript'})); W=new Worker(url,{type:'module'}); }catch(e){ fail('This browser can’t run the studio voice.'); return; }
+    status.state='loading'; status.pct=0; notify();
+    W.onmessage=e=>{ const m=e.data;
+      if(m.type==='progress'){ status.pct=Math.round(m.pct||0); notify(); clearTimeout(wTimer); wTimer=setTimeout(()=>{ if(status.state==='loading') fail('The studio voice download stalled.'); },60000); }
+      else if(m.type==='ready'){ clearTimeout(wTimer); status.state='ready'; status.pct=100; notify(); }
+      else if(m.type==='audio') play(m);
+      else if(m.type==='error') fail(m.msg); };
+    W.onerror=e=>{ e.preventDefault&&e.preventDefault(); fail('The studio voice could not load here.'); };
+    W.postMessage({type:'load'});
+    wTimer=setTimeout(()=>{ if(status.state==='loading'&&!status.pct) fail('The studio voice download did not start.'); },45000);
+  }
+  function actx(){ try{ if(!ac){ const C=window.AudioContext||window.webkitAudioContext; if(!C) return null; ac=new C(); gain=ac.createGain(); gain.connect(ac.destination); } if(ac.state==='suspended') ac.resume(); gain.gain.value=vol; return ac; }catch(e){ return null; } }
+  function play(m){
+    if(m.id!==job) return; const c=actx(); if(!c) return;
+    const b=c.createBuffer(1,m.pcm.length,m.sr); b.copyToChannel(m.pcm,0); const s=c.createBufferSource(); s.buffer=b; s.connect(gain);
+    const t=Math.max(c.currentTime+.05,tEnd); s.start(t); tEnd=t+b.duration+.18; playing.push(s);
+    s.onended=()=>{ playing=playing.filter(x=>x!==s); if(m.last&&m.id===job&&cbs[m.id]){ const d=cbs[m.id]; delete cbs[m.id]; d(); } };
+  }
+  function parts(t){ const raw=spoken(t).match(/[^.!?]+[.!?]+["')]*\s*|[^.!?]+$/g)||[t], out=[]; let cur='';
+    for(const r of raw){ const x=r.trim(); if(!x) continue; if((cur+' '+x).length<60||!cur) cur=(cur?cur+' ':'')+x; else { out.push(cur); cur=x; } } if(cur) out.push(cur);
+    if(out.length>1&&out[out.length-1].length<40){ const l=out.pop(); out[out.length-1]+=' '+l; } return out; }
+  function hush(){ job++; if(W) W.postMessage({type:'cancel',upto:job-1}); for(const s of playing){ try{ s.stop(); }catch(e){} } playing=[]; tEnd=0; cbs={}; next=null; devTok++; if(S) S.cancel(); clearTimeout(fakeT); }
+  function caption(t){ const cap=$('anncap'); if(cap){ cap.hidden=false; cap.innerHTML=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-3.1A7 7 0 0 0 19 11z"/></svg><span>${esc(shown(t))}</span>`; } }
+  /* say(text, interrupt, onDone): onDone runs when the call has finished (or after a reading pause when nothing is spoken) */
+  function say(t,big,done,quiet){
+    if(!t){ if(done) done(); return; } if(!quiet) caption(t);
+    if(!on||!sfx.on){ fake(t,done); return; }
+    if(engine==='studio'&&status.state!=='failed'){
+      if(status.state==='ready'){ hush(); cbs[job]=done||null; if(!done) delete cbs[job]; actx(); W.postMessage({type:'say',id:job,parts:parts(t),voice:sv,speed:1}); return; }
+      warm(); fake(t,done); return; }
+    if(big) hush(); devSay(t,big,done);
   }
   return {
     get on(){ return on; },
-    set(v){ on=v; try{ localStorage.setItem('fdl-ann',v?'on':'off'); }catch(e){} if(!v&&S){ next=null; S.cancel(); } },
-    say, stop(){ next=null; if(S) S.cancel(); },
+    set(v){ on=v; try{ localStorage.setItem('fdl-ann',v?'on':'off'); }catch(e){} if(!v) hush(); else warm(); },
+    say, stop:hush, warm, caption,
     avg:x=>'\u0001'+Math.round(Math.max(0,Math.min(1,x))*1000)+'\u0001',
-    get voiceName(){ return voice?voice.name:'' }
+    get voiceName(){ return voice?voice.name:''; },
+    get vol(){ return vol; }, setVol(v){ vol=Math.max(0,Math.min(1,v)); if(gain) gain.gain.value=vol; try{ localStorage.setItem('fdl-ann-vol',vol); }catch(e){} },
+    voices:()=>list().map(v=>({name:v.name,lang:v.lang,human:HUMAN.test(v.name)})),
+    setVoice(n){ want=n; try{ localStorage.setItem('fdl-ann-voice',n); }catch(e){} pickVoice(); },
+    get engine(){ return engine; }, setEngine(e){ engine=e; hush(); try{ localStorage.setItem('fdl-ann-engine',e); }catch(x){} if(e==='studio'){ if(status.state==='failed'){ status.state='idle'; status.err=''; } warm(); } notify(); },
+    studio:STUDIO, get studioVoice(){ return sv; }, setStudioVoice(v){ sv=v; try{ localStorage.setItem('fdl-ann-sv',v); }catch(e){} },
+    status, onStatus(f){ subs.add(f); return ()=>subs.delete(f); },
+    ok:!!S
   };
 })();
 /* who's who for the call: pronouns, numbers and the lore the franchise keeps */
 function annInfo(n){ for(let t=0;t<2;t++){ const I=G.teams[t].info&&G.teams[t].info[n]; if(I) return Object.assign({t},I); } const d=DHS.find(x=>x.name===n); return d?{dh:1,f:d.f}:{}; }
 const heOf=n=>annInfo(n).f?'she':'he', HeOf=n=>annInfo(n).f?'She':'He', hisOf=n=>annInfo(n).f?'her':'his', himOf=n=>annInfo(n).f?'her':'him';
 const plainText=h=>String(h).replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/\s+/g,' ').trim();
-function annScore(){ const a=total(G,0), h=total(G,1); if(a===h) return a?`We're tied at ${a}.`:'No score yet.'; return `It's ${G.teams[0].name} ${a}, ${G.teams[1].name} ${h}.`; }
 const annFr=()=>!!(G&&G.isFr&&F&&FR);
 const theTeam=n=>/\s/.test(n)?'the '+n:n, TheTeam=n=>/\s/.test(n)?'The '+n:n;
 const annPost=()=>annFr()&&FR.kind==='po';
 /* a player's season so far, including today's game (the season store is only updated after each game day) */
 function annSeason(n){ if(!annFr()) return null; const st=(annPost()?F.pstats:F.stats)[n], b=G.box[n], o=blank(''); for(const k of STATK){ o[k]=(st?st[k]:0)+(b&&k!=='G'?b[k]||0:0); } return o; }
-function annHR(n){
-  if(!annFr()) return ''; const s=annSeason(n), tot=s.HR, his=hisOf(n);
-  let t= tot>1 ? ` That's number ${tot} ${annPost()?'this postseason':'on the season'} for ${lastName(n)}.` : ` That's ${his} first ${annPost()?'of the postseason':'of the season'}.`;
-  const R=F.records&&F.records.HR;
-  if(R && !annPost()){
-    if(tot===R.v+1) t+=` That's a new league record! The old mark was ${R.v}, by ${R.name} in Season ${R.season}.`;
-    else if(tot>R.v+1) t+=` ${HeOf(n)} keeps adding to ${his} new league record.`;
-    else if(tot===R.v) t+=` That ties the league record of ${R.v}, set by ${R.name} in Season ${R.season}.`;
-    else if(tot>=10 && R.v-tot<=3) t+=` ${HeOf(n)}'s ${R.v-tot} shy of the league record.`;
-  }
-  return t;
-}
-function annStreak(n){
-  if(!annFr()||annPost()||!F.nx) return ''; const b=G.box[n], hs=F.nx.hs[n]||0;
-  return b&&b.H===1&&hs>=4 ? ` That extends ${hisOf(n)} hitting streak to ${hs+1} games.` : '';
-}
 function annLeadoff(){
   if(!G||G.over) return ''; const t=G.half, n=curBatter(G), I=annInfo(n), T=G.teams[t];
   let s=`Leading off the ${t?'bottom':'top'} of the ${ordinal(G.inning)} for ${T.name}${I.n?`, #${I.n}`:''}, ${n}.`;
@@ -1647,61 +1811,189 @@ function annLeadoff(){
   if(!facts.length) return s;
   return s+' '+facts[(G.inning+t+G.idx[t])%facts.length];
 }
-const ANN_PRE={'Home run':['There it goes!','Way back... and gone!','Swung on and belted!'],'Grand slam':['Grand slam!'],'Strikeout':['Strike three!'],'Single':['Base hit!','Into the outfield for a hit!'],'Double':['Two-base hit!'],'Triple':['A three-bagger!'],'Walk':['Ball four.'],'Double play':['Two for the price of one!'],'Diving catch':['What a play!'],'Gold Glove':['Robbed!'],'Robbed':['At the wall... robbed!'],'Stolen base':['There goes the runner!'],'Steals home!':['Here comes the runner!'],'Picked off':['Picked off!']};
-function annResult(){
-  const E=G.event, L=G.last; if(!E) return '';
-  const gs=L&&L.o==='HR'&&L.runs===4&&/home run|gone/i.test(plainText(E.html));
-  const wo=G.over&&G.walkoff&&L&&L.o==='HR';
-  const pool=wo?[gs?'A walk-off grand slam!':'A walk-off home run!']:ANN_PRE[gs?'Grand slam':E.title]; let s=pool?pool[(G.idx[0]+G.idx[1])%pool.length]+' ':'';
-  s+=plainText(E.html);
-  if(L&&L.o==='HR'&&!/caught|robbed/i.test(plainText(E.html))&&G.box[L.batter]) s+=annHR(L.batter);
-  if(L&&['1B','2B','3B','HR'].includes(L.o)&&G.box[L.batter]) s+=annStreak(L.batter);
+/* ---------- the storylines: what's true about this game, this season, right now ---------- */
+function gamesWord(g){ if(g===0.5) return 'half a game'; if(g===1) return 'one game'; if(g===1.5) return 'a game and a half'; return g%1?`${Math.floor(g)} and a half games`:`${g} games`; }
+const gDiff=(x,y)=>((x.w-x.l)-(y.w-y.l))/2;
+/* playoff math with ties counted as "not safe" (ties are broken by run differential, which can still change) */
+function frRace(id){
+  const st=frStandings(), left=x=>SEASON_GAMES-(x.w+x.l), me=st.find(x=>x.id===id);
+  const others=st.filter(x=>x.id!==id), maxMe=me.w+left(me);
+  const clinched=others.filter(x=>x.w+left(x)>=me.w).length<=3;
+  const out=others.filter(x=>x.w>maxMe).length>=4;
+  return {st,rank:st.indexOf(me)+1,me,clinched,out,left:left(me)};
+}
+function frStory(A,H){
+  const u=F.userId, opp=A.id===u?H.id:A.id, out=[];
+  if(FR.kind==='po'){
+    const all=[...(F.po.series||[]),F.po.final].filter(Boolean), s=all.find(x=>!x.winner&&(x.hi===u||x.lo===u)&&(x.hi===opp||x.lo===opp));
+    if(s){ const nm=s.need===4?'the Floodlight Series':'the semifinals', gn=s.g.length+1, a=s.w[s.hi], b=s.w[s.lo], na=s.need-a, nb=s.need-b;
+      out.push(gn===1?`Game 1 of ${nm}. First to ${s.need} wins.`:a===b?`Game ${gn} of ${nm}, and the series is tied ${a}–${b}.`:`Game ${gn} of ${nm}. ${TheTeam(tname(a>b?s.hi:s.lo))} lead the series ${Math.max(a,b)}–${Math.min(a,b)}.`);
+      if(na===1&&nb===1) out.push(`It's winner take all${s.need===4?' for the Floodlight Series trophy':''}.`);
+      else if(na===1||nb===1){ const c=na===1?s.hi:s.lo; out.push(`${TheTeam(tname(c))} can ${s.need===4?'win the Floodlight Series':'close out the series'} tonight. ${TheTeam(tname(c===s.hi?s.lo:s.hi))} are facing elimination.`); }
+      out.push(`${TheTeam(tname(s.hi))} have home field as the No. ${F.po.seeds.indexOf(s.hi)+1} seed.`);
+    }
+  } else {
+    const day=F.day, left=SEASON_GAMES-day;
+    if(day===0) out.push(F.season===1?`It's Opening Day, the first game in league history.`:`It's Opening Day of Season ${F.season}.`);
+    else if(left===1) out.push(`It's the final game of the regular season.`);
+    else if(day===SEASON_GAMES/2) out.push(`We've reached the halfway point of the season.`);
+    if(day>=6){ const R=frRace(u), st=R.st, nm=TheTeam(tname(u));
+      if(R.clinched) out.push(`${nm} have already clinched a playoff spot.`);
+      else if(R.out) out.push(`${nm} have been eliminated from playoff contention.`);
+      else if(R.rank===1){ const g=gDiff(st[0],st[1]); out.push(g>0?`${nm} lead the league by ${gamesWord(g)}.`:`${nm} are tied for first place.`); }
+      else if(R.rank<=4){ const g=gDiff(R.me,st[4]); out.push(g>0?`${nm} sit ${ordinal(R.rank)}, ${gamesWord(g)} clear of fifth place.`:`${nm} hold the last playoff spot on run differential, tied with ${theTeam(tname(st[4].id))}.`); }
+      else { const g=gDiff(st[3],R.me); out.push(g>0?`${nm} are ${gamesWord(g)} out of the last playoff spot${left<=12?`, with ${left} games to play`:''}.`:`${nm} are tied for the last playoff spot, but on the outside on run differential.`); }
+    }
+  }
+  const last=F.history[F.history.length-1];
+  if(last){ const pair=[last.champ,last.runner]; if(pair.includes(A.id)&&pair.includes(H.id)) out.push(`It's a rematch of last season's Floodlight Series, won by ${theTeam(last.champName)} ${last.score}.`);
+    else if(last.champ===A.id||last.champ===H.id) out.push(`${TheTeam(last.champName)} are the defending Floodlight Series champions.`); }
+  const ts=F.nx&&F.nx.ts||{}; for(const T of [A,H]){ const v=ts[T.id]||0; if(v>=3) out.push(`${TheTeam(T.name)} have won ${v} straight.`); else if(v<=-3) out.push(`${TheTeam(T.name)} have lost ${-v} in a row.`); }
+  const met=F.games.filter(g=>(g.a===u&&g.h===opp)||(g.a===opp&&g.h===u)); if(met.length){ const w=met.filter(g=>(g.a===u)===(g.ra>g.rh)).length; out.push(`${TheTeam(tname(u))} are ${w}–${met.length-w} against them this season.`); }
+  else { const hh=F.nx&&F.nx.h2h[opp]; if(F.season>1&&hh&&hh.w+hh.l>0) out.push(`All-time, ${theTeam(tname(u))} are ${hh.w}–${hh.l} against ${theTeam(tname(opp))}.`); }
+  if(FR.kind!=='po'&&F.nx){ const L=[...A.lineup,...H.lineup], hot=L.map(n=>[n,F.nx.hs[n]||0]).filter(x=>x[1]>=5).sort((a,b)=>b[1]-a[1])[0]; if(hot) out.push(`${hot[0]} brings a ${hot[1]}-game hitting streak into tonight.`); }
+  const RH=F.records&&F.records.HR; if(RH&&FR.kind!=='po'){ for(const n of [...A.lineup,...H.lineup]){ const s=F.stats[n]; if(!s) continue;
+    if(s.HR>RH.v){ out.push(`${n} already has ${s.HR} home runs, a new single-season league record.`); break; }
+    if(s.HR===RH.v){ out.push(`${n} has ${s.HR} home runs, tied with ${RH.name}'s league record.`); break; }
+    if(s.HR>=RH.v-3&&s.HR>0){ out.push(`${n} has ${s.HR} home runs, ${RH.v-s.HR} shy of ${RH.name}'s league record of ${RH.v}.`); break; } } }
+  return out;
+}
+/* the call after the final out */
+function annPostgame(){
+  if(!G||!G.over) return ''; const a=total(G,0), h=total(G,1), w=a>h?0:1, W=G.teams[w], L=G.teams[1-w], best=potg();
+  let s=`And that's the ballgame! ${TheTeam(W.name)} beat ${theTeam(L.name)}${G.walkoff?' on a walk-off':''}, ${Math.max(a,h)} to ${Math.min(a,h)}${G.inning>9?`, in ${G.inning} innings`:''}.`;
+  if(best) s+=` Player of the game: ${best.name}, ${statLine(best.b)}.`;
+  if(!(G.isFr&&F&&G.frDone)) return s;
+  const u=F.userId, nm=TheTeam(tname(u));
+  if(G.frKind==='reg'){ const r=F.rec[u];
+    if(F.phase!=='reg'){ const seed=F.po.seeds.indexOf(u)+1; s+=` That's the end of the regular season. ${nm} finish ${r.w}–${r.l}${seed<=4?`, and they're in the playoffs as the No. ${seed} seed!`:`, and they'll miss the playoffs.`}`; }
+    else { const R=frRace(u); s+=` ${nm} are now ${r.w}–${r.l}.`;
+      const ts=F.nx&&F.nx.ts[u]||0; if(ts>=3) s+=` That's ${ts} wins in a row.`; else if(ts<=-3) s+=` That's ${-ts} straight losses.`;
+      if(F.day>=6){ if(R.clinched) s+=` They've clinched a playoff spot!`; else if(R.out) s+=` They've been eliminated from playoff contention.`; else if(R.rank<=4) s+=` They're ${ordinal(R.rank)} and in playoff position.`; else { const g=gDiff(R.st[3],R.me); s+=g>0?` They're ${gamesWord(g)} out of a playoff spot.`:` They're tied for the last playoff spot, on the outside for now.`; } } }
+  } else if(F.po){ const opp=G.teams[0].id===u?G.teams[1].id:G.teams[0].id, all=[...(F.po.series||[]),F.po.final].filter(Boolean).filter(x=>(x.hi===u||x.lo===u)&&(x.hi===opp||x.lo===opp)), x=all[all.length-1];
+    if(x){ const a2=x.w[x.hi], b2=x.w[x.lo];
+      if(x.winner){ if(x.winner===u) s+= x.need===4?` ${nm} are Floodlight Series champions!`:` ${nm} win the series ${Math.max(a2,b2)}–${Math.min(a2,b2)}, and they're headed to the Floodlight Series!`;
+        else s+=` ${TheTeam(tname(x.winner))} win the series ${Math.max(a2,b2)}–${Math.min(a2,b2)}. The season is over for ${theTeam(tname(u))}.`; }
+      else s+= a2===b2?` The series is tied ${a2}–${b2}.`:` ${TheTeam(tname(a2>b2?x.hi:x.lo))} lead the series ${Math.max(a2,b2)}–${Math.min(a2,b2)}.`; } }
   return s;
 }
-function annFinal(){
-  const Fw=finalWords(), best=potg();
-  return `And that's the ballgame! ${Fw.head}`+(best?` Player of the game: ${best.name}, ${statLine(best.b)}.`:'');
+
+/* ---------- Floodlight Tonight: the studio show after games 10, 20 and the regular-season finale ---------- */
+const TV_AT=[10,20,32];
+function tvDue(){
+  if(!F||F.live||!F.ids) return 0;
+  if(!F.tv||F.tv.s!==F.season) F.tv={s:F.season,done:[]};
+  const fresh=F.phase==='reg'||(F.phase==='post'&&F.po&&!F.po.final&&F.po.series.every(s=>!s.g.length));
+  const due=TV_AT.filter(m=>F.day>=m&&!F.tv.done.includes(m));
+  if(!due.length) return 0;
+  F.tv.done.push(...due); frSave();
+  return fresh?due[due.length-1]:0;
 }
-/* call the play that just happened; post() runs this after every play */
-function annPlay(){
-  if(!G) return; const p=G.annPrev, a=total(G,0), h=total(G,1), out=[]; let big=false;
-  const res=annResult(); if(res) out.push(res);
-  const sameHalf=p&&p.inning===G.inning&&p.half===G.half;
-  if(G.over){ out.push(annFinal()); big=true; }
-  else if(p&&!sameHalf){ out.push(`That's the end of the ${p.half?'bottom':'top'} of the ${ordinal(p.inning)}. ${annScore()}`); const lo=annLeadoff(); if(lo) out.push(lo); }
-  else { if(p&&G.outs>p.outs) out.push(['','One out.','Two outs.'][G.outs]||''); if(p&&(a!==p.a||h!==p.h)) out.push(annScore()); }
-  if(G.last&&G.last.o==='HR'&&G.last.runs===4) big=true;
-  G.annPrev={inning:G.inning,half:G.half,outs:G.outs,a,h};
-  ann.say(out.filter(Boolean).join(' '),big);
+function tvMaybe(){ const m=tvDue(); if(m) setTimeout(()=>tvShow(m),350); }
+function tvData(m){
+  const u=F.userId, st=frStandings(), rows=Object.entries(F.stats).filter(([,s])=>s.PA>0);
+  const gp=id=>F.rec[id].w+F.rec[id].l, minpa=m>=SEASON_GAMES?MIN_PA:Math.max(10,Math.round(F.day*2.5));
+  const top=(fn,ok,k=3)=>rows.filter(([,s])=>(!ok||ok(s))&&fn(s)>0).sort((a,b)=>fn(b[1])-fn(a[1])).slice(0,k).map(([n,s])=>({n,s,v:fn(s)}));
+  const mvp=top(s=>pscore(s)+ops(s)*20);
+  return {u,st,gp,minpa,hr:top(s=>s.HR),avg:top(avg,s=>s.PA>=minpa),rbi:top(s=>s.RBI),sb:top(s=>s.SB),mvp};
+}
+function tvSegments(m){
+  const D=tvData(m), u=D.u, st=D.st, nm=id=>tname(id), end=m>=SEASON_GAMES, segs=[];
+  const rec=id=>`${F.rec[id].w}–${F.rec[id].l}`, me=TheTeam(nm(u));
+  const dotN=id=>`${tdot(id)}${esc(nm(id))}`;
+  const leaderRows=(L,fmt)=>L.length?L.map((x,i)=>`<li><i>${i+1}</i>${tdot(x.s.team)}<span>${esc(x.n)}</span><b>${fmt(x.v)}</b></li>`).join(''):'<li class="none">No qualifier yet</li>';
+  // 1. open
+  const title=m===10?'The 10-game report':m===20?'The 20-game report':'Regular season wrap-up';
+  segs.push({tag:'Tonight',title,html:`<div class="tvopen"><span class="tvk">Season ${F.season} · ${end?'Final regular season':`After ${m} of ${SEASON_GAMES} games`}</span><b class="tvbig">${title}</b><div class="tvstats"><div><span>League leader</span><b>${dotN(st[0].id)}</b><small>${rec(st[0].id)}</small></div><div><span>Your club</span><b>${dotN(u)}</b><small>${rec(u)} · ${ordinal(st.findIndex(r=>r.id===u)+1)}</small></div>${D.hr[0]?`<div><span>Home run leader</span><b>${tdot(D.hr[0].s.team)}${esc(D.hr[0].n)}</b><small>${D.hr[0].v} HR</small></div>`:''}</div></div>`,
+    say: m===10?`Welcome to Floodlight Tonight! We're ten games into Season ${F.season}, and the league is starting to take shape. Let's get you caught up.`
+      : m===20?`Welcome to Floodlight Tonight! Twenty games down, twelve to go in Season ${F.season}. The stretch run starts now, so let's check the races.`
+      : `Welcome to Floodlight Tonight! Thirty-two games are in the books, and the regular season of Season ${F.season} is over. Let's wrap it all up.`});
+  // 2. standings
+  { const lead=st[0], second=st[1], g=gDiff(lead,second), fourth=st[3], fifth=st[4], gap=gDiff(fourth,fifth), ui=st.findIndex(r=>r.id===u), parts=[];
+    if(end){ parts.push(`Here are your final standings. ${TheTeam(nm(lead.id))} finish on top at ${rec(lead.id)}${g>0?`, ${gamesWord(g)} ahead of ${theTeam(nm(second.id))}`:', winning first place on run differential'}.`);
+      parts.push(`${TheTeam(nm(fourth.id))} ${gap>0?`grab the last playoff spot by ${gamesWord(gap)}`:`grab the last playoff spot on run differential`} over ${theTeam(nm(fifth.id))}.`);
+      parts.push(ui<4?`${me} are in, as the No. ${ui+1} seed.`:`${me} finish ${ordinal(ui+1)} and miss the playoffs.`); }
+    else { parts.push(g>0?`${TheTeam(nm(lead.id))} lead the league at ${rec(lead.id)}, ${gamesWord(g)} ahead of ${theTeam(nm(second.id))}.`:`It's a tie at the top: ${theTeam(nm(lead.id))} and ${theTeam(nm(second.id))} are both ${rec(lead.id)}.`);
+      parts.push(gap>0?`In the race for the last playoff spot, ${theTeam(nm(fourth.id))} hold fourth, ${gamesWord(gap)} ahead of ${theTeam(nm(fifth.id))}.`:`The last playoff spot is a dead heat: ${theTeam(nm(fourth.id))} and ${theTeam(nm(fifth.id))} are both ${rec(fourth.id)}.`);
+      if(ui>=2){ const R=frRace(u); parts.push(R.clinched?`${me} have already clinched a spot.`:R.out?`${me} have been eliminated.`:ui<4?`${me} are ${ordinal(ui+1)} at ${rec(u)}, in playoff position.`:`${me} are ${ordinal(ui+1)} at ${rec(u)}, ${gamesWord(gDiff(fourth,st[ui]))} out.`); } }
+    segs.push({tag:'Standings',title:end?'Final standings':'Standings',html:`<table class="tvtbl"><thead><tr><th></th><th class="l">Team</th><th>W</th><th>L</th><th>GB</th><th>Diff</th></tr></thead><tbody>${st.map((r,i)=>`<tr class="${r.id===u?'me':''}${i===3?' line':''}"><td>${i+1}</td><td class="l">${dotN(r.id)}${end&&i<4?' <em>In</em>':''}</td><td>${r.w}</td><td>${r.l}</td><td>${r.gb?r.gb.toFixed(1).replace('.0',''):'–'}</td><td>${r.rs-r.ra>0?'+':''}${r.rs-r.ra}</td></tr>`).join('')}</tbody></table><p class="tvnote">Top four make the playoffs.</p>`,say:parts.join(' ')}); }
+  // 3. leaders
+  { const parts=[], RH=F.records&&F.records.HR, h=D.hr[0];
+    if(h&&h.v>0){ const tied=D.hr[1]&&D.hr[1].v===h.v; parts.push(tied?`At the top of the home run chart, ${h.n} and ${D.hr[1].n} are tied with ${h.v}.`:`${h.n} leads the league with ${h.v} home run${h.v===1?'':'s'}.`);
+      if(!end){ const pace=Math.round(h.v*SEASON_GAMES/D.gp(h.s.team)); parts.push(`That's a pace for ${pace}${RH?pace>RH.v?`, which would break ${RH.name}'s league record of ${RH.v}`:pace===RH.v?`, which would tie ${RH.name}'s league record`:'':''}.`); }
+      else if(RH&&h.v>RH.v) parts.push(`That's a new single-season league record, passing ${RH.name}'s ${RH.v}.`); }
+    if(D.avg[0]) parts.push(`${D.avg[0].n} ${end?'wins the batting race':'leads the batting race'} at ${ann.avg(D.avg[0].v)}.`);
+    if(D.rbi[0]&&D.rbi[0].v>0) parts.push(`And ${D.rbi[0].n} has driven in ${D.rbi[0].v}, the most in the league.`);
+    segs.push({tag:'Leaders',title:'League leaders',html:`<div class="tvlead"><div><h5>Home runs</h5><ol>${leaderRows(D.hr,v=>v)}</ol></div><div><h5>Average</h5><ol>${leaderRows(D.avg,f3)}</ol></div><div><h5>RBI</h5><ol>${leaderRows(D.rbi,v=>v)}</ol></div><div><h5>Stolen bases</h5><ol>${leaderRows(D.sb,v=>v)}</ol></div></div><p class="tvnote">Average leaders need ${D.minpa} plate appearances.</p>`,say:parts.join(' ')}); }
+  // 4. MVP race, or the awards at the end
+  if(!end){ const M=D.mvp, line=x=>`${f3(avg(x.s))}, ${x.s.HR} HR, ${x.s.RBI} RBI`;
+    if(M.length) segs.push({tag:'MVP race',title:'The MVP race',html:`<div class="tvcards">${M.map((x,i)=>`<div class="tvc${i?'':' one'}"><i>${i+1}</i><b>${tdot(x.s.team)}${esc(x.n)}</b><span>${esc(nm(x.s.team))}</span><small>${esc(line(x))} · ${f3(ops(x.s))} OPS</small></div>`).join('')}</div>`,
+      say:`In the MVP race, it's ${M[0].n} out front for ${theTeam(nm(M[0].s.team))}, hitting ${ann.avg(avg(M[0].s))} with ${M[0].s.HR} home run${M[0].s.HR===1?'':'s'} and ${M[0].s.RBI} RBI.${M[1]?` ${M[1].n}${M[2]?` and ${M[2].n} are`:' is'} right behind.`:''}${m===20?' Twelve games to make a case.':''}`}); }
+  else { const A=F.awards||{}, card=(k,lbl)=>A[k]?`<div class="tvc${k==='mvp'?' one':''}"><i>${lbl}</i><b>${F.teams[A[k].team]?tdot(A[k].team):''}${esc(A[k].name)}</b><span>${esc(nm(A[k].team))}</span><small>${esc(A[k].line)}</small></div>`:'';
+    const said=n=>{ const x=F.stats[n]; return x?`${ann.avg(avg(x))}, with ${x.HR} home run${x.HR===1?'':'s'} and ${x.RBI} RBI`:''; }, parts=[];
+    if(A.hr){ const x=F.stats[A.hr.name]; parts.push(`The home run crown goes to ${A.hr.name}, with ${x?x.HR:''} home runs.`); }
+    if(A.bat){ const x=F.stats[A.bat.name]; parts.push(`The batting title: ${A.bat.name}, at ${x?ann.avg(avg(x)):''}.`); }
+    if(A.mvp) parts.push(`And your league MVP: ${A.mvp.name} of ${theTeam(nm(A.mvp.team))}, hitting ${said(A.mvp.name)}.`);
+    if(parts.length) segs.push({tag:'Awards',title:'Season awards',html:`<div class="tvcards">${card('mvp','MVP')}${card('hr','HR king')}${card('bat','Batting')}</div>`,say:parts.join(' ')}); }
+  // 5. storylines, or the playoff bracket
+  if(!end){ const lines=[], L=new Set(F.ids.flatMap(id=>F.teams[id].lineup));
+    const hot=Object.entries(F.nx&&F.nx.hs||{}).filter(([n,v])=>v>=5&&L.has(n)).sort((a,b)=>b[1]-a[1])[0]; if(hot) lines.push(`${hot[0]} has hit safely in ${hot[1]} straight games.`);
+    const ts=F.ids.map(id=>[id,F.nx&&F.nx.ts[id]||0]).sort((a,b)=>b[1]-a[1]); if(ts[0][1]>=3) lines.push(`${TheTeam(nm(ts[0][0]))} are the hottest team in the league, winners of ${ts[0][1]} straight.`); const cold=ts[ts.length-1]; if(cold[1]<=-3) lines.push(`${TheTeam(nm(cold[0]))} have dropped ${-cold[1]} in a row.`);
+    const rd=st.slice().sort((a,b)=>(b.rs-b.ra)-(a.rs-a.ra))[0]; if(rd.rs-rd.ra>0) lines.push(`${TheTeam(nm(rd.id))} have the best run differential in the league, plus ${rd.rs-rd.ra}.`);
+    const mine=Object.entries(F.stats).filter(([n,s])=>s.team===u&&s.PA>0).sort((a,b)=>(pscore(b[1])+ops(b[1])*20)-(pscore(a[1])+ops(a[1])*20))[0]; if(mine) lines.push(`For ${theTeam(nm(u))}, ${mine[0]} is leading the way: ${ann.avg(avg(mine[1]))} with ${mine[1].HR} home run${mine[1].HR===1?'':'s'} and ${mine[1].RBI} RBI.`);
+    if(lines.length) segs.push({tag:'Storylines',title:'Around the league',html:`<ul class="tvlist">${lines.map(t=>`<li>${esc(t.replace(/\u0001(\d+)\u0001/g,(x,d)=>'.'+String(d).padStart(3,'0')))}</li>`).join('')}</ul>`,say:lines.join(' ')}); }
+  else if(F.po){ const s=F.po.seeds, pr=(a,b)=>`<div class="tvm"><div>${tdot(s[a])}<i>${a+1}</i>${esc(nm(s[a]))}<small>${rec(s[a])}</small></div><div>${tdot(s[b])}<i>${b+1}</i>${esc(nm(s[b]))}<small>${rec(s[b])}</small></div></div>`, ui=s.indexOf(u);
+    segs.push({tag:'Playoffs',title:'The playoff picture',html:`<div class="tvbr">${pr(0,3)}${pr(1,2)}</div><p class="tvnote">Semifinals are best of 3, the Floodlight Series is best of 7. The higher seed has home field.</p>`,
+      say:`On to the playoffs. In the semifinals, the No. 1 seed, ${theTeam(nm(s[0]))}, take on No. 4, ${theTeam(nm(s[3]))}. And No. 2, ${theTeam(nm(s[1]))}, face No. 3, ${theTeam(nm(s[2]))}. Best of three, and the winners meet in the Floodlight Series.${ui>=0&&ui<4?` Good luck to ${theTeam(nm(u))}.`:''}`}); }
+  // 6. sign-off
+  segs.push({tag:'Floodlight Tonight',title:'That’s the show',html:`<div class="tvopen"><b class="tvbig">Floodlight Tonight</b><span class="tvk">${end?'The playoffs are next':`Next report: after game ${m===10?20:SEASON_GAMES}`}</span></div>`,
+    say:end?`That's all for Floodlight Tonight. The playoffs are next. We'll see you at the ballpark.`:`That's all for Floodlight Tonight. We'll check back in after game ${m===10?20:SEASON_GAMES}. See you at the ballpark.`});
+  return segs;
+}
+function tvShow(m){
+  if(!F||document.querySelector('div.tv')) return; const segs=tvSegments(m); let i=-1, t1=0, t2=0, gone=false;
+  const tick=[...F.games.filter(g=>g.d===F.day-1).map(g=>`${F.teams[g.a].abbr} ${g.ra}, ${F.teams[g.h].abbr} ${g.rh}${g.inn>9?` (${g.inn})`:''}`), ...frStandings().map((r,k)=>`${k+1}. ${F.teams[r.id].abbr} ${r.w}–${r.l}`)].map(esc).join('<span>•</span>');
+  const el=document.createElement('div'); el.className='tv'; el.setAttribute('role','dialog'); el.setAttribute('aria-label','Floodlight Tonight');
+  el.innerHTML=`<div class="tvbg"></div><header class="tvbug"><span class="tvlogo"><b>Floodlight</b><em>Tonight</em></span><span class="tvlive">Live</span><span class="tvsub">Season ${F.season} · ${m>=SEASON_GAMES?'Regular season final':`After game ${m}`}</span></header>
+<main class="tvstage"><div class="tvseg" id="tvSeg"></div></main>
+<div class="tvlower"><span class="tvtag" id="tvTag"></span><p id="tvCap"></p></div>
+<footer class="tvfoot"><div class="tvtick"><b>Floodlight</b><div class="tvrun"><div>${tick}<span>•</span>${tick}</div></div></div><div class="tvctl"><span class="tvdots">${segs.map(()=>'<i></i>').join('')}</span><button class="btn small" type="button" id="tvNext">Next ›</button><button class="btn small" type="button" id="tvSkip">Skip show</button></div></footer>`;
+  document.body.appendChild(el); ann.stop(); sfx.tvOpen&&sfx.tvOpen();
+  const go=()=>{ if(gone) return; clearTimeout(t1); clearTimeout(t2); i++; if(i>=segs.length){ close(); return; }
+    const S=segs[i], seg=$('tvSeg'); seg.classList.remove('in'); void seg.offsetWidth;
+    seg.innerHTML=`<h4 class="tvh"><span>${esc(S.title)}</span></h4>${S.html}`; seg.classList.add('in');
+    $('tvTag').textContent=S.tag; $('tvCap').textContent=S.say.replace(/\u0001(\d+)\u0001/g,(x,d)=>'.'+String(d).padStart(3,'0'));
+    el.querySelectorAll('.tvdots i').forEach((d,k)=>d.classList.toggle('on',k<=i)); if(i&&sfx.whoosh) sfx.whoosh();
+    let said=false, min=false; const adv=()=>{ if(said&&min) go(); };
+    t1=setTimeout(()=>{ min=true; adv(); },4500); t2=setTimeout(()=>{ said=true; min=true; adv(); },30000);
+    ann.say(S.say,true,()=>{ said=true; setTimeout(adv,900); },true); };
+  const close=()=>{ if(gone) return; gone=true; clearTimeout(t1); clearTimeout(t2); ann.stop(); el.classList.add('out'); setTimeout(()=>el.remove(),reduce?0:400); };
+  $('tvNext').onclick=()=>{ ann.stop(); go(); }; $('tvSkip').onclick=close;
+  el.addEventListener('keydown',e=>{ if(e.key==='Escape') close(); }); $('tvNext').focus();
+  setTimeout(go, reduce?0:900);
 }
 function annStart(){ if(G) G.annPrev={inning:G.inning,half:G.half,outs:G.outs,a:total(G,0),h:total(G,1)}; const c=$('anncap'); if(c){ c.hidden=true; c.innerHTML=''; } }
 
 /* ---------- pregame cutscene: who's playing, what's at stake, then play ball ---------- */
 function cutscene(){
   if(!G) return; ann.stop(); annStart();
-  const A=G.teams[0], H=G.teams[1], fr=annFr(), story=[];
+  const A=G.teams[0], H=G.teams[1], fr=annFr(), story=fr?frStory(A,H):[];
   let kicker='Tonight under the lights', recA='Visitors', recH='Home';
-  if(fr){
-    kicker=G.frLabel||`Season ${F.season}`;
-    const r=id=>F.rec[id]?`${F.rec[id].w}–${F.rec[id].l}`:''; recA=r(A.id); recH=r(H.id);
-    const u=F.userId, opp=A.id===u?H.id:A.id;
-    if(FR.kind==='po'){ const s=activeSeries().find(x=>(x.hi===u||x.lo===u)); if(s) story.push(s.g.length?`${seriesText(s)} in the ${s.need===4?'Floodlight Series':'semifinal'}.`:`Game 1 of the ${s.need===4?'Floodlight Series':'semifinal'}. First to ${s.need} wins.`); }
-    const last=F.history[F.history.length-1]; if(last&&(last.champ===A.id||last.champ===H.id)) story.push(`${TheTeam(tname(last.champ))} are the defending Floodlight Series champions.`);
-    const ts=F.nx&&F.nx.ts||{}; for(const T of [A,H]){ const v=ts[T.id]||0; if(v>=3) story.push(`${TheTeam(T.name)} have won ${v} straight.`); else if(v<=-3) story.push(`${TheTeam(T.name)} have lost ${-v} in a row.`); }
-    const hh=F.nx&&F.nx.h2h[opp]; if(hh&&hh.w+hh.l>0) story.push(`All-time, ${theTeam(tname(u))} are ${hh.w} and ${hh.l} against ${theTeam(tname(opp))}.`);
-  } else {
+  if(fr){ kicker=G.frLabel||`Season ${F.season}`; const r=id=>F.rec[id]?`${F.rec[id].w}–${F.rec[id].l}`:''; recA=r(A.id); recH=r(H.id); }
+  else {
     story.push(G.mode==='sim'?'Simulation rules: the D12, action cards, designated hitters and player abilities.':'Arcade rules: the D8 and nothing but the dice.');
     const me=G.cpu[0]!==G.cpu[1]?(G.cpu[0]?1:0):-1; if(me>=0) story.push(`You manage ${G.teams[me].name}. The computer has ${G.teams[1-me].name}.`);
   }
-  const st=story.slice(0,2);
-  const el=document.createElement('div'); el.className='cut'; el.setAttribute('role','dialog'); el.setAttribute('aria-label','Pregame');
+  const st=story.slice(0,3);
+  const el=document.createElement('div'); el.className='cutsc'; el.setAttribute('role','dialog'); el.setAttribute('aria-label','Pregame');
   el.innerHTML=`<span class="beam l"></span><span class="beam r"></span><div class="cutin"><span class="logo">Floodlight Baseball</span><span class="k">${esc(kicker)}</span>
 <div class="vs"><div class="tm"><b style="color:${A.color}">${esc(A.name)}</b><span>${esc(recA)}</span></div><span class="at">at</span><div class="tm h"><b style="color:${H.color}">${esc(H.name)}</b><span>${esc(recH)}</span></div></div>
 ${st.length?`<p class="story">${st.map(esc).join('<br>')}</p>`:''}<span class="skip">Tap to play ball</span></div>`;
-  document.body.appendChild(el); sfx.power();
-  ann.say(`Good evening, and welcome to the ballpark! ${fr?kicker.replace(/\s*·/g,',')+'. ':''}${TheTeam(A.name)}${fr&&recA?`, ${recA},`:''} take on ${theTeam(H.name)}${fr&&recH?`, ${recH}`:''}. ${st.join(' ')} ${annLeadoff()}`,true);
-  let gone=false; const done=()=>{ if(gone) return; gone=true; el.classList.add('out'); setTimeout(()=>el.remove(),reduce?0:400); };
-  el.addEventListener('click',done); setTimeout(done, reduce?2500:7000);
+  document.body.appendChild(el); sfx.organ();
+  let gone=false, min=false, said=false; const done=()=>{ if(gone) return; gone=true; el.classList.add('out'); setTimeout(()=>el.remove(),reduce?0:400); };
+  const adv=()=>{ if(min&&said) done(); };
+  ann.say(`Good evening, and welcome to the ballpark! ${fr?kicker.replace(/\s*·/g,',')+'. ':''}${TheTeam(A.name)}${fr&&recA?`, ${recA},`:''} take on ${theTeam(H.name)}${fr&&recH?`, ${recH}`:''}. ${story.slice(0,5).join(' ')} ${annLeadoff()}`,true,()=>{ said=true; setTimeout(adv,500); });
+  el.addEventListener('click',()=>done()); setTimeout(()=>{ min=true; adv(); }, reduce?1500:6000); setTimeout(done, 30000);
 }
 
 /* ---------- trophy presentation when your club wins the Floodlight Series ---------- */
@@ -2109,7 +2401,7 @@ async function doRoll(){
 function post(){
   checkDH(); checkDraw(); busy=false;
   if(G.over) G.big = G.walkoff ? (G.last&&G.last.o==='HR'&&G.last.team===1 ? (G.last.runs===4?'Walk-off Grand Slam!':'Walk-off Home Run!') : 'Walk-off!') : (G.big||'Final');
-  renderGame(); celebrate(); playFx(); annPlay();
+  renderGame(); celebrate(); playFx();
   autoSave();
   if(G.over && !G.shownFinal){ G.shownFinal=true; gameOver(); setTimeout(showFinal, reduce?250:1900); }
 }
@@ -2287,7 +2579,8 @@ ${fr?`<p class="frnote">${fr}</p>`:''}
 <p class="fnote" id="fNote" hidden></p>
 </div>`;
   ov.hidden=false; ($('fHub')||$('fShare')).focus();
-  const close=()=>{ ov.hidden=true; ov.innerHTML=''; ov.onclick=null; if(G.trophy && F){ G.trophy=false; showTrophy(F.history[F.history.length-1]); return true; } return false; };
+  if(!G.annEnd){ G.annEnd=true; ann.say(annPostgame(),true); }
+  const close=()=>{ ov.hidden=true; ov.innerHTML=''; ov.onclick=null; if(G.trophy && frNow()){ G.trophy=false; showTrophy(frNow().history[frNow().history.length-1]); return true; } return false; };
   $('fClose').onclick=close;
   if($('fAgain')) $('fAgain').onclick=()=>{ close(); newGame(); };
   if($('fHub')) $('fHub').onclick=()=>{ if(!close()) openHub(); };
@@ -2356,7 +2649,7 @@ const avg=s=>s.AB?s.H/s.AB:0, obp=s=>s.PA?(s.H+s.BB)/s.PA:0, slg=s=>s.AB?(s.H+s[
 const f3=x=>x>=1?x.toFixed(3):x.toFixed(3).replace(/^0/,'');
 const pct=(w,l)=>w+l?f3(w/(w+l)):'.000';
 const blank=team=>Object.assign({team},Object.fromEntries(STATK.map(k=>[k,0])));
-const me=()=>F.teams[F.userId];
+const me=()=>F.teams[F.userId], frNow=()=>F;
 const tname=id=>F.teams[id]?F.teams[id].name:id;
 const tdot=id=>`<span class="dot" style="background:${F.teams[id].color}"></span>`;
 
@@ -2512,7 +2805,7 @@ function statLineShort(n){ const s=F&&F.stats[n]; return s&&s.PA?`${f3(avg(s))} 
 function frStart(nx,home){
   const M=gameTeam(me()), O=gameTeam(F.teams[nx.opp]);
   mode='sim'; renderFaces(); paintModeTabs();
-  G=newState('sim',home?[O,M]:[M,O],home?[true,false]:[false,true]); G.isFr=true; G.frLabel=nx.label;
+  G=newState('sim',home?[O,M]:[M,O],home?[true,false]:[false,true]); G.isFr=true; G.frLabel=nx.label; G.frKind=nx.kind;
   FR={label:nx.label,kind:nx.kind,season:F.season,day:F.day}; frMode=true; setWhere('fr'); setFrUI();
   checkDraw(); annStart(); renderGame(); frSaveLive(); cutscene();
 }
@@ -2537,9 +2830,9 @@ function frGameOver(){
 function frSimUser(){
   if(!F||F.live) return; const was=F.phase;
   const lines = F.phase==='reg' ? frFinishDay(null) : frPlayoffDay(null);
-  hubMsg = lines&&lines.length ? 'Simulated: '+lines.join(' · ') : 'Simulated the next game day.'; frSave(); renderHub(); maybeTrophy(was);
+  hubMsg = lines&&lines.length ? 'Simulated: '+lines.join(' · ') : 'Simulated the next game day.'; frSave(); renderHub(); maybeTrophy(was); tvMaybe();
 }
-function frSimToPlayoffs(){ if(!F||F.live) return; let w=0,l=0; const before=Object.assign({},F.rec[F.userId]); while(F.phase==='reg') frFinishDay(null); const r=F.rec[F.userId]; hubMsg=`Simulated the rest of the regular season: ${r.w-before.w}–${r.l-before.l} the rest of the way.`; frSave(); renderHub(); }
+function frSimToPlayoffs(){ if(!F||F.live) return; let w=0,l=0; const before=Object.assign({},F.rec[F.userId]); while(F.phase==='reg') frFinishDay(null); const r=F.rec[F.userId]; hubMsg=`Simulated the rest of the regular season: ${r.w-before.w}–${r.l-before.l} the rest of the way.`; frSave(); renderHub(); tvMaybe(); }
 function frSimPlayoffs(){ if(!F||F.live) return; const was=F.phase; let g=0; while(F.phase==='post' && g++<40) frPlayoffDay(null); hubMsg='Simulated the rest of the playoffs.'; frSave(); renderHub(); maybeTrophy(was); }
 function frNextSeason(){
   const gone=frRetire(), cls=frInduct(gone); F.season++; frNewSeason(); nwRetire(gone); nwHof(cls); F.rookies=gone.map(g=>g.rookie);
@@ -2620,7 +2913,7 @@ function renderFbar(){
 function frExit(){ autoSave(); frMode=false; FR=null; setFrUI(); closeHub(); setWhere('quick'); if(!resumeQuick(jparse(lsGet(QKEY)))||G.over) startExhibition(); }
 
 /* ---------- the hub ---------- */
-function openHub(){ if(busy) return; const h=$('hub'); h.hidden=false; h.classList.add('anim'); renderHub(); setTimeout(()=>h.classList.remove('anim'),300); document.body.style.overflow='hidden'; }
+function openHub(){ if(busy) return; const h=$('hub'); h.hidden=false; h.classList.add('anim'); renderHub(); setTimeout(()=>h.classList.remove('anim'),300); document.body.style.overflow='hidden'; if(F) tvMaybe(); }
 function closeHub(){ $('hub').hidden=true; document.body.style.overflow=''; }
 const TABS=[['home','Home'],['news','News'],['standings','Standings'],['schedule','Schedule'],['stats','Player stats'],['records','Records'],['hof','Hall of Fame'],['champs','Champions'],['teams','Teams'],['settings','Settings']];
 function renderHub(){
@@ -3188,7 +3481,7 @@ ${msg?`<p class="frnote" role="status">${msg}</p>`:''}
 <h4 class="svh">Save slots on this device</h4><ol class="slots">${[1,2,3].map(slotRow).join('')}</ol>
 <h4 class="svh">Move your save to another phone or computer</h4>
 <div class="svgrid"><div class="svbox"><b>Save file</b><p>Download a save file (on a phone you can send it to yourself or keep it in Files / Drive), then open it on the other device.</p><div class="ovbtns"><button class="btn" type="button" data-sv="file">Save file</button><label class="btn" style="cursor:pointer;text-align:center">Open save file<input type="file" id="svFile" accept="application/json,.json,text/plain" hidden></label></div></div>
-<div class="svbox"><b>Save code</b><p>Copy a code, text or email it to yourself, and paste it in on the other device.</p><div class="ovbtns"><button class="btn" type="button" data-sv="code">Copy save code</button><button class="btn" type="button" data-sv="paste">Enter save code</button></div><textarea id="svCode" rows="3" placeholder="Paste a save code here" hidden></textarea><button class="btn small primary" type="button" data-sv="usecode" id="svUse" hidden>Load this code</button></div></div>
+<div class="svbox"><b>Save code</b><p>Get a 6-character code, then type it in on your other device.</p><div class="ovbtns"><button class="btn" type="button" data-sv="code">Get save code</button><button class="btn" type="button" data-sv="paste">Enter save code</button></div><textarea id="svCode" rows="1" placeholder="Type your code, like K7P2QX" autocapitalize="characters" autocomplete="off" spellcheck="false" hidden></textarea><button class="btn small primary" type="button" data-sv="usecode" id="svUse" hidden>Load this code</button></div></div>
 <details class="svtip"><summary>Play it like an app on your phone</summary><p><b>iPhone / iPad (Safari):</b> tap Share, then <b>Add to Home Screen</b>. <b>Android (Chrome):</b> tap the ⋮ menu, then <b>Add to Home screen</b> or <b>Install app</b>. It opens full screen with its own icon, and your saves stay with it.</p></details>
 </div>`;
     ov.hidden=false;
@@ -3208,12 +3501,21 @@ ${msg?`<p class="frnote" role="status">${msg}</p>`:''}
     else if(a==='load'){ const s=slotRead(i); if(s && confirm(`Load slot ${i}? Your current game will be replaced (save it to another slot first if you want to keep it).`)){ applySnap(s); close(); toast(G.half,`Loaded slot ${i}.`,'abil'); } }
     else if(a==='del'){ if(confirm(`Delete the save in slot ${i}?`)){ lsDel('fdl-slot-'+i); draw(`Slot ${i} cleared.`); } }
     else if(a==='file'){ const m=await saveFile(); if(m) draw(esc(m)); }
-    else if(a==='code'){ const code=await toCode(snapshot()); let msg;
-      try{ await navigator.clipboard.writeText(code); msg=`Save code copied (${code.length.toLocaleString()} characters). Paste it into a text or email to yourself.`; }
-      catch(err){ msg='Copy this save code:'; }
-      draw(msg); const ta=$('svCode'); ta.hidden=false; ta.value=code; ta.readOnly=true; ta.select(); }
+    else if(a==='code'){ b.disabled=true; b.textContent='Saving…'; const code=await toCode(snapshot()); let short=null;
+      try{ const r=await fetch(SAVE_API,{method:'POST',headers:{'content-type':'text/plain'},body:code}); if(r.ok) short=(await r.json()).code; }catch(err){}
+      if(short){ let copied=false; try{ await navigator.clipboard.writeText(short); copied=true; }catch(err){}
+        draw(`Your save code: <b class="svbig">${esc(short)}</b>${copied?' (copied)':''}<br>On your other device, open <b>Save / Load</b>, tap <b>Enter save code</b> and type it in. The code holds your game exactly as it is right now; get a new one after you play more.`); return; }
+      let msg; try{ await navigator.clipboard.writeText(code); msg=`Couldn’t reach the save server, so here’s a full-length code instead (copied). Paste it into a text or email to yourself.`; }
+      catch(err){ msg='Couldn’t reach the save server, so here’s a full-length code instead. Copy all of it:'; }
+      draw(msg); const ta=$('svCode'); ta.hidden=false; ta.rows=3; ta.value=code; ta.readOnly=true; ta.select(); }
     else if(a==='paste'){ const ta=$('svCode'); ta.hidden=false; ta.readOnly=false; ta.value=''; ta.focus(); $('svUse').hidden=false; }
-    else if(a==='usecode'){ try{ const s=await fromCode($('svCode').value); applySnap(s); close(); toast(G.half,'Save code loaded.','abil'); }catch(err){ draw('That save code didn’t work. Make sure you pasted all of it.'); } }
+    else if(a==='usecode'){ const v=$('svCode').value.trim(), c=v.toUpperCase().replace(/[^A-Z0-9]/g,'');
+      if(!/^FDL/i.test(v)){ if(c.length!==6){ draw('Save codes are 6 characters, like K7P2QX.'); return; }
+        let r=null; try{ r=await fetch(SAVE_API+'?code='+c); }catch(err){ draw('Couldn’t reach the save server. Check your internet connection and try again.'); return; }
+        if(r.status===404){ draw(`No save found for <b>${esc(c)}</b>. Check the letters and try again.`); return; }
+        try{ const s=await fromCode((await r.json()).save); applySnap(s); close(); toast(G.half,'Save code loaded.','abil'); }catch(err){ draw('That save couldn’t be loaded. Try getting a new code.'); }
+        return; }
+      try{ const s=await fromCode(v); applySnap(s); close(); toast(G.half,'Save code loaded.','abil'); }catch(err){ draw('That save code didn’t work. Make sure you pasted all of it.'); } }
   };
 }
 
@@ -3406,7 +3708,7 @@ $('detail').addEventListener('click',e=>{ if(e.target.id==='setLU'){ if(frMode) 
 $('finish').addEventListener('click',()=>{
   if(busy||G.over) return;
   let g=0; while(!G.over && g++<4000){ const [o,o2]=rollAB(G.mode); atBat(G,o,true,o2); }
-  G.dice=[]; G.pinch=null; checkDH(); G.big=G.walkoff?'Walk-off!':'Final'; renderGame(); celebrate(); ann.say(annFinal(),true); annStart();
+  G.dice=[]; G.pinch=null; checkDH(); G.big=G.walkoff?'Walk-off!':'Final'; renderGame(); celebrate();
   if(!G.shownFinal){ G.shownFinal=true; sfx.organ(); gameOver(); setTimeout(showFinal, reduce?200:1500); }
 });
 $('newgame').addEventListener('click',newGame);
@@ -3447,7 +3749,40 @@ function paintSound(){ soundBtn.setAttribute('aria-pressed',sfx.on); soundBtn.te
 soundBtn.addEventListener('click',()=>{ sfx.set(!sfx.on); paintSound(); if(sfx.on) sfx.pop(); else ann.stop(); });
 paintSound();
 function paintAnn(){ const b=$('annBtn'); b.setAttribute('aria-pressed',ann.on); b.textContent=ann.on?'Announcer on':'Announcer off'; }
-$('annBtn').addEventListener('click',()=>{ ann.set(!ann.on); paintAnn(); if(ann.on) ann.say('Announcer is on. Let\'s play some baseball!',true); });
+$('annBtn').addEventListener('click',e=>{ e.stopPropagation(); annPanel(); });
+/* announcer settings: on/off, which voice, how loud */
+function annPanel(){
+  let pop=document.querySelector('.annpop'); if(pop){ pop.remove(); return; }
+  pop=document.createElement('div'); pop.className='annpop'; pop.setAttribute('role','dialog'); pop.setAttribute('aria-label','Announcer');
+  const vs=ann.voices(), cur=ann.voiceName, st=ann.status;
+  pop.innerHTML=`<div class="row"><button class="btn small" type="button" id="apOn">${ann.on?'Turn announcer off':'Turn announcer on'}</button><button class="btn small" type="button" id="apTest">Test voice</button><button class="btn small" type="button" id="apX">Done</button></div>
+<div class="eng" role="radiogroup" aria-label="Voice type"><label class="opt"><input type="radio" name="apEng" value="studio"${ann.engine==='studio'?' checked':''}><span><b>Studio voice</b> · human-sounding AI voice, free. One-time download of about 90 MB, then it’s saved in your browser.</span></label>
+<label class="opt"><input type="radio" name="apEng" value="device"${ann.engine==='device'?' checked':''}><span><b>Device voice</b> · your browser’s built-in voice. No download.</span></label></div>
+<label id="apSvW">Announcer<select id="apSv">${ann.studio.map(([id,n])=>`<option value="${id}"${id===ann.studioVoice?' selected':''}>${esc(n)}</option>`).join('')}</select></label>
+<label id="apVoiceW">Device voice<select id="apVoice">${vs.length?vs.map(v=>`<option value="${esc(v.name)}"${v.name===cur?' selected':''}>${v.human?'★ ':''}${esc(v.name)}</option>`).join(''):'<option>No voices on this device</option>'}</select></label>
+<label>Volume <span id="apVolN" style="text-transform:none">${Math.round(ann.vol*100)}</span><input type="range" id="apVol" min="0" max="100" step="5" value="${Math.round(ann.vol*100)}"></label>
+<small id="apSt"></small>`;
+  document.body.appendChild(pop);
+  const paint=()=>{ if(!pop.isConnected){ off(); return; } const e=ann.engine, s=ann.status; $('apSvW').hidden=e!=='studio'; $('apVoiceW').hidden=e==='studio';
+    $('apSt').textContent= e!=='studio' ? '★ = natural-sounding voice. Which ones you get depends on your browser and device.'
+      : s.state==='ready' ? 'Studio voice is ready.' : s.state==='loading' ? `Downloading the studio voice… ${s.pct}%. You’ll see the captions until it’s ready.`
+      : s.state==='failed' ? `The studio voice couldn’t load here (${s.err}) so the device voice fills in.` : 'The studio voice downloads the first time it’s needed.';
+    place(); };
+  const place=()=>{ const r=$('annBtn').getBoundingClientRect(); pop.style.top=Math.max(8,Math.min(r.bottom+8,innerHeight-pop.offsetHeight-8))+'px'; pop.style.left=Math.max(16,Math.min(r.left,innerWidth-pop.offsetWidth-16))+'px'; };
+  const off=ann.onStatus(paint); paint();
+  const test=()=>{ if(ann.on) ann.say('Good evening, and welcome to the ballpark! It\'s a beautiful night for baseball under the lights.',true); };
+  $('apOn').onclick=()=>{ ann.set(!ann.on); paintAnn(); $('apOn').textContent=ann.on?'Turn announcer off':'Turn announcer on'; if(ann.on) test(); };
+  $('apTest').onclick=()=>{ ann.warm(); test(); };
+  pop.querySelectorAll('input[name=apEng]').forEach(r=>r.onchange=()=>{ ann.setEngine(r.value); paint(); });
+  $('apSv').onchange=e=>{ ann.setStudioVoice(e.target.value); test(); };
+  $('apVoice').onchange=e=>{ ann.setVoice(e.target.value); test(); };
+  $('apVol').oninput=e=>{ ann.setVol(e.target.value/100); $('apVolN').textContent=e.target.value; };
+  $('apVol').onchange=test;
+  $('apX').onclick=()=>{ pop.remove(); off(); };
+  setTimeout(()=>document.addEventListener('click',function out(ev){ if(!pop.isConnected){ document.removeEventListener('click',out); return; } if(!pop.contains(ev.target)){ pop.remove(); off(); document.removeEventListener('click',out); } }),0);
+}
+/* start fetching the studio voice on the first tap, so it's ready by the first pitch */
+document.addEventListener('pointerdown',()=>ann.warm(),{once:true});
 paintAnn();
 function paintModeTabs(){ document.querySelectorAll('.tab[data-mode]').forEach(b=>{ const on=b.dataset.mode===mode; b.setAttribute('aria-selected',on); b.tabIndex=on?0:-1; }); }
 function setMode(m){
