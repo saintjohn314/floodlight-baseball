@@ -1708,7 +1708,8 @@ const ann=(()=>{
   const bcast=n=>{ const i=BROADCAST.findIndex(r=>r.test(n)); return i<0?0:60-i*4; };
   const score=v=>(HUMAN.test(v.name)?100:0)+(MALE.test(v.name)||GOOD.test(v.name)?40:FEMALE.test(v.name)?-200:0)+(GOOD.test(v.name)?15:0)+(MATURE.test(v.name)?10:0)+(HUMAN.test(v.name)?bcast(v.name):0)+(ROBOT.test(v.name)?-80:0)+(/en[-_]US/i.test(v.lang)?200:/en[-_](CA)/i.test(v.lang)?20:0)+(v.localService?0:2);
   function list(){ return S?S.getVoices().filter(v=>/^en/i.test(v.lang)&&!FEMALE.test(v.name)).sort((a,b)=>score(b)-score(a)):[]; }
-  function pickVoice(){ if(!S) return; const vs=list(); voice=(want&&vs.find(v=>v.name===want))||vs[0]||null; }
+  const MARK=/^Microsoft Mark\b/i;
+  function pickVoice(){ if(!S) return; const all=S.getVoices(), vs=list(); voice=all.find(v=>MARK.test(v.name)&&/en[-_]US/i.test(v.lang))||all.find(v=>MARK.test(v.name))||vs[0]||null; }
   if(S){ pickVoice(); try{ S.addEventListener('voiceschanged',pickVoice); }catch(e){ S.onvoiceschanged=pickVoice; } }
   /* how numbers are read: a record is "seven and three", a series is "two games to one", a score is already written "five to four" */
   const gm=(a,b)=>`${a} ${+a===1?'game':'games'} to ${+b===0?'none':b}`;
@@ -1719,14 +1720,17 @@ const ann=(()=>{
   function avgWords(d){ if(d>=1000) return 'a thousand'; if(d===0) return 'zero'; const a=Math.floor(d/100), b=d%100; return a? `${a} ${b===0?'hundred':b<10?'oh '+b:b}` : (b<10?'oh oh '+b:'oh '+b); }
   const status={state:'idle',pct:0,err:''}, subs=new Set(); const notify=()=>subs.forEach(f=>{ try{ f(status); }catch(e){} });
   /* device voice */
-  let keep=0, lastCancel=0;
+  /* devLive: one of our calls is being spoken. If the browser's speech is stuck "speaking" with nothing of ours playing
+     (it happens in Chrome after sleep or a dropped line), the next call clears it instead of waiting behind it forever.
+     devUs keeps the lines alive until they finish, so Chrome can't throw them away mid-call. */
+  let keep=0, lastCancel=0, devLive=false, devUs=[];
   function devSay(t,big,done){
     if(!S){ fake(t,done); return; }
-    if(!big&&(S.speaking||S.pending)){ next={t,cb:done}; return; }
-    next=null; if(S.speaking||S.pending){ S.cancel(); lastCancel=Date.now(); } clearInterval(keep); const tok=++devTok, chunks=parts(t,170,170), cap=Date.now()+t.length*170+10000; let wd=0, over=false;
-    const finish=()=>{ if(over||tok!==devTok) return; over=true; clearInterval(keep); clearTimeout(wd); if(next){ const n=next; next=null; devSay(n.t,true,n.cb); } else if(done) done(); };
-    const start=()=>{ if(tok!==devTok) return; try{ if(S.paused) S.resume(); }catch(e){}
-      chunks.forEach((txt,i)=>{ const u=new SpeechSynthesisUtterance(txt); if(voice){ u.voice=voice; u.lang=voice.lang; } else u.lang='en-US';
+    if(!big&&devLive){ next={t,cb:done}; return; }
+    next=null; if(S.speaking||S.pending){ S.cancel(); lastCancel=Date.now(); } clearInterval(keep); const tok=++devTok, chunks=parts(t,170,170), cap=Date.now()+t.length*170+10000; let wd=0, over=false; devLive=true;
+    const finish=()=>{ if(over||tok!==devTok) return; over=true; devLive=false; devUs=[]; clearInterval(keep); clearTimeout(wd); if(next){ const n=next; next=null; devSay(n.t,true,n.cb); } else if(done) done(); };
+    const start=()=>{ if(tok!==devTok) return; try{ if(S.paused) S.resume(); }catch(e){} if(!voice) pickVoice();
+      chunks.forEach((txt,i)=>{ const u=new SpeechSynthesisUtterance(txt); devUs.push(u); if(voice){ u.voice=voice; u.lang=voice.lang; } else u.lang='en-US';
         u.volume=vol; u.rate=voice&&HUMAN.test(voice.name)?1:1.05; u.pitch=voice&&(MALE.test(voice.name)||GOOD.test(voice.name))?1:0.85;
         if(i===chunks.length-1) u.onend=finish; u.onerror=e=>{ if(e&&e.error!=='interrupted'&&e.error!=='canceled') finish(); }; S.speak(u); }); };
     const since=Date.now()-lastCancel; if(since<150) setTimeout(start,150-since); else start();
@@ -1786,9 +1790,11 @@ onmessage=e=>{ const m=e.data; if(m.type==='cancel'){ cut=Math.max(cut,m.upto); 
   let W=null, wTimer=0, ac=null, gain=null, playing=[], tEnd=0, job=0, cbs={}, lastA=0, firstT=0, heard=0, slowHits=0; const cache=new Map(), SPEED=1.12, DEEP=.95;
   /* the studio voice is only used where this computer renders it faster than it's spoken */
   const humanDev=()=>!!voice&&HUMAN.test(voice.name), autoDev=()=>!engineChosen&&humanDev();
-  const studioOK=()=>!autoDev()&&engine==='studio'&&status.state==='ready'&&status.rtf>=1.05&&!status.slow&&!(status.blocked&&(!ac||ac.state!=='running'));
+  const ONLY_DEVICE=true; // the announcer is Microsoft Mark only: no studio download, no server voice
+  const studioOK=()=>!ONLY_DEVICE&&!autoDev()&&engine==='studio'&&status.state==='ready'&&status.rtf>=1.05&&!status.slow&&!(status.blocked&&(!ac||ac.state!=='running'));
   function fail(msg){ status.state='failed'; status.err=msg||'The studio voice could not load.'; clearTimeout(wTimer); if(W){ try{ W.terminate(); }catch(e){} W=null; } notify(); }
   function warm(){
+    if(ONLY_DEVICE) return;
     if(cloud.state!=='off'){ probeCloud(()=>{ if(cloud.state==='off') warm(); }); return; }
     if(W||status.state==='failed'||engine!=='studio'||!on||autoDev()) return;
     try{ const url=URL.createObjectURL(new Blob([workerCode()],{type:'text/javascript'})); W=new Worker(url,{type:'module'}); }catch(e){ fail('This browser can’t run the studio voice.'); return; }
@@ -1814,7 +1820,7 @@ onmessage=e=>{ const m=e.data; if(m.type==='cancel'){ cut=Math.max(cut,m.upto); 
      phone hears the same announcer. The game checks once whether the site has it set up. */
   const TTS_API=(/\.netlify\.app$/.test(location.hostname)?location.origin:SITE_URL)+'/api/tts';
   const cloud={state:'unknown',voice:'',fails:0}, ccache=new Map();
-  const cloudOK=()=>cloud.state==='on';
+  const cloudOK=()=>!ONLY_DEVICE&&cloud.state==='on';
   function probeCloud(then){
     if(cloud.state!=='unknown'){ if(then) then(); return; } cloud.state='checking';
     const end=st=>{ cloud.state=st; notify(); if(then) then(); };
@@ -1843,7 +1849,7 @@ onmessage=e=>{ const m=e.data; if(m.type==='cancel'){ cut=Math.max(cut,m.upto); 
     for(const r of raw){ const x=r.trim(); if(!x) continue; const lim=out.length?rest:max; if((cur+' '+x).length<lim||!cur) cur=(cur?cur+' ':'')+x; else { out.push(cur); cur=x; } } if(cur) out.push(cur);
     if(out.length>1&&out[out.length-1].length<40){ const l=out.pop(); out[out.length-1]+=' '+l; } return out; }
   function dropAll(){ const keys=[...cache.keys()]; if(W&&keys.length) W.postMessage({type:'drop',keys}); cache.clear(); }
-  function hush(){ clearTimeout(firstT); for(const c of cache.values()) c.live=0; job++; if(W) W.postMessage({type:'cancel',upto:job-1}); for(const s of playing){ try{ s.stop(); }catch(e){} } playing=[]; tEnd=0; cbs={}; next=null; devTok++; if(S&&(S.speaking||S.pending)){ S.cancel(); lastCancel=Date.now(); } clearTimeout(fakeT); }
+  function hush(){ clearTimeout(firstT); for(const c of cache.values()) c.live=0; job++; if(W) W.postMessage({type:'cancel',upto:job-1}); for(const s of playing){ try{ s.stop(); }catch(e){} } playing=[]; tEnd=0; cbs={}; next=null; devTok++; devLive=false; devUs=[]; if(S&&(S.speaking||S.pending)){ S.cancel(); lastCancel=Date.now(); } clearTimeout(fakeT); }
   function caption(t){ const cap=$('anncap'); if(cap){ cap.hidden=false; cap.innerHTML=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-3.1A7 7 0 0 0 19 11z"/></svg><span>${esc(shown(t))}</span>`; } }
   /* say(text, interrupt, onDone): onDone runs when the call has finished (or after a reading pause when nothing is spoken) */
   function say(t,big,done,quiet){
@@ -1871,7 +1877,7 @@ onmessage=e=>{ const m=e.data; if(m.type==='cancel'){ cut=Math.max(cut,m.upto); 
       cache.set(key,{chunks:[],done:false,live:0}); W.postMessage({type:'say',id:0,pre:true,key,parts:parts(t),voice:sv,speed:SPEED}); },
     dropAll, unlock(){ actx(); try{ if(S&&!S.speaking){ const u=new SpeechSynthesisUtterance(' '); u.volume=0; S.speak(u); } }catch(e){} },
     avg:x=>'\u0001'+Math.round(Math.max(0,Math.min(1,x))*1000)+'\u0001',
-    get voiceName(){ return voice?voice.name:''; },
+    get voiceName(){ return voice?voice.name:''; }, get isMark(){ return !!voice&&MARK.test(voice.name); },
     get vol(){ return vol; }, setVol(v){ vol=Math.max(0,Math.min(1,v)); if(gain) gain.gain.value=vol; try{ localStorage.setItem('fdl-ann-vol',vol); }catch(e){} },
     voices:()=>list().map(v=>({name:v.name,lang:v.lang,human:HUMAN.test(v.name)})),
     setVoice(n){ want=n; try{ localStorage.setItem('fdl-ann-voice',n); }catch(e){} pickVoice(); },
@@ -3978,35 +3984,23 @@ $('annBtn').addEventListener('click',e=>{ e.stopPropagation(); annPanel(); });
 function annPanel(){
   let pop=document.querySelector('.annpop'); if(pop){ pop.remove(); return; }
   pop=document.createElement('div'); pop.className='annpop'; pop.setAttribute('role','dialog'); pop.setAttribute('aria-label','Announcer');
-  const vs=ann.voices(), cur=ann.voiceName, st=ann.status;
   pop.innerHTML=`<div class="row"><button class="btn small" type="button" id="apOn">${ann.on?'Turn announcer off':'Turn announcer on'}</button><button class="btn small" type="button" id="apTest">Test voice</button><button class="btn small" type="button" id="apX">Done</button></div>
-<div class="eng" role="radiogroup" aria-label="Voice type"><label class="opt"><input type="radio" name="apEng" value="studio"${ann.engine==='studio'?' checked':''}><span><b>Studio voice</b> · natural AI voice that runs on this device, free. One-time download of about 60 MB, then it’s saved.</span></label>
-<label class="opt"><input type="radio" name="apEng" value="device"${ann.engine==='device'?' checked':''}><span><b>Device voice</b> · your browser’s built-in voice. No download.</span></label></div>
-<label id="apSvW">Announcer<select id="apSv">${ann.studio.map(([id,n])=>`<option value="${id}"${id===ann.studioVoice?' selected':''}>${esc(n)}</option>`).join('')}</select></label>
-<label id="apVoiceW">Device voice<select id="apVoice">${vs.length?vs.map(v=>`<option value="${esc(v.name)}"${v.name===cur?' selected':''}>${v.human?'★ ':''}${esc(v.name)}</option>`).join(''):'<option>No voices on this device</option>'}</select></label>
 <label>Volume <span id="apVolN" style="text-transform:none">${Math.round(ann.vol*100)}</span><input type="range" id="apVol" min="0" max="100" step="5" value="${Math.round(ann.vol*100)}"></label>
 <small id="apSt"></small>`;
   document.body.appendChild(pop);
-  const paint=()=>{ if(!pop.isConnected){ off(); return; } const e=ann.engine, s=ann.status, cl=ann.cloud.state==='on';
-    pop.querySelector('.eng').hidden=cl; $('apSvW').hidden=cl||e!=='studio'; $('apVoiceW').hidden=cl||e==='studio';
-    if(cl){ $('apSt').textContent=`Calling the games: the broadcast voice (${(ann.cloud.voice||'').replace(/^en-US-|Neural$/g,'')||'Christopher'}), spoken by this site's server. Same announcer on every browser and phone.`; place(); return; }
-    const vn=ann.voiceName, nat=/natural|neural|online|premium|enhanced/i.test(vn);
-    $('apSt').textContent= e!=='studio' ? (nat?`Calling the games: ${vn.replace(/^Microsoft /,'').replace(/ - .*$/,'').replace(/(Multilingual)? Online \(Natural\)/,'')}, a natural voice built into your browser.`:'Your browser only has robotic built-in voices. For a natural-sounding announcer, open the game in Microsoft Edge (free), or pick the studio voice above.')
-      : s.state==='ready' ? (s.slow?`This computer renders the studio voice too slowly${s.rtf?` (${s.rtf.toFixed(1)}× real time)`:''}, so your device’s voice is calling the games. For a natural free voice, open the game in Microsoft Edge.`:s.rtf?`Studio voice is ready, running on your ${s.device==='webgpu'?'graphics chip':'processor'} (${s.rtf.toFixed(1)}× real time).`:'Studio voice is ready. Checking its speed…') : s.state==='loading' ? `Downloading the studio voice${s.device==='webgpu'?' for your graphics chip':''}… ${s.pct}%. Until it’s ready you’ll hear your device’s voice.`
-      : s.state==='failed' ? `The studio voice couldn’t load here (${s.err}) so the device voice fills in.` : 'The studio voice downloads the first time it’s needed.';
-    place(); };
-  const place=()=>{ const r=$('annBtn').getBoundingClientRect(); pop.style.top=Math.max(8,Math.min(r.bottom+8,innerHeight-pop.offsetHeight-8))+'px'; pop.style.left=Math.max(16,Math.min(r.left,innerWidth-pop.offsetWidth-16))+'px'; };
-  const off=ann.onStatus(paint); paint();
-  const test=()=>{ if(ann.on) ann.say('Good evening, and welcome to the ballpark! It\'s a beautiful night for baseball under the lights.',true); };
+  const paint=()=>{ if(!pop.isConnected) return; const n=ann.voiceName;
+    $('apSt').textContent = !ann.ok ? 'This browser has no speech voices, so the calls show as captions.'
+      : ann.isMark ? 'Voice: Microsoft Mark (English, United States).'
+      : n ? `Microsoft Mark isn’t on this device, so the closest American voice is calling the games: ${n.replace(/ - .*$/,'')}.` : 'Loading the voice…';
+    const r=$('annBtn').getBoundingClientRect(); pop.style.top=Math.max(8,Math.min(r.bottom+8,innerHeight-pop.offsetHeight-8))+'px'; pop.style.left=Math.max(16,Math.min(r.left,innerWidth-pop.offsetWidth-16))+'px'; };
+  paint(); setTimeout(paint,600);
+  const test=()=>{ if(ann.on) ann.say('Good evening, and welcome to the ballpark. It\'s a beautiful night for baseball under the lights.',true); };
   $('apOn').onclick=()=>{ ann.set(!ann.on); paintAnn(); $('apOn').textContent=ann.on?'Turn announcer off':'Turn announcer on'; if(ann.on) test(); };
-  $('apTest').onclick=()=>{ ann.warm(); test(); };
-  pop.querySelectorAll('input[name=apEng]').forEach(r=>r.onchange=()=>{ ann.setEngine(r.value); paint(); });
-  $('apSv').onchange=e=>{ ann.setStudioVoice(e.target.value); test(); };
-  $('apVoice').onchange=e=>{ ann.setVoice(e.target.value); test(); };
+  $('apTest').onclick=test;
   $('apVol').oninput=e=>{ ann.setVol(e.target.value/100); $('apVolN').textContent=e.target.value; };
   $('apVol').onchange=test;
-  $('apX').onclick=()=>{ pop.remove(); off(); };
-  setTimeout(()=>document.addEventListener('click',function out(ev){ if(!pop.isConnected){ document.removeEventListener('click',out); return; } if(!pop.contains(ev.target)){ pop.remove(); off(); document.removeEventListener('click',out); } }),0);
+  $('apX').onclick=()=>pop.remove();
+  setTimeout(()=>document.addEventListener('click',function out(ev){ if(!pop.isConnected){ document.removeEventListener('click',out); return; } if(!pop.contains(ev.target)){ pop.remove(); document.removeEventListener('click',out); } }),0);
 }
 /* start fetching the studio voice on the first tap, so it's ready by the first pitch */
 document.addEventListener('pointerdown',()=>{ ann.unlock(); ann.warm(); },{once:true});
