@@ -1,0 +1,4 @@
+# The game is a single static page; the only server code is the short save-code function.
+[build]
+  publish = "."
+  functions = "netlify/functions"
