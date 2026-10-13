@@ -1701,7 +1701,11 @@ const ann=(()=>{
   function list(){ return S?S.getVoices().filter(v=>/^en/i.test(v.lang)&&!FEMALE.test(v.name)).sort((a,b)=>score(b)-score(a)):[]; }
   function pickVoice(){ if(!S) return; const vs=list(); voice=(want&&vs.find(v=>v.name===want))||vs[0]||null; }
   if(S){ pickVoice(); try{ S.addEventListener('voiceschanged',pickVoice); }catch(e){ S.onvoiceschanged=pickVoice; } }
-  const spoken=t=>t.replace(/(\d)–(\d)/g,'$1 to $2').replace(/–/g,', ').replace(/\u0001(\d+)\u0001/g,(m,d)=>avgWords(+d)).replace(/\bRBI\b/g,'R B I').replace(/\bMVP\b/g,'M V P').replace(/#(\d+)/g,'number $1').replace(/\bNo\. (\d)/g,'number $1').replace(/[“”"]/g,'');
+  /* how numbers are read: a record is "seven and three", a series is "two games to one", a score is already written "five to four" */
+  const gm=(a,b)=>`${a} ${+a===1?'game':'games'} to ${+b===0?'none':b}`;
+  const spoken=t=>t.replace(/series is tied (\d+)–\d+/g,'series is tied at $1').replace(/(series|Series),? (\d+)–(\d+)/g,(m,w,a,b)=>`${w} ${gm(a,b)}`)
+    .replace(/(won by [^.,]*?) (\d+)–(\d+)/g,(m,w,a,b)=>`${w}, ${gm(a,b)}`).replace(/(They beat [^.,]*?), (\d+)–(\d+)/g,(m,w,a,b)=>`${w}, ${gm(a,b)}`)
+    .replace(/(\d)–(\d)/g,'$1 and $2').replace(/–/g,', ').replace(/\u0001(\d+)\u0001/g,(m,d)=>avgWords(+d)).replace(/\bRBI\b/g,'R B I').replace(/\bMVP\b/g,'M V P').replace(/#(\d+)/g,'number $1').replace(/\bNo\. (\d)/g,'number $1').replace(/[“”"]/g,'');
   const shown=t=>t.replace(/\u0001(\d+)\u0001/g,(m,d)=>'.'+String(d).padStart(3,'0').replace(/^1000$/,'1.000'));
   function avgWords(d){ if(d>=1000) return 'a thousand'; if(d===0) return 'zero'; const a=Math.floor(d/100), b=d%100; return a? `${a} ${b===0?'hundred':b<10?'oh '+b:b}` : (b<10?'oh oh '+b:'oh '+b); }
   const status={state:'idle',pct:0,err:''}, subs=new Set(); const notify=()=>subs.forEach(f=>{ try{ f(status); }catch(e){} });
@@ -1789,7 +1793,7 @@ onmessage=e=>{ const m=e.data; if(m.type==='cancel'){ cut=Math.max(cut,m.upto); 
   return {
     get on(){ return on; },
     set(v){ on=v; try{ localStorage.setItem('fdl-ann',v?'on':'off'); }catch(e){} if(!v) hush(); else warm(); },
-    say, stop:hush, warm, caption,
+    say, stop:hush, warm, caption, spoken,
     /* still talking (or about to): nothing should cut in */
     get busy(){ if(!on||!sfx.on) return false; if(S&&(S.speaking||S.pending)) return true; return playing.length>0||(!!cbs[job]&&Date.now()-lastA<4000); },
     /* get a line ready ahead of time (the studio voice renders it in the background) */
