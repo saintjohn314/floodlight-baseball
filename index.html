@@ -1624,7 +1624,7 @@ const TN = t => G.teams[t].name;
 /* ---------- sound: everything is synthesized, nothing to download ---------- */
 const sfx=(()=>{
   /* the sound effects are built live with Web Audio: a wood bat, a leather mitt, a ballpark organ. The crowd is recorded:
-     hundreds of real voices (audio/crowd-*.mp3) on its own volume, heard only while a game is on screen. */
+     light chatter from hundreds of real voices (audio/crowd-bed.mp3) on its own volume, heard only while a game is on screen. */
   let ctx=null, on=true, vol=.9, buf=null, pink=null, out=null, room=null;
   let crowdOn=true, crowdVol=.7, cbus=null, bedSrc=null, bedG=null, bedAt=-1, cLoad=null; const CB={};
   try{ on=localStorage.getItem('fdl-sound')!=='off'; crowdOn=localStorage.getItem('fdl-crowd')!=='off';
@@ -1648,8 +1648,8 @@ const sfx=(()=>{
     return ctx;
   }
   const dest=(wet)=>{ const g=ctx.createGain(); g.connect(out); if(wet) g.connect(room); return g; };
-  /* the recorded crowd: a looping bed of chatter, and cheers, a roar and groans that play on top of it */
-  const CROWD=['bed','cheer','big','groan'], AUD=(/^https?:$/.test(location.protocol)?['audio/']:[]).concat(SITE_URL+'/audio/');
+  /* the recorded crowd: a looping bed of light chatter */
+  const CROWD=['bed'], AUD=(/^https?:$/.test(location.protocol)?['audio/']:[]).concat(SITE_URL+'/audio/');
   async function getBuf(k){ let err=null;
     for(const base of AUD){ try{ const r=await fetch(base+'crowd-'+k+'.mp3'); if(!r.ok) throw new Error('crowd '+r.status); const ab=await r.arrayBuffer();
       return await new Promise((res,rej)=>ctx.decodeAudioData(ab,res,rej)); }catch(e){ err=e; } }
@@ -1665,12 +1665,6 @@ const sfx=(()=>{
         if(CB.bed.duration>49.5){ bedSrc.loopStart=1; bedSrc.loopEnd=49; } bedSrc.connect(bedG); bedSrc.start(0,bedSrc.loopEnd?1+Math.random()*48:Math.random()*CB.bed.duration); bedAt=-1; }
       if(Math.abs(level-bedAt)>.01){ glide(bedG,level,sec); bedAt=level; } return; }
     if(!bedSrc) return; const src=bedSrc, g=bedG; bedSrc=null; bedG=null; bedAt=-1; glide(g,.0001,sec); setTimeout(()=>{ try{ src.stop(); }catch(e){} try{ g.disconnect(); }catch(e){} },sec*1000+200); }
-  /* a reaction on top of the bed: 'big' (home run roar), 'cheer', 'groan'; lvl scales it */
-  function react(kind,lvl=1){
-    if(!crowdOn||!ctxOK()) return; const b=CB[kind];
-    if(!b){ loadCrowd().catch(()=>{}); return; }
-    const t=ctx.currentTime+.04, src=ctx.createBufferSource(), g=ctx.createGain(); src.buffer=b; src.playbackRate.value=.97+Math.random()*.06; g.gain.value=lvl; src.connect(g); g.connect(cbus); src.start(t);
-    if(bedG&&bedAt>0){ const top=Math.min(1.6,bedAt*(kind==='big'?1.5:1.2)); bedG.gain.cancelScheduledValues(t); bedG.gain.setValueAtTime(Math.max(.0001,bedG.gain.value),t); bedG.gain.linearRampToValueAtTime(top,t+.5); bedG.gain.linearRampToValueAtTime(bedAt,t+b.duration*.9); } }
   function noise(t0,dur,o){
     const c=ac(); if(!c) return; o=Object.assign({type:'bandpass',f:1000,q:1,gain:.3,attack:.005,src:buf,wet:true},o);
     const src=c.createBufferSource(); src.buffer=o.src; src.loop=true;
@@ -1700,7 +1694,6 @@ const sfx=(()=>{
     get crowdVol(){ return crowdVol; }, setCrowdVol(v){ crowdVol=Math.max(0,Math.min(1,v)); if(cbus) cbus.gain.value=crowdVol; try{ localStorage.setItem('fdl-crowd-vol',crowdVol); }catch(e){} },
     /* the crowd is heard only during a game: the page calls this a couple of times a second (level 0 = fade it out) */
     crowd(level,sec=1.5){ if(level>0&&!ctx&&navigator.userActivation&&!navigator.userActivation.hasBeenActive) return; if(level>0||bedSrc) bedTo(level,sec); },
-    react,
     unlock(){ if(ctxOK()&&crowdOn) loadCrowd().catch(()=>{}); },
     dice(){ if(!ac()) return; const t=now(); for(let i=0;i<7;i++) noise(t+i*.085+Math.random()*.03,.05,{f:2200+Math.random()*1900,q:4,gain:.2,attack:.002,wet:false}); },
     /* a wood bat: the snap, the ring of the barrel, the thump */
@@ -1710,7 +1703,6 @@ const sfx=(()=>{
       tone(t,150,.06,{type:'sine',gain:.35,f2:80,attack:.002,hold:.1}); },
     /* the pop of a catcher's mitt */
     pop(){ if(!ac()) return; const t=now(); noise(t,.07,{type:'lowpass',f:480,q:.9,gain:1,attack:.001}); noise(t,.022,{f:1900,q:1.2,gain:.35,attack:.0008}); tone(t,105,.07,{type:'sine',gain:.3,f2:70,attack:.002,hold:.1}); },
-    cheer(big){ react(big?'big':'cheer'); },
     flip(){ if(!ac()) return; const t=now(); noise(t,.2,{f:3200,f2:800,q:1.3,gain:.2,attack:.01,wet:false}); },
     power(){ if(!ac()) return; const t=now(); [523.25,659.25,783.99,1046.5].forEach((f,i)=>tone(t+i*.07,f,.16,{type:'triangle',gain:.05})); },
     /* "Charge!" on the organ */
@@ -2161,7 +2153,7 @@ function showTrophy(h){
 ${h.smvp?`<p>Series MVP: <b>${esc(h.smvp.n)}</b>, ${esc(h.smvp.line)}</p>`:''}
 <p>Regular season ${h.user.w}–${h.user.l} · ${titles>1?`Title No. ${titles} for the franchise`:'The first title in franchise history'}</p>
 <div class="ovbtns"><button class="btn primary" type="button" id="trGo">Raise the trophy!</button></div></div>`;
-  ov.hidden=false; const card=ov.querySelector('.troph'); fireworks(card,true,8); sfx.cheer(true); setTimeout(()=>sfx.organ(),600);
+  ov.hidden=false; const card=ov.querySelector('.troph'); fireworks(card,true,8); setTimeout(()=>sfx.organ(),600);
   ann.say(`${TheTeam(h.champName)} are your Floodlight Series champions! They beat ${theTeam(h.runnerName)}, ${h.score}.${h.smvp?` The Series MVP is ${h.smvp.n}.`:''} ${titles>1?`That's title number ${titles} for the franchise.`:'The first championship in franchise history!'}`,true);
   $('trGo').onclick=()=>{ fireworks(card,true,6); setTimeout(()=>{ ov.hidden=true; ov.innerHTML=''; openHub(); }, reduce?0:900); };
   $('trGo').focus();
@@ -2618,13 +2610,9 @@ function post(){
 }
 function playFx(){
   const fx=G.fx; G.fx=null; if(!fx) return;
-  /* the crowd roots for the home team. An out that ends a half has already turned the inning over, so the side that batted is the other one */
-  const outFx=fx==='K'||fx==='OUT'||fx==='DP'||fx==='SQ', bat=outFx&&G.outs===0&&!G.over?1-G.half:G.half, home=bat===1;
-  if(fx==='HR'){ sfx.crack(); sfx.react(home?'big':'groan'); }
-  else if(fx==='1B'||fx==='2B'||fx==='3B'){ sfx.crack(); if(home) sfx.react('cheer'); else if(fx!=='1B') sfx.react('groan',.6); }
-  else if(fx==='SB'||fx==='SQ'){ if(home) sfx.react('cheer',.8); }
-  else if(fx==='K'||fx==='OUT'||fx==='DP'){ sfx.pop(); if(!home&&(fx!=='OUT'||G.outs===0)) sfx.react('cheer',fx==='OUT'?.6:.8); else if(home&&fx==='DP') sfx.react('groan',.6); }
-  if(G.over){ setTimeout(()=>sfx.organ(), 500); if(fx!=='HR') sfx.react(total(G,1)>total(G,0)?'big':'groan'); }
+  if(fx==='HR'||fx==='1B'||fx==='2B'||fx==='3B') sfx.crack();
+  else if(fx==='K'||fx==='OUT'||fx==='DP') sfx.pop();
+  if(G.over) setTimeout(()=>sfx.organ(), 500);
 }
 function callout(text,gold){ const c=$('callout'); c.textContent=text; c.classList.remove('show'); c.classList.toggle('gold',!!gold); void c.offsetWidth; c.classList.add('show'); }
 /* fireworks over the stadium (or any box): bursts of sparks, plus falling confetti when conf is set */
