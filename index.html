@@ -161,6 +161,11 @@ button,select,input{font:inherit;color:inherit}
 .tvlead h5{margin:0 0 6px;font-family:var(--f-head);letter-spacing:.12em;text-transform:uppercase;font-size:13px;color:#ffc861}
 .tvlead ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
 .tvlead li{display:flex;align-items:center;gap:6px;font-size:15px}.tvlead li i{font-style:normal;color:#aab6cc;width:14px}.tvlead li span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tvlead li b{font-family:var(--f-num);color:#ffd77e}.tvlead li.none{color:#aab6cc}
+.tlogo{display:inline-block;width:18px;height:18px;flex:none;vertical-align:-4px;margin-right:6px}
+.troph h3 .tlogo{width:.9em;height:.9em;vertical-align:-.08em;margin-right:.2em}
+.board td.team .tlogo{width:14px;height:14px;margin-right:5px;vertical-align:-2px}
+.tv .tlogo{width:22px;height:22px;vertical-align:-6px}.tvc b .tlogo,.tvstats b .tlogo{width:24px;height:24px}
+.cutsc .tm .tlogo.big,.matchup .tlogo.big{width:clamp(44px,7vw,72px);height:clamp(44px,7vw,72px);margin:0 0 6px;display:block}
 .tv .dot{flex:none;width:10px;height:10px;display:inline-block;border-radius:50%;margin-right:6px;vertical-align:middle}
 .tvcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
 .tvc{position:relative;padding:16px}.tvc i{font-style:normal;font-family:var(--f-head);font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#d63031;font-size:14px}
@@ -863,7 +868,7 @@ button,select,input{font:inherit;color:inherit}
 <div class="hdr" id="hdrBtns">
 <button class="btn small" id="menuBtn" type="button" title="Back to the main menu">Menu</button>
 <button class="btn small exh" id="newgame" type="button" title="Set home or away and your batting order, then play">New game</button>
-<button class="btn small" id="finish" type="button" title="Rolls out the rest of the game in one go (no cards or abilities)">Finish game</button>
+<button class="btn small" id="finish" type="button" title="Plays out the rest of the game in one go. In Simulation mode the computer manages both teams the rest of the way.">Finish game</button>
 <button class="btn small" id="saves" type="button" title="Save slots, save files and save codes to move your game to another device">Save / Load</button>
 <button class="btn small" id="tips" type="button" aria-pressed="true" title="Show hints about what you can do right now">Tips on</button>
 <button class="btn small" id="lights" type="button" aria-pressed="true">Lights on</button>
@@ -1099,8 +1104,8 @@ function hashStr(s){ let h=2166136261; for(let i=0;i<s.length;i++){ h^=s.charCod
 /* ---------- drawn card art: the cartoon player cards every team uses, and art for the new action cards ---------- */
 const svgURI = s => 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(s);
 const genCache = {};
-function genPlayerCard(name,info,color){
-  const key=name+'|'+color; if(genCache[key]) return genCache[key];
+function genPlayerCard(name,info,color,lg){
+  const key=name+'|'+color+'|'+(lg||''); if(genCache[key]) return genCache[key];
   const h=hashStr(name), skins=['#f1c8a0','#e8b48c','#d9a77a','#f0c49b'], darks=['#7a4e33','#5e3b26'], hairs=['#2b1d14','#5a3a22','#8a5a2b','#c99a52','#1b1b1b','#7a2f1a'];
   const skin=((info&&info.dk)||DARK_SKIN.has(name))?darks[h%darks.length]:(info&&info.hi)?['#d9a77a','#c99468','#b98257'][h%3]:skins[h%skins.length], hair=hairs[(h>>>4)%hairs.length], c=color||'#b3271f', f=info&&info.f, num=(info&&info.n)||((h>>>8)%49+1);
   const skyA=['#8fc3d6','#9ccbd2','#a9cde0'][(h>>>12)%3], lean=((h>>>14)%2)?1:-1, seed=(h>>>16)%97;
@@ -1143,6 +1148,7 @@ ${f?`<path d="M96 51 Q110 55 108 80 Q104 72 98.5 67 Q100 58 96 51Z" fill="${hair
 <circle cx="31" cy="31" r="14" fill="#9e2f28" stroke="#f1e6c8" stroke-width="2"/>
 <text x="31" y="37" text-anchor="middle" font-family="Impact,'Arial Narrow Bold','Arial Black',sans-serif" font-size="16" fill="#f6efdc">${num}</text>
 <text x="85" y="215" text-anchor="middle" font-family="Impact,'Arial Narrow Bold','Oswald','Arial Black',sans-serif" font-size="${fs}" letter-spacing=".6" fill="#38302a">${esc(NAME)}</text>
+${lg&&LOGOS[lg]?`<g transform="translate(124 16) scale(.47)">${LOGOS[lg]}</g>`:''}
 <rect width="170" height="238" rx="11" filter="url(#n)"/>
 <rect x="5" y="5" width="160" height="228" rx="9" fill="none" stroke="#c4ab7a" stroke-width="1.5"/>
 </svg>`;
@@ -1168,9 +1174,9 @@ function cardSrc(name,T){
   if(pic){
     if(pic===name && PHOTO[pic]) return PHOTO[pic];
     const k=pic+'|'+name; if(cardReady[k]) return cardReady[k];
-    const fb=genPlayerCard(name,info,T&&T.color); cardFallback[k]=fb; buildPhotoCard(pic,name); return fb;
+    const fb=genPlayerCard(name,info,T&&T.color,logoKey(T)); cardFallback[k]=fb; buildPhotoCard(pic,name); return fb;
   }
-  return genPlayerCard(name,info,T&&T.color);
+  return genPlayerCard(name,info,T&&T.color,logoKey(T));
 }
 let fontWait=null;
 function buildPhotoCard(pic,name){
@@ -1228,7 +1234,7 @@ function advance(b,o,batter){
   return {bases:nb, scored:s};
 }
 /* a team as it plays one game: who bats in what order, and each player's ability */
-function gameTeam(T){ const ab={}; for(const n of T.lineup) ab[n]=(T.roster[n]||{}).ab||null; return {id:T.id,name:T.name,abbr:T.abbr,color:T.color,lineup:T.lineup.slice(),ab,info:JSON.parse(JSON.stringify(T.roster))}; }
+function gameTeam(T){ const ab={}; for(const n of T.lineup) ab[n]=(T.roster[n]||{}).ab||null; return {id:T.id,name:T.name,abbr:T.abbr,color:T.color,logo:logoKey(T),lineup:T.lineup.slice(),ab,info:JSON.parse(JSON.stringify(T.roster))}; }
 function newState(m,teams,cpuFlags){ return {mode:m,teams,cpu:cpuFlags||[false,false],inning:1,half:0,outs:0,bases:[null,null,null],line:[[0],[]],hits:[0,0],bb:[0,0],hr:[0,0],idx:[0,0],over:false,log:[],final:'',box:{},walkoff:false,
   last:null,event:null,big:null,dice:[],abUsed:[{},{}],
   deck:shuffle(DECK),dhPile:shuffle(DHS),hands:[[],[]],dhUse:[[false,false],[false,false]],injured:[[],[]],rally:[false,false],hitRun:false,halfPA:0,drawn:{},dhOn:[null,null],pinch:null}; }
@@ -2023,7 +2029,7 @@ function cutscene(){
   const st=story.slice(0,3);
   const el=document.createElement('div'); el.className='cutsc'; el.setAttribute('role','dialog'); el.setAttribute('aria-label','Pregame');
   el.innerHTML=`<span class="beam l"></span><span class="beam r"></span><div class="cutin"><span class="logo">Floodlight Baseball</span><span class="k">${esc(kicker)}</span>
-<div class="vs"><div class="tm"><b style="color:${ink(A.color)}">${esc(A.name)}</b><span>${esc(recA)}</span></div><span class="at">at</span><div class="tm h"><b style="color:${ink(H.color)}">${esc(H.name)}</b><span>${esc(recH)}</span></div></div>
+<div class="vs"><div class="tm">${teamMark(A,'big')}<b style="color:${ink(A.color)}">${esc(A.name)}</b><span>${esc(recA)}</span></div><span class="at">at</span><div class="tm h">${teamMark(H,'big')}<b style="color:${ink(H.color)}">${esc(H.name)}</b><span>${esc(recH)}</span></div></div>
 ${st.length?`<p class="story">${st.map(esc).join('<br>')}</p>`:''}<span class="skip">Tap to play ball</span></div>`;
   document.body.appendChild(el); sfx.organ();
   let gone=false, min=false, said=false; const done=()=>{ if(gone) return; gone=true; el.classList.add('out'); setTimeout(()=>el.remove(),reduce?0:400); };
@@ -2045,7 +2051,7 @@ const CUP_SVG=`<svg class="cup" viewBox="0 0 200 240" aria-hidden="true"><defs><
 <ellipse class="shine" cx="70" cy="42" rx="10" ry="22" fill="url(#cupS)" transform="rotate(-18 70 42)"/></svg>`;
 function showTrophy(h){
   if(!F||!h) return; const ov=$('ov'), titles=F.history.filter(x=>x.champ===h.champ).length;
-  ov.onclick=null; ov.innerHTML=`<div class="troph" role="dialog" aria-modal="true" aria-labelledby="trT">${CUP_SVG}<span class="aside">Season ${h.season} · Floodlight Series champions</span><h3 id="trT">${esc(h.champName)}</h3>
+  ov.onclick=null; ov.innerHTML=`<div class="troph" role="dialog" aria-modal="true" aria-labelledby="trT">${CUP_SVG}<span class="aside">Season ${h.season} · Floodlight Series champions</span><h3 id="trT">${F&&F.teams[h.champ]?teamMark(F.teams[h.champ]):''}${esc(h.champName)}</h3>
 <p>Beat the ${esc(h.runnerName)} <b>${esc(h.score)}</b> in the Floodlight Series.</p>
 ${h.smvp?`<p>Series MVP: <b>${esc(h.smvp.n)}</b>, ${esc(h.smvp.line)}</p>`:''}
 <p>Regular season ${h.user.w}–${h.user.l} · ${titles>1?`Title No. ${titles} for the franchise`:'The first title in franchise history'}</p>
@@ -2063,7 +2069,7 @@ function renderBoard(){
   for(let i=i0+1;i<=n;i++) h+=`<th scope="col">${i}</th>`;
   h+='<th scope="col" class="tot">R</th><th scope="col">H</th></tr></thead><tbody>';
   for(let t=0;t<2;t++){
-    h+=`<tr><td class="team" title="${esc(TN(t))} (${t?'home':'visitor'})"><i style="background:${G.teams[t].color};color:${G.teams[t].color}"></i>${esc(G.teams[t].abbr)}</td>`;
+    h+=`<tr><td class="team" title="${esc(TN(t))} (${t?'home':'visitor'})">${teamMark(G.teams[t])}${esc(G.teams[t].abbr)}</td>`;
     for(let i=i0;i<n;i++){ const now=!G.over&&G.half===t&&G.inning-1===i; h+=lsCell(G.line[t][i],now?'now':''); }
     h+=lsCell(total(G,t),'tot'+(!G.over&&G.half===t?' batting':''))+lsCell(G.hits[t])+'</tr>';
   }
@@ -2071,7 +2077,7 @@ function renderBoard(){
 }
 function renderLineup(){
   const t=G.half, T=G.teams[t], up=G.idx[t]%9, dh=G.dhOn[t];
-  $('lineupTitle').innerHTML=`<i style="background:${T.color}"></i>${esc(T.name.length>9?T.abbr:T.name)} batting order<span class="key">${G.over?'':'gold = up · dashed = on deck'}</span>`;
+  $('lineupTitle').innerHTML=`${teamMark(T)}${esc(T.name.length>9?T.abbr:T.name)} batting order<span class="key">${G.over?'':'gold = up · dashed = on deck'}</span>`;
   const pinchUp=!!G.pinch && G.pinch.team===t;
   $('lineup').innerHTML=T.lineup.map((name,i)=>{
     // the DH holds this spot while batting or on base; if the spot comes back around first, the regular is up
@@ -2123,11 +2129,11 @@ function renderHands(){
     const cards = c ? (G.hands[t].length?`<span class="mback"><span class="mstk${G.hands[t].length>1?' two':''}"><b>?</b></span><span class="mcnt">×${G.hands[t].length}</span></span>`:'')
       : G.hands[t].map(id=>{ const A=ACTIONS[id], go=legal(t,id);
         return `<button type="button" class="acbtn ${A.side}${go?' go':''}" data-card="${id}" data-team="${t}" aria-disabled="${!go}" title="${esc(A.name)}. ${esc(A.when)} ${esc(A.text)}"><img src="${ACARD[id]}" alt=""><span>${esc(A.short)}${go?'<em>play</em>':A.react?'<small>auto</small>':A.side==='def'?'<small>def</small>':''}</span></button>`; }).join('');
-    return `<div class="hand${up?' up':''}"><span class="who"><i style="background:${T.color}"></i>${esc(T.abbr)}<small>${up?'batting':'in field'}</small></span><span class="pile"><span class="plbl">DH pile</span>${dh}</span><span class="pile grow"><span class="plbl">Action cards</span>${cards||`<span class="none">${nextDraw(t)}</span>`}</span>${c?'<span class="cpu-tag">CPU</span>':''}</div>`;
+    return `<div class="hand${up?' up':''}"><span class="who">${teamMark(T)}${esc(T.abbr)}<small>${up?'batting':'in field'}</small></span><span class="pile"><span class="plbl">DH pile</span>${dh}</span><span class="pile grow"><span class="plbl">Action cards</span>${cards||`<span class="none">${nextDraw(t)}</span>`}</span>${c?'<span class="cpu-tag">CPU</span>':''}</div>`;
   }).join('');
   // a little pile on the table for the team you're managing (or the team at bat in a 2-player game)
   const me=userSide()>=0?userSide():G.half, T=G.teams[me], n=dhLeft(me), k=G.hands[me].length, ok=canDH(me), anyGo=G.hands[me].some(id=>legal(me,id));
-  tp.innerHTML = G.over ? '' : `<span class="tlbl"><i style="background:${T.color}"></i>${esc(T.abbr)} cards</span><div class="trow"><button type="button" class="tstk dh${ok?' go':''}${n?'':' empty'}" ${ok?`data-dh="${me}"`:'data-pile="dh"'} title="${esc(T.name)}'s designated hitter pile: ${n} left"><span class="cardb"><b>DH</b></span><span class="tcnt">${n}</span></button><button type="button" class="tstk ac${anyGo?' go':''}${k?'':' empty'}" data-pile="ac" title="${esc(T.name)}'s action cards: ${k} in hand. Tap to see them."><span class="cardb"><b>${k?'★':'—'}</b></span><span class="tcnt">${k}</span></button></div><span class="tsub">DH · Action</span>`;
+  tp.innerHTML = G.over ? '' : `<span class="tlbl">${teamMark(T)}${esc(T.abbr)} cards</span><div class="trow"><button type="button" class="tstk dh${ok?' go':''}${n?'':' empty'}" ${ok?`data-dh="${me}"`:'data-pile="dh"'} title="${esc(T.name)}'s designated hitter pile: ${n} left"><span class="cardb"><b>DH</b></span><span class="tcnt">${n}</span></button><button type="button" class="tstk ac${anyGo?' go':''}${k?'':' empty'}" data-pile="ac" title="${esc(T.name)}'s action cards: ${k} in hand. Tap to see them."><span class="cardb"><b>${k?'★':'—'}</b></span><span class="tcnt">${k}</span></button></div><span class="tsub">DH · Action</span>`;
 }
 
 /* ---------- tips: one plain-language hint about what you can do right now ---------- */
@@ -2184,18 +2190,18 @@ function renderAbar(){
 
 let toastTimer=null;
 function toast(t,html,cls){
-  const el=$('ctoast'); el.className='ctoast show '+(cls||''); el.innerHTML=`<i style="background:${G.teams[t].color}"></i><span>${html}</span>`;
+  const el=$('ctoast'); el.className='ctoast show '+(cls||''); el.innerHTML=`${teamMark(G.teams[t])}<span>${html}</span>`;
   clearTimeout(toastTimer); toastTimer=setTimeout(()=>{ el.className='ctoast'; },2800);
 }
 const who = t => cpu(t)?`The computer (${esc(TN(t))})`:esc(TN(t));
 function abToast(t,k,name){ toast(t,`${who(t)}: <b>${esc(name)}</b> uses ${abIcon(k)} <b>${esc(ABIL[k].name)}</b>.`,'abil'); sfx.power(); }
 function cardHTML(t,id){
   const A=ACTIONS[id], side=A.side==='def'?'Defense':A.side==='curse'?'Must play':'Offense';
-  return `<div class="acard ${A.side}">${ACARD[id]?`<img class="art" src="${ACARD[id]}" alt="">`:''}<div class="acopy"><span class="aside"><i style="background:${G.teams[t].color}"></i>${esc(TN(t))} · ${side}</span><b>${esc(A.name)}</b><span class="when">${esc(A.when)}</span><span class="txt">${esc(A.text)}</span></div></div>`;
+  return `<div class="acard ${A.side}">${ACARD[id]?`<img class="art" src="${ACARD[id]}" alt="">`:''}<div class="acopy"><span class="aside">${teamMark(G.teams[t])}${esc(TN(t))} · ${side}</span><b>${esc(A.name)}</b><span class="when">${esc(A.when)}</span><span class="txt">${esc(A.text)}</span></div></div>`;
 }
 function abCardHTML(t,k,name){
   const A=ABIL[k];
-  return `<div class="abcard" style="--c:${A.color}">${abIcon(k,'big')}<div class="acopy"><span class="aside"><i style="background:${G.teams[t].color}"></i>${esc(TN(t))} · Player ability</span><b>${esc(A.name)}</b><span class="who2">${esc(name)}</span><span class="txt">${esc(A.text)} Once a game.</span></div></div>`;
+  return `<div class="abcard" style="--c:${A.color}">${abIcon(k,'big')}<div class="acopy"><span class="aside">${teamMark(G.teams[t])}${esc(TN(t))} · Player ability</span><b>${esc(A.name)}</b><span class="who2">${esc(name)}</span><span class="txt">${esc(A.text)} Once a game.</span></div></div>`;
 }
 function ask(t,id,q){
   if(cpu(t)){ toast(t,`The computer plays <b>${esc(ACTIONS[id].name)}</b>.`,ACTIONS[id].side); flashCard(t,id); return Promise.resolve(true); }
@@ -2222,7 +2228,7 @@ function askAb(t,k,name,q,ctx){
 function showDH(t,card,sub){
   return new Promise(res=>{
     const ov=$('ov'); sfx.flip();
-    ov.innerHTML=`<div class="dhcard" role="dialog" aria-label="Designated hitter"><span class="aside"><i style="background:${G.teams[t].color}"></i>${esc(TN(t))} · Designated hitter</span><b>${esc(card.name)}</b><span class="res ${kind(card.o)}">${LABEL[card.o]}</span><span class="sub">Guaranteed. Batting for ${esc(sub)}.</span></div>`;
+    ov.innerHTML=`<div class="dhcard" role="dialog" aria-label="Designated hitter"><span class="aside">${teamMark(G.teams[t])}${esc(TN(t))} · Designated hitter</span><b>${esc(card.name)}</b><span class="res ${kind(card.o)}">${LABEL[card.o]}</span><span class="sub">Guaranteed. Batting for ${esc(sub)}.</span></div>`;
     ov.hidden=false;
     let gone=false; const done=()=>{ if(gone) return; gone=true; ov.onclick=null; ov.hidden=true; ov.innerHTML=''; res(); };
     ov.onclick=done; setTimeout(done, reduce?700:2100);
@@ -2263,9 +2269,9 @@ function checkDH(){
 function logCard(t,text,runs,out){ G.log.push({tag:tagOf(G),team:t,text,runs:runs||0,out:out==null?null:Math.min(out,3)}); }
 
 /* ---------- card plays ---------- */
-async function cardSteal(t){
-  const b=G.bases, from=(b[1]&&!b[2])?1:0, runner=b[from], r=rig()||rollFace(mode);
-  await tossP(0,r); G.dice=[r];
+async function cardSteal(t){ const r=rig()||rollFace(mode); await tossP(0,r); stealCore(t,r); }
+function stealCore(t,r){
+  const b=G.bases, from=(b[1]&&!b[2])?1:0, runner=b[from]; G.dice=[r];
   if(r==='K'){ G.fx='OUT'; b[from]=null; G.outs++; setEvent(G,'Caught stealing','k',`The die shows K. <b>${esc(runner)}</b> is thrown out trying to steal ${BASE_N[from+1]}.`); G.big=null; logCard(t,`Caught stealing ${BASE_N[from+1]} · ${runner}`,0,G.outs); afterPlay(G,true); }
   else { G.fx='SB'; b[from+1]=runner; b[from]=null; boxOf(G,runner,t).SB++; setEvent(G,'Stolen base','hit',`The die shows ${FACE[r]}. <b>${esc(runner)}</b> steals ${BASE_N[from+1]}.`); G.big='Stolen Base!'; logCard(t,`Steals ${BASE_N[from+1]} · ${runner}`); }
 }
@@ -2277,9 +2283,9 @@ function cardBunt(t){
   setEvent(G,'Sacrifice bunt','out',`<b>${esc(bat)}</b> bunts and is out at first. Every runner moves up a base.`+runsText(sc.length)); G.big=null;
   logCard(t,`Sacrifice bunt · ${bat}`,sc.length,G.outs); afterPlay(G,true);
 }
-async function cardSqueeze(t){
-  const b=G.bases, bat=curBatter(G), runner=b[2], r=rig()||rollFace(mode);
-  await tossP(0,r); G.dice=[r];
+async function cardSqueeze(t){ const r=rig()||rollFace(mode); await tossP(0,r); squeezeCore(t,r); }
+function squeezeCore(t,r){
+  const b=G.bases, bat=curBatter(G), runner=b[2]; G.dice=[r];
   if(r==='K'||r==='DP'){ G.fx='OUT'; b[2]=null; G.outs++; setEvent(G,'Squeeze fails','k',`The die shows ${FACE[r]}. <b>${esc(runner)}</b> is tagged out at home, and <b>${esc(bat)}</b> stays at the plate.`); G.big=null; logCard(t,`Squeeze fails, out at home · ${runner}`,0,G.outs); afterPlay(G,true); }
   else { G.fx='SQ'; G.idx[t]++; G.halfPA++; G.hitRun=false; const bx=boxOf(G,bat,t); bx.PA++; G.outs++; b[2]=null; bx.RBI++; score(G,t,[runner]); setEvent(G,'Squeeze play','hit',`The die shows ${FACE[r]}. <b>${esc(runner)}</b> scores and <b>${esc(bat)}</b> is out at first.`); G.big='Squeeze!'; logCard(t,`Squeeze, ${runner} scores · ${bat}`,1,G.outs); afterPlay(G,true); }
 }
@@ -2289,9 +2295,9 @@ function cardInjured(t,forced){
   if(!isInjured(G,t,bat)) G.injured[t].push(bat);
   applyPA(G,'OUT',{title:'Injured',cls:'k',big:'Injured!',text:`<b>${esc(bat)}</b> is hurt${forced?' (Injured had to be played by the 9th)':''}. Out now, and an automatic out every time that spot comes up.`,logText:`Injured, out for the game · ${bat}`});
 }
-async function cardPickoff(t){ // t is the team in the field
-  const b=G.bases, from=b[1]?1:0, runner=b[from], r=rig()||rollFace(mode);
-  await tossP(0,r); G.dice=[r];
+async function cardPickoff(t){ const r=rig()||rollFace(mode); await tossP(0,r); pickoffCore(t,r); } // t is the team in the field
+function pickoffCore(t,r){
+  const b=G.bases, from=b[1]?1:0, runner=b[from]; G.dice=[r];
   if(r==='K'||r==='DP'){ b[from]=null; G.outs++; G.fx='OUT'; setEvent(G,'Picked off','k',`The die shows ${FACE[r]}. <b>${esc(runner)}</b> is picked off ${BASE_N[from]}!`); G.big='Picked Off!'; logCard(t,`Picked off ${BASE_N[from]} · ${runner}`,0,G.outs); afterPlay(G,true); }
   else { G.fx=null; setEvent(G,'Back safely','out',`The die shows ${FACE[r]}. <b>${esc(runner)}</b> dives back to ${BASE_N[from]} in time.`); G.big=null; logCard(t,`Pickoff try, ${runner} safe`); }
 }
@@ -2314,16 +2320,23 @@ async function playCard(t,id){
 }
 async function sendDH(t){
   if(!canDH(t)){ explainDH(t); return; }
-  busy=true; G.dhUse[t][dhWindow()]=true;
+  busy=true; const {card,sub}=dhCore(t);
+  renderGame();
+  await showDH(t,card,sub);
+  dhSwing(t,card);
+  post();
+}
+function dhCore(t){
+  G.dhUse[t][dhWindow()]=true;
   const card=G.dhPile.shift(), slot=curSlot(G), sub=curBatter(G);
   G.dhOn[t]={name:card.name,slot}; G.pinch={team:t,name:card.name}; G.dice=[];
   G.log.push({sys:`${TN(t)} sends up designated hitter ${card.name} for ${sub}.`});
-  renderGame();
-  await showDH(t,card,sub);
+  return {card,sub};
+}
+function dhSwing(t,card){
   G.pinch=null;
   const hr=G.hitRun; G.hitRun=false;
   applyPA(G,card.o,{batter:card.name,dh:true,hitRun:hr,title:LABEL[card.o],text:`Designated hitter <b>${esc(card.name)}</b>: ${LABEL[card.o].toLowerCase()}, guaranteed.`,logText:`DH ${card.name}: ${LABEL[card.o]}`});
-  post();
 }
 
 /* ---------- ability plays (Speed, Eagle Eye, Small Ball are used before a roll) ---------- */
@@ -2341,11 +2354,68 @@ function abBunt(t,bat){
 async function runAbility(t,a){
   if(!a||busy||G.over) return;
   busy=true; G.abUsed[t][a.name]=true; abToast(t,a.k,a.name); renderGame();
+  abilityCore(t,a);
+  await sleep(reduce?0:250);
+  post();
+}
+
+function abilityCore(t,a){
   if(a.k==='SPD') abSteal(t,a.name,a.from);
   else if(a.k==='EYE'){ G.dice=[]; const hr=G.hitRun; applyPA(G,'BB',{hitRun:hr,title:'Eagle Eye',cls:'walk',big:'Eagle Eye!',text:`Eagle Eye! <b>${esc(a.name)}</b> lays off everything and takes a walk.`,logText:`Walk (Eagle Eye) · ${a.name}`}); }
   else if(a.k==='BNT') abBunt(t,a.name);
-  await sleep(reduce?0:250);
-  post();
+}
+
+/* ---------- simulated games: both managers make the same calls the computer makes in a live game
+   (action cards, designated hitters, abilities, steals). Every roll is still a fair die. ---------- */
+function smartRun(G2){
+  const keepG=G, keepBusy=busy; G=G2; busy=false;
+  try{ let n=0; while(!G.over && n++<4000) smartStep(); }
+  finally{ G=keepG; busy=keepBusy; }
+  return G2;
+}
+function smartDraw(){
+  if(!cardsOn()||G.over||G.halfPA!==0||!DRAW_INNINGS.includes(G.inning)) return;
+  const key=G.inning+'-'+G.half; if(G.drawn[key]) return; G.drawn[key]=true;
+  const c=G.deck.shift(); if(c) G.hands[G.half].push(c);
+}
+function smartStep(){
+  smartDraw();
+  const t=G.half, f=1-t, m=G.mode, roll=()=>rollFace(m);
+  if(cardsOn()){
+    const d=cpuDefPick(); if(d){ take(f,d); if(d==='PK') pickoffCore(f,roll()); else cardIBB(f); checkDH(); return; }
+    if(!mustInjure()){
+      const a=cpuAbPick(); if(a){ G.abUsed[t][a.name]=true; abilityCore(t,a); checkDH(); return; }
+      const act=cpuPick();
+      if(act==='DH'){ const {card}=dhCore(t); dhSwing(t,card); checkDH(); return; }
+      if(act){ take(t,act);
+        if(act==='SB') stealCore(t,roll()); else if(act==='SQ') squeezeCore(t,roll()); else if(act==='HNR') cardHitRun(t);
+        else if(act==='BU') cardBunt(t); else if(act==='RC') cardRally(t); else if(act==='INJ') cardInjured(t,false);
+        checkDH(); return; }
+    } else { take(t,'INJ'); cardInjured(t,true); checkDH(); return; }
+  }
+  const batter=curBatter(G);
+  if(isInjured(G,t,batter)){ applyPA(G,'OUT',{log:false,title:'Injured',logText:`Injured, automatic out · ${batter}`}); return; }
+  let [o,o2]=rollAB(m), r=resolveFaces(o,o2), eff=r.eff;
+  const info={log:false,hitRun:G.hitRun,tri:r.tri,hrr:r.hrr}; G.hitRun=false;
+  const use=k=>{ if(!abReady(G,t,batter,k)||!cpuAb(t,k,{})) return false; G.abUsed[t][batter]=true; return true; };
+  const again=()=>{ [o,o2]=rollAB(m); r=resolveFaces(o,o2); eff=r.eff; info.tri=r.tri; info.hrr=r.hrr; };
+  if(cardsOn()){
+    if(o==='H?' && use('SLG')){ eff='HR'; info.tri=null; info.hrr=null; }
+    else {
+      if(eff==='K' && use('CON')) again();
+      if(isOut(eff) && (G.bases[1]||G.bases[2]) && use('CLU')) again();
+    }
+  }
+  if(G.rally[t] && (eff==='OUT'||eff==='DP')){ G.rally[t]=false; eff='1B'; info.rally=true; info.tri=null; info.hrr=null; }
+  if(eff==='K' && has(t,'WC')){ take(t,'WC'); eff='BB'; }
+  if(cardsOn() && eff==='DP' && G.bases[0] && G.outs<2 && !info.hitRun && use('HUS')) eff='FC';
+  if(eff==='1B' && o==='1B' && !info.rally && has(f,'DC')){ take(f,'DC'); eff='OUT'; info.caught=true; info.hitRun=false; }
+  const gm=cardsOn()&&gloveMan(f);
+  if(gm && (eff==='1B'||eff==='2B') && !info.rally && cpuAb(f,'GLV',{hit:eff})){ G.abUsed[f][gm]=true; eff='OUT'; info.caught=true; info.hitRun=false; info.tri=null; }
+  if(cardsOn() && eff==='1B' && !info.rally && use('GAP')){ eff='2B'; info.hitRun=false; }
+  if(eff==='HR' && has(f,'RW')){ take(f,'RW'); eff='OUT'; info.hitRun=false; info.hrr=null; }
+  if(eff==='OUT' && !info.caught && G.bases[2] && G.outs<2 && has(t,'SF')){ take(t,'SF'); info.sacFly=true; info.tri=null; }
+  applyPA(G,eff,info); checkDH();
 }
 
 /* ---------- rolling the dice ---------- */
@@ -2532,11 +2602,11 @@ function cpuAbPick(){
   const b=G.bases, inn=G.inning, outs=G.outs, late=inn>=6, close=closeGame(), r=Math.random;
   for(const a of activeAbils(t)){
     if(a.k==='SPD'){
-      if(a.from===2 ? ((outs===2&&(close||late)) || (inn>=8&&close&&r()<.6)) : (outs<2 && (late||r()<(a.from?0.45:0.3)))) return a;
+      return a; // a Speed steal can't fail: always take the base (or the run)
     } else if(a.k==='EYE'){
-      if((b[0]&&b[1]&&b[2]) || ((b[1]||b[2]) && late && r()<.6) || r()<.06) return a;
+      if((b[0]&&b[1]&&b[2]) || (b[0]&&b[1]&&(late||close)) || ((b[1]||b[2]) && late && r()<.7) || r()<.08) return a;
     } else if(a.k==='BNT'){
-      if(((b[1]||b[2]) && outs<2 && (late||close) && r()<.6) || (!b[0]&&!b[1]&&!b[2]&&r()<.05)) return a;
+      if((b[2] && outs<2) || ((b[1]||b[0]) && outs<2 && (late||close) && r()<.7) || (!b[0]&&!b[1]&&!b[2]&&late&&close&&r()<.3) || r()<.05) return a;
     }
   }
   return null;
@@ -2576,7 +2646,7 @@ let flashTimer=null;
 function flashCard(t,id){
   const el=$('aflash'); if(!el || !ACARD[id]) return;
   const side=t?' r':'';
-  el.innerHTML=`<img src="${ACARD[id]}" alt=""><span class="who"><i style="background:${G.teams[t].color}"></i>${cpu(t)?'Computer':esc(G.teams[t].abbr)}</span>`;
+  el.innerHTML=`<img src="${ACARD[id]}" alt=""><span class="who">${teamMark(G.teams[t])}${cpu(t)?'Computer':esc(G.teams[t].abbr)}</span>`;
   el.className='aflash'+side; void el.offsetWidth; el.className='aflash show'+side;
   clearTimeout(flashTimer); flashTimer=setTimeout(()=>{ el.className='aflash'+side; }, reduce?900:1950);
   sfx.flip();
@@ -2599,9 +2669,9 @@ function showFinal(){
   const ov=$('ov'); if(!ov.hidden) return;
   const F=finalWords(), best=potg(), n=Math.max(9,G.inning);
   let tb='<thead><tr><th scope="col"><span hidden>Team</span></th>'; for(let i=1;i<=n;i++) tb+=`<th scope="col">${i}</th>`; tb+='<th scope="col" class="tot">R</th><th scope="col">H</th></tr></thead><tbody>';
-  for(let t=0;t<2;t++){ tb+=`<tr><td class="team"><i style="background:${G.teams[t].color};color:${G.teams[t].color}"></i>${esc(G.teams[t].abbr)}</td>`; for(let i=0;i<n;i++) tb+=lsCell(G.line[t][i]); tb+=lsCell(total(G,t),'tot')+lsCell(G.hits[t])+'</tr>'; }
+  for(let t=0;t<2;t++){ tb+=`<tr><td class="team">${teamMark(G.teams[t])}${esc(G.teams[t].abbr)}</td>`; for(let i=0;i<n;i++) tb+=lsCell(G.line[t][i]); tb+=lsCell(total(G,t),'tot')+lsCell(G.hits[t])+'</tr>'; }
   const tops=[0,1].map(t=>Object.entries(G.box).filter(([,b])=>b.team===t&&b.PA&&(b.H||b.BB||b.RBI||b.SB)).sort((x,y)=>pscore(y[1])-pscore(x[1])).slice(0,2)
-    .map(([name,b])=>`<li><i style="background:${G.teams[t].color}"></i><span><b>${esc(name)}</b> ${esc(statLine(b))}</span></li>`).join('')).join('');
+    .map(([name,b])=>`<li>${teamMark(G.teams[t])}<span><b>${esc(name)}</b> ${esc(statLine(b))}</span></li>`).join('')).join('');
   const fr=G.frNote||'';
   ov.innerHTML=`<div class="ovcard final" role="dialog" aria-modal="true" aria-labelledby="fTitle">
 <button class="x" type="button" id="fClose" aria-label="Close">×</button>
@@ -2646,8 +2716,15 @@ const LASTS_JP=['Nakamura','Tanaka','Kimura','Sato','Suzuki','Takahashi','Watana
 const LASTS=['Abbott','Barlow','Calloway','Dempsey','Ellison','Fontaine','Holt','Ingram','Jessup','Kowalski','Lindqvist','Maddox','Pruitt','Quinlan','Rourke','Tolliver','Underwood','Vance','Whitaker','Yates','Booker','Delacroix','Esposito','Fairbanks','Gallo','Hargrove','Keane','Lockhart','Pike','Ramsey','Stroud','Voss','Webb','Brannigan','Corbett','Duval','Flynn','Hagen','McCoy','Sutter','Tate','Wilder'];
 const CPU_COLORS=['#3fbf7f','#f08a2c','#9b6be0','#2cc4c4','#e6c23a','#e85b9a'];
 /* the league's clubs: you're California (RED's roster); Boston has BLUE's roster; the other four are computer clubs */
-const FR_USER={name:'California Kings',abbr:'CAL',nick:'Kings',color:'#9b5de5'};
-const FR_CLUBS=[{name:'Boston Red Hats',abbr:'BOS',nick:'Red Hats',color:'#d9493f'},{name:'Seattle Emeralds',abbr:'SEA',nick:'Emeralds',color:'#2fa865'},{name:'Florida Suns',abbr:'FLA',nick:'Suns',color:'#e8c33a'},{name:'Chicago Knights',abbr:'CHI',nick:'Knights',color:'#17171b'},{name:'Texas Horns',abbr:'TEX',nick:'Horns',color:'#f0802a'}];
+const FR_USER={name:'California Kings',abbr:'CAL',nick:'Kings',color:'#9b5de5',logo:'crown'};
+const FR_CLUBS=[{name:'Boston Red Hats',abbr:'BOS',nick:'Red Hats',color:'#d9493f',logo:'cap'},{name:'Seattle Emeralds',abbr:'SEA',nick:'Emeralds',color:'#2fa865',logo:'needle'},{name:'Florida Suns',abbr:'FLA',nick:'Suns',color:'#e8c33a',logo:'sun'},{name:'Chicago Knights',abbr:'CHI',nick:'Knights',color:'#17171b',logo:'sword'},{name:'Texas Horns',abbr:'TEX',nick:'Horns',color:'#f0802a',logo:'horns'}];
+/* club logos: a crown, a red cap, the Space Needle, a sun, a sword and bull horns */
+const LOGOS={crown:`<circle cx="32" cy="32" r="30" fill="#f4eefe" stroke="#9b5de5" stroke-width="3"/><path d="M13 44 L16 21 L25.5 31 L32 14 L38.5 31 L48 21 L51 44 Z" fill="#9b5de5" stroke="#4b2386" stroke-width="2" stroke-linejoin="round"/><rect x="12" y="43" width="40" height="7" rx="2" fill="#7a3fd0" stroke="#4b2386" stroke-width="2"/><g fill="#ffd23f" stroke="#4b2386" stroke-width="1.2"><circle cx="16" cy="21" r="3"/><circle cx="32" cy="14" r="3"/><circle cx="48" cy="21" r="3"/></g><g fill="#fff" opacity=".9"><circle cx="24" cy="46.5" r="1.6"/><circle cx="32" cy="46.5" r="1.6"/><circle cx="40" cy="46.5" r="1.6"/></g>`,cap:`<circle cx="32" cy="32" r="30" fill="#fdf1ef" stroke="#d9493f" stroke-width="3"/><path d="M10 42 C9.5 25 19.5 14 31 14 C43 14 51 23.5 51 37 L51 42 Z" fill="#d9493f" stroke="#7d1d17" stroke-width="2" stroke-linejoin="round"/><path d="M31.5 14.5 Q34 28 34.5 42" stroke="#7d1d17" stroke-width="1.2" fill="none" opacity=".55"/><circle cx="31" cy="14" r="2.4" fill="#b8352c" stroke="#7d1d17" stroke-width="1"/><path d="M30 41 L58 39.5 Q61.5 45.5 54.5 48 L30 47.5 Z" fill="#b8352c" stroke="#7d1d17" stroke-width="2" stroke-linejoin="round"/><text x="21.5" y="37" font-family="Georgia,'Times New Roman',serif" font-weight="700" font-size="18" fill="#fff" text-anchor="middle">B</text>`,needle:`<circle cx="32" cy="32" r="30" fill="#e8f7ee" stroke="#2fa865" stroke-width="3"/><path d="M7.2 46 Q14.5 42 22 46 T37 46 T56.8 46 A28.5 28.5 0 0 1 7.2 46 Z" fill="#3a8fc7"/><path d="M11 51.5 Q17 48.5 23 51.5 T35 51.5 T53 51.5" stroke="#e8f7ee" stroke-width="1.6" fill="none" opacity=".75"/><path d="M32 5 V15" stroke="#1d6b42" stroke-width="2" stroke-linecap="round"/><path d="M28.5 15 H35.5 L34.5 18 H29.5 Z" fill="#1d6b42"/><ellipse cx="32" cy="20.5" rx="15" ry="3.6" fill="#2fa865" stroke="#1d6b42" stroke-width="1.5"/><path d="M19 21 L25.5 25.5 H38.5 L45 21 Z" fill="#1d6b42"/><path d="M28.5 25.5 L30.6 37 L26.5 47 H29.5 L32 40 L34.5 47 H37.5 L33.4 37 L35.5 25.5 Z" fill="#2fa865" stroke="#1d6b42" stroke-width="1.2" stroke-linejoin="round"/><path d="M29.4 33 H34.6" stroke="#1d6b42" stroke-width="1.4"/>`,sun:`<circle cx="32" cy="32" r="30" fill="#103a6b" stroke="#e8c33a" stroke-width="3"/><path d="M32.0 7.5L30.1 18.1L33.9 18.1ZM44.2 10.8L37.2 19.0L40.6 21.0ZM53.2 19.7L43.0 23.4L45.0 26.8ZM56.5 32.0L45.9 30.1L45.9 33.9ZM53.2 44.2L45.0 37.2L43.0 40.6ZM44.2 53.2L40.6 43.0L37.2 45.0ZM32.0 56.5L33.9 45.9L30.1 45.9ZM19.7 53.2L26.8 45.0L23.4 43.0ZM10.8 44.3L21.0 40.6L19.0 37.2ZM7.5 32.0L18.1 33.9L18.1 30.1ZM10.8 19.7L19.0 26.8L21.0 23.4ZM19.7 10.8L23.4 21.0L26.8 19.0Z" fill="#ffd23f"/><circle cx="32" cy="32" r="11.5" fill="#ffd23f" stroke="#f08a1c" stroke-width="2"/><circle cx="28.5" cy="28.5" r="3.5" fill="#fff3b0" opacity=".7"/>`,sword:`<circle cx="32" cy="32" r="30" fill="#17171b" stroke="#c9ced6" stroke-width="3"/><path d="M32 6 L36 13 V40 H28 V13 Z" fill="#dfe3e9" stroke="#8a919c" stroke-width="1.2" stroke-linejoin="round"/><path d="M32 12 V39" stroke="#8a919c" stroke-width="1.4"/><rect x="18.5" y="39.5" width="27" height="5" rx="2.5" fill="#c9ced6" stroke="#8a919c" stroke-width="1"/><rect x="29.5" y="44.5" width="5" height="9" rx="1.5" fill="#3a3a42" stroke="#c9ced6" stroke-width="1"/><circle cx="32" cy="56" r="3.2" fill="#c9ced6" stroke="#8a919c" stroke-width="1"/>`,horns:`<circle cx="32" cy="32" r="30" fill="#f0802a" stroke="#fff" stroke-width="3"/><path d="M24.5 25 C15 26 8.5 19 10 8.5 C13.5 15 18 18.5 25.5 19.5 Z" fill="#fff"/><path d="M39.5 25 C49 26 55.5 19 54 8.5 C50.5 15 46 18.5 38.5 19.5 Z" fill="#fff"/><path d="M21 22.5 Q17 23 15.5 26.5 Q19 27.5 22.5 26 Z M43 22.5 Q47 23 48.5 26.5 Q45 27.5 41.5 26 Z" fill="#fff"/><path d="M22 21 Q32 16.5 42 21 L40.5 31 Q39.5 38 37.5 44 Q35 51 32 51 Q29 51 26.5 44 Q24.5 38 23.5 31 Z" fill="#fff"/><ellipse cx="32" cy="45" rx="6.5" ry="5" fill="#ffd9bd"/><g fill="#f0802a"><circle cx="29.3" cy="45.5" r="1.4"/><circle cx="34.7" cy="45.5" r="1.4"/><ellipse cx="27.2" cy="30" rx="1.8" ry="2.2"/><ellipse cx="36.8" cy="30" rx="1.8" ry="2.2"/></g>`};
+const LOGO_OF={'California Kings':'crown','Boston Red Hats':'cap','Seattle Emeralds':'needle','Florida Suns':'sun','Chicago Knights':'sword','Texas Horns':'horns'};
+const logoKey=T=>T?(LOGOS[T.logo]?T.logo:LOGO_OF[T.name]||null):null;
+/* a team's mark: its logo, or a color dot for a team without one */
+const teamMark=(T,cls='')=>{ const k=logoKey(T); return k?`<svg class="tlogo ${cls}" viewBox="0 0 64 64" role="img" aria-label="${esc(T.name)}"><use href="#lg-${k}"/></svg>`:`<i style="background:${T&&T.color}"></i>`; };
+document.body.insertAdjacentHTML('afterbegin',`<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>${Object.entries(LOGOS).map(([k,v])=>`<symbol id="lg-${k}" viewBox="0 0 64 64">${v}</symbol>`).join('')}</defs></svg>`);
 /* team color as text: a very dark club color (Chicago's black) reads as silver on the dark screen */
 const ink=c=>{ const n=parseInt(String(c).slice(1,7),16); if(isNaN(n)) return c; const r=n>>16&255, g=n>>8&255, b=n&255; return .2126*r+.7152*g+.0722*b<60?'#d3d7de':c; };
 /* a club's nickname: stored for the league's clubs, otherwise the last word of the name */
@@ -2694,7 +2771,7 @@ const pct=(w,l)=>w+l?f3(w/(w+l)):'.000';
 const blank=team=>Object.assign({team},Object.fromEntries(STATK.map(k=>[k,0])));
 const me=()=>F.teams[F.userId], frNow=()=>F;
 const tname=id=>F.teams[id]?F.teams[id].name:id;
-const tdot=id=>`<span class="dot" style="background:${F.teams[id].color}"></span>`;
+const tdot=id=>{ const T=F.teams[id]; return logoKey(T)?teamMark(T):`<span class="dot" style="background:${T.color}"></span>`; };
 
 function abbrOf(s,taken){ const w=s.toUpperCase().replace(/[^A-Z ]/g,'').trim(); const cands=[w.replace(/ /g,'').slice(0,3), (w.split(' ')[0][0]||'')+(w.split(' ')[1]||w.slice(1)).slice(0,2), w.replace(/[AEIOU ]/g,'').slice(0,3)]; for(const c of cands) if(c.length>=2 && !taken.has(c)) return c; let i=2; while(taken.has(cands[0]+i)) i++; return cands[0].slice(0,2)+i; }
 /* nine players: the first is the team's one woman (or the kept player), hisp of them Hispanic and jp of them Japanese */
@@ -2716,7 +2793,7 @@ function frCreate(name,abbr){
   const teams={}, C=FR_CLUBS.map(c=>Object.assign({},c));
   if(abbr) for(const c of C) if(c.abbr===abbr) c.abbr=abbrOf(c.name.split(' ')[0],new Set([abbr,...C.map(x=>x.abbr)]));
   const QR=namedTeam('red'), QB=namedTeam('blue'); // start from any custom names used in quick games
-  teams.red={id:'red',name,abbr,color:FR_USER.color,lineup:QR.lineup.slice(),roster:QR.roster}; if(name===FR_USER.name) teams.red.nick=FR_USER.nick;
+  teams.red={id:'red',name,abbr,color:FR_USER.color,lineup:QR.lineup.slice(),roster:QR.roster}; if(name===FR_USER.name) Object.assign(teams.red,{nick:FR_USER.nick,logo:FR_USER.logo});
   teams.blue=Object.assign({id:'blue'},C[0],{lineup:QB.lineup.slice(),roster:QB.roster});
   const fixedH=[...RED_LINEUP,...BLUE_LINEUP].filter(n=>ROSTER[n].hi).length, left=Math.max(0,LEAGUE_HISPANIC-fixedH), hs=shuffle([0,1,2,3].map(i=>Math.floor(left/4)+(i<left%4?1:0)));
   const allyAt=1+Math.floor(Math.random()*4), jpAt=shuffle([1,2,3,4].filter(i=>i!==allyAt)).slice(0,LEAGUE_JAPANESE); used.add(ALLY.name);
@@ -2762,7 +2839,7 @@ function addBox(store,G2){
   for(const [name,b] of Object.entries(G2.box)){ const tid=ids[b.team]; if(!F.teams[tid].roster[name]) continue; const s=store[name]||(store[name]=blank(tid)); for(const k of STATK) if(k!=='G') s[k]+=b[k]||0; }
   G2.teams.forEach((T,i)=>T.lineup.forEach(n=>{ (store[n]||(store[n]=blank(ids[i]))).G++; }));
 }
-function simGame(a,h){ return playWhole('sim',[gameTeam(F.teams[a]),gameTeam(F.teams[h])]); }
+function simGame(a,h){ return smartRun(newState('sim',[gameTeam(F.teams[a]),gameTeam(F.teams[h])],[true,true])); }
 function frStandings(){
   const rows=F.ids.map(id=>Object.assign({id},F.rec[id])).sort((x,y)=>(y.w-y.l)-(x.w-x.l) || ((y.rs-y.ra)-(x.rs-x.ra)) || (y.w-x.w) || (x.id<y.id?-1:1));
   const top=rows[0]; rows.forEach(r=>r.gb=((top.w-r.w)+(r.l-top.l))/2); return rows;
@@ -2949,15 +3026,15 @@ function frInduct(gone){
 function frClubOrder(){ return ['blue',...F.ids.filter(id=>id!==F.userId&&id!=='blue')].filter(id=>id!==F.userId&&F.teams[id]); }
 function frIsStd(){ const M=me(); return (M.name!==FR_USER.name||M.color===FR_USER.color)&&frClubOrder().every((id,i)=>FR_CLUBS[i]&&F.teams[id].name===FR_CLUBS[i].name&&F.teams[id].color===FR_CLUBS[i].color); }
 function frStdClubs(){
-  const pm={}, mine=me().abbr; if(me().name===FR_USER.name) Object.assign(me(),{color:FR_USER.color,nick:FR_USER.nick});
+  const pm={}, mine=me().abbr; if(me().name===FR_USER.name) Object.assign(me(),{color:FR_USER.color,nick:FR_USER.nick,logo:FR_USER.logo});
   frClubOrder().forEach((id,i)=>{ const T=F.teams[id], c=FR_CLUBS[i]; if(!c) return; let ab=c.abbr; if(ab===mine) ab=abbrOf(c.name.split(' ')[0],new Set([mine,...FR_CLUBS.map(x=>x.abbr)]));
-    if(T.name!==c.name) pm[T.name]=c.name; Object.assign(T,{name:c.name,abbr:ab,nick:c.nick,color:c.color}); });
+    if(T.name!==c.name) pm[T.name]=c.name; Object.assign(T,{name:c.name,abbr:ab,nick:c.nick,color:c.color,logo:c.logo}); });
   const sub=v=>pm[v]||v, txt=v=>{ let t=String(v); for(const [o,n] of Object.entries(pm)) t=t.split(o).join(n); return t; };
   for(const h of F.history||[]){ h.champName=sub(h.champName); h.runnerName=sub(h.runnerName); (h.standings||[]).forEach(r=>r.name=sub(r.name)); }
   for(const R of Object.values(F.records||{})){ if(R.team) R.team=sub(R.team); if(R.name) R.name=sub(R.name); }
   for(const x of [...(F.hof||[]),...(F.retired||[])]) x.team=sub(x.team);
   if(F.news) for(const it of new Set([...F.news,...((F.nx&&F.nx.arch)||[])])){ it.h=txt(it.h); it.b=txt(it.b); }
-  const live=[F.live&&F.live.G, frMode&&G].filter(Boolean); for(const g of live) for(const t of g.teams){ const T=F.teams[t.id]; if(T){ t.name=T.name; t.abbr=T.abbr; t.color=T.color; } }
+  const live=[F.live&&F.live.G, frMode&&G].filter(Boolean); for(const g of live) for(const t of g.teams){ const T=F.teams[t.id]; if(T){ t.name=T.name; t.abbr=T.abbr; t.color=T.color; t.logo=logoKey(T); } }
   prepCards(F.ids.map(id=>F.teams[id])); frSave(); hubMsg='The league now plays with its standard clubs.'; renderHub(); renderFbar(); if(frMode&&G) renderGame();
 }
 /* rename this year's rookies */
@@ -3047,7 +3124,7 @@ function hubBody(){
 function matchupHTML(nx){
   const M=me(), O=F.teams[nx.opp], rec=id=>`${F.rec[id].w}–${F.rec[id].l}`;
   const A=nx.home?O:M, H=nx.home?M:O;
-  return `<div class="matchup"><div class="tm"><b style="color:${ink(A.color)}">${esc(A.name)}</b><span>${rec(A.id)}</span></div><span class="vs">at</span><div class="tm"><b style="color:${ink(H.color)}">${esc(H.name)}</b><span>${rec(H.id)}</span></div></div><p class="legend" style="text-align:center">${nx.home?'Home game · you bat last':'Road game · you bat first'}</p>`;
+  return `<div class="matchup"><div class="tm">${teamMark(A,'big')}<b style="color:${ink(A.color)}">${esc(A.name)}</b><span>${rec(A.id)}</span></div><span class="vs">at</span><div class="tm">${teamMark(H,'big')}<b style="color:${ink(H.color)}">${esc(H.name)}</b><span>${rec(H.id)}</span></div></div><p class="legend" style="text-align:center">${nx.home?'Home game · you bat last':'Road game · you bat first'}</p>`;
 }
 function homeHTML(){
   const M=me(), r=F.rec[M.id], nx=frNext();
@@ -3056,7 +3133,7 @@ function homeHTML(){
     const L=F.live.G; main=`<div class="hcard nextg"><h4>Game in progress · ${esc(F.live.FR.label)}</h4><p><b>${esc(L.teams[0].name)} ${total(L,0)}</b>, <b>${esc(L.teams[1].name)} ${total(L,1)}</b> · ${L.over?'Final':(L.half?'Bottom ':'Top ')+ordinal(L.inning)}</p><div class="hbtns"><button class="btn primary" type="button" data-act="resume">Resume game</button></div></div>`;
   } else if(F.phase==='reg'){
     main=`<div class="hcard nextg"><h4>Next up · Game ${F.day+1} of ${F.sched.length}</h4>${matchupHTML(nx)}<p>Pick home or away and set your batting order on the next screen.</p>
-<div class="hbtns"><button class="btn primary" type="button" data-act="play">Play game</button><button class="btn" type="button" data-act="sim" title="Rolls your game out instantly with no cards or abilities">Sim game</button><button class="btn" type="button" data-act="simreg">Sim to playoffs</button></div></div>`;
+<div class="hbtns"><button class="btn primary" type="button" data-act="play">Play game</button><button class="btn" type="button" data-act="sim" title="Plays your game out instantly. The computer manages both teams: cards, designated hitters, abilities and steals.">Sim game</button><button class="btn" type="button" data-act="simreg">Sim to playoffs</button></div></div>`;
   } else if(F.phase==='post'){
     main=`<div class="hcard nextg"><h4>Playoffs</h4>${nx?`<p><b>${esc(nx.label)}</b> · ${esc(seriesText(nx.series))}</p>${matchupHTML(nx)}<div class="hbtns"><button class="btn primary" type="button" data-act="play">Play game</button><button class="btn" type="button" data-act="sim">Sim game</button></div>`
       :`<p>${F.po.seeds.slice(0,4).includes(M.id)?'Your season is over. ':'You missed the playoffs this year. '}Watch the rest play out.</p><div class="hbtns"><button class="btn primary" type="button" data-act="sim">Sim next game</button><button class="btn" type="button" data-act="simpo">Sim rest of playoffs</button></div>`}</div>${bracketHTML()}`;
@@ -3710,7 +3787,7 @@ function autoOrder(T){
 function openPregame(o){
   const ov=$('ov'), st={lu:o.cols.map(c=>c.T.lineup.slice()), sel:null, home:!!o.home};
   const colHTML=(c,ci)=>{ const T=c.T;
-    return `<div class="lcol"><h4><i style="background:${T.color}"></i>${esc(T.name)}${c.note?` <span style="color:var(--muted);font-weight:600;letter-spacing:.04em;text-transform:none">· ${esc(c.note)}</span>`:''}<span class="mini">${c.editable?`<button class="btn small" type="button" data-auto="${ci}" title="Table setters up top, power in the middle">Auto</button><button class="btn small" type="button" data-reset="${ci}">Reset</button>`:''}</span></h4>
+    return `<div class="lcol"><h4>${teamMark(T)}${esc(T.name)}${c.note?` <span style="color:var(--muted);font-weight:600;letter-spacing:.04em;text-transform:none">· ${esc(c.note)}</span>`:''}<span class="mini">${c.editable?`<button class="btn small" type="button" data-auto="${ci}" title="Table setters up top, power in the middle">Auto</button><button class="btn small" type="button" data-reset="${ci}">Reset</button>`:''}</span></h4>
 <ol class="ledit">${st.lu[ci].map((n,i)=>{ const k=T.roster[n].ab, sel=st.sel&&st.sel[0]===ci&&st.sel[1]===i;
   return `<li class="${sel?'sel':''}${c.editable?'':' ro'}" data-c="${ci}" data-i="${i}"><span class="n">${i+1}</span><img src="${cardSrc(n,T)}" alt=""><span class="nm"><b>${esc(n)}</b><span class="meta">${abChip(k)}<small>${esc(c.stat?c.stat(n):ABIL[k].short)}</small></span></span>${c.editable?`<span class="mv"><button type="button" data-mv="-1" aria-label="Move ${esc(n)} up"${i===0?' disabled':''}>▲</button><button type="button" data-mv="1" aria-label="Move ${esc(n)} down"${i===8?' disabled':''}>▼</button></span>`:''}</li>`; }).join('')}</ol></div>`; };
   const draw=()=>{
@@ -3787,7 +3864,7 @@ $('abar').addEventListener('click',e=>{ const b=e.target.closest('[data-ab]'); i
 $('detail').addEventListener('click',e=>{ if(e.target.id==='setLU'){ if(frMode) frPregame(); else newGame(); } });
 $('finish').addEventListener('click',()=>{
   if(busy||G.over) return;
-  let g=0; while(!G.over && g++<4000){ const [o,o2]=rollAB(G.mode); atBat(G,o,true,o2); }
+  if(cardsOn()) smartRun(G); else { let g=0; while(!G.over && g++<4000){ const [o,o2]=rollAB(G.mode); atBat(G,o,true,o2); } }
   G.dice=[]; G.pinch=null; checkDH(); G.big=G.walkoff?'Walk-off!':'Final'; renderGame(); celebrate();
   if(!G.shownFinal){ G.shownFinal=true; sfx.organ(); gameOver(); setTimeout(showFinal, reduce?200:1500); }
 });
