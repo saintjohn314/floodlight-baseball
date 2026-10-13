@@ -183,6 +183,7 @@ button,select,input{font:inherit;color:inherit}
 @media (prefers-reduced-motion:reduce){.tv,.tvseg.in>*,.tvbg::after,.tvrun>div,.tvlive::before{animation:none!important}}
 @media (max-width:620px){.tvsub{margin-left:0;width:100%}.tvtbl td,.tvtbl th{padding:6px 5px}.tvtag{padding:0 8px;font-size:11px}.tvlower p{max-height:6.6em;font-size:13px}}
 .annpop .eng{display:flex;flex-direction:column;gap:6px}.annpop .opt{flex-direction:row;align-items:flex-start;gap:8px;text-transform:none;letter-spacing:0;font-size:13px;color:var(--cream);cursor:pointer}.annpop .opt input{margin-top:3px}
+.prerow .venue{font-weight:600;color:var(--cream)}
 .svbig{display:inline-block;font-family:var(--f-led,monospace);font-size:30px;letter-spacing:.18em;color:#ffd77e;padding:4px 10px;margin:4px 0;border:1px solid rgba(255,200,97,.45);border-radius:8px;background:rgba(0,0,0,.3);user-select:all}
 .annpop{position:fixed;z-index:9400;width:min(320px,calc(100vw - 32px));padding:14px;border-radius:14px;border:1px solid var(--line);background:#0d1628;box-shadow:0 18px 50px rgba(0,0,0,.55);display:flex;flex-direction:column;gap:10px;color:var(--cream);font-size:14px}
 .annpop label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
@@ -198,7 +199,7 @@ button,select,input{font:inherit;color:inherit}
 .cutin{position:relative;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;padding:24px 16px;max-width:920px}
 .cutsc .k{font-family:var(--f-head);font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--flood);font-size:clamp(12px,1.8vw,16px);animation:cutUp .6s .15s both}
 .cutsc .logo{font-family:var(--f-logo);font-size:clamp(26px,5vw,48px);color:var(--cream);text-shadow:3px 3px 0 #9e2f28,0 0 24px rgba(255,200,97,.4);animation:cutUp .6s both}
-.cutsc .vs{display:flex;align-items:center;justify-content:center;gap:clamp(10px,4vw,48px);flex-wrap:wrap}
+.cutsc .vs{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(4px,1.2vh,12px)}
 .cutsc .tm{display:flex;flex-direction:column;align-items:center;gap:4px;animation:cutL .7s .35s both}
 .cutsc .tm.h{animation-name:cutR}
 .cutsc .tm b{font-family:var(--f-head);font-weight:700;font-size:clamp(30px,6.5vw,68px);line-height:1;letter-spacing:.02em;text-shadow:0 0 30px rgba(0,0,0,.6)}
@@ -267,7 +268,7 @@ button,select,input{font:inherit;color:inherit}
 .board td{font-family:var(--f-led);font-size:17px;font-weight:400;color:#ffd77e;text-shadow:0 0 4px rgba(255,190,80,.55)}
 .board td:not(.team){background:radial-gradient(circle,rgba(0,0,0,.28) 0 60%,transparent 62%) center/22px 22px no-repeat}
 .board td.team{font-family:var(--f-head);font-weight:700;text-align:left;font-size:16px;letter-spacing:.08em;white-space:nowrap;padding-right:8px;color:#f4ecd8;text-shadow:none;background:none}
-.board td.team i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:2px}
+.board td.team i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:2px;outline:1px solid rgba(255,255,255,.25);outline-offset:0}
 .board .tot{border-left:1px solid rgba(201,185,143,.45)}
 .board td.tot{color:#fff3d6;text-shadow:0 0 5px rgba(255,220,150,.6)}
 .board td.now{color:#fff1c4;text-shadow:0 0 6px rgba(255,200,97,.9);background:radial-gradient(circle,rgba(255,200,97,.16) 0 60%,transparent 62%) center/22px 22px no-repeat}
@@ -557,7 +558,7 @@ button,select,input{font:inherit;color:inherit}
 .tbl tr.me td{background:rgba(255,200,97,.08)}
 .tbl tr.me td.l b{color:var(--flood)}
 .tbl tr.cut td{border-bottom:2px dashed rgba(255,200,97,.55)}
-.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:0;flex:none}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:0;flex:none;box-shadow:0 0 0 1px rgba(255,255,255,.28)}
 .tbl td .seed{font-family:var(--f-num);font-size:11px;color:var(--flood);margin-left:6px}
 .tbl th[data-sort]{cursor:pointer}
 .tbl th[data-sort]:hover,.tbl th.on{color:var(--flood)}
@@ -1997,7 +1998,7 @@ function cutscene(){
   const st=story.slice(0,3);
   const el=document.createElement('div'); el.className='cutsc'; el.setAttribute('role','dialog'); el.setAttribute('aria-label','Pregame');
   el.innerHTML=`<span class="beam l"></span><span class="beam r"></span><div class="cutin"><span class="logo">Floodlight Baseball</span><span class="k">${esc(kicker)}</span>
-<div class="vs"><div class="tm"><b style="color:${A.color}">${esc(A.name)}</b><span>${esc(recA)}</span></div><span class="at">at</span><div class="tm h"><b style="color:${H.color}">${esc(H.name)}</b><span>${esc(recH)}</span></div></div>
+<div class="vs"><div class="tm"><b style="color:${ink(A.color)}">${esc(A.name)}</b><span>${esc(recA)}</span></div><span class="at">at</span><div class="tm h"><b style="color:${ink(H.color)}">${esc(H.name)}</b><span>${esc(recH)}</span></div></div>
 ${st.length?`<p class="story">${st.map(esc).join('<br>')}</p>`:''}<span class="skip">Tap to play ball</span></div>`;
   document.body.appendChild(el); sfx.organ();
   let gone=false, min=false, said=false; const done=()=>{ if(gone) return; gone=true; el.classList.add('out'); setTimeout(()=>el.remove(),reduce?0:400); };
@@ -2458,7 +2459,7 @@ function renderGame(){
   $('finish').disabled=G.over||busy;
   const items=G.log.slice(-80).reverse();
   $('log').innerHTML = items.length ? items.map(e=> e.sys ? `<li><span class="inn"></span><span class="sys">${esc(e.sys)}</span></li>`
-    : `<li><span class="inn" style="color:${G.teams[e.team].color}">${e.tag}</span><span>${esc(e.text)}${e.runs?` <span class="runs">+${e.runs}</span>`:''}${e.out!=null?` <span class="inn">${e.out} out</span>`:''}</span></li>`).join('')
+    : `<li><span class="inn" style="color:${ink(G.teams[e.team].color)}">${e.tag}</span><span>${esc(e.text)}${e.runs?` <span class="runs">+${e.runs}</span>`:''}${e.out!=null?` <span class="inn">${e.out} out</span>`:''}</span></li>`).join('')
     : '<li class="empty">No at-bats yet. Every roll shows up here.</li>';
 }
 function renderFaces(){
@@ -2619,13 +2620,20 @@ const FIRST_JP=['Kenji','Hiro','Takeshi','Daisuke','Shohei','Kazuo','Yuki','Ryo'
 const LASTS_JP=['Nakamura','Tanaka','Kimura','Sato','Suzuki','Takahashi','Watanabe','Yamamoto','Kobayashi','Matsui'];
 const LASTS=['Abbott','Barlow','Calloway','Dempsey','Ellison','Fontaine','Holt','Ingram','Jessup','Kowalski','Lindqvist','Maddox','Pruitt','Quinlan','Rourke','Tolliver','Underwood','Vance','Whitaker','Yates','Booker','Delacroix','Esposito','Fairbanks','Gallo','Hargrove','Keane','Lockhart','Pike','Ramsey','Stroud','Voss','Webb','Brannigan','Corbett','Duval','Flynn','Hagen','McCoy','Sutter','Tate','Wilder'];
 const CPU_COLORS=['#3fbf7f','#f08a2c','#9b6be0','#2cc4c4','#e6c23a','#e85b9a'];
+/* the league's clubs: you're California (RED's roster); Boston has BLUE's roster; the other four are computer clubs */
+const FR_USER={name:'California Kings',abbr:'CAL',nick:'Kings',color:'#9b5de5'};
+const FR_CLUBS=[{name:'Boston Red Hats',abbr:'BOS',nick:'Red Hats',color:'#d9493f'},{name:'Seattle Emeralds',abbr:'SEA',nick:'Emeralds',color:'#2fa865'},{name:'Florida Suns',abbr:'FLA',nick:'Suns',color:'#e8c33a'},{name:'Chicago Knights',abbr:'CHI',nick:'Knights',color:'#17171b'},{name:'Texas Horns',abbr:'TEX',nick:'Horns',color:'#f0802a'}];
+/* team color as text: a very dark club color (Chicago's black) reads as silver on the dark screen */
+const ink=c=>{ const n=parseInt(String(c).slice(1,7),16); if(isNaN(n)) return c; const r=n>>16&255, g=n>>8&255, b=n&255; return .2126*r+.7152*g+.0722*b<60?'#d3d7de':c; };
+/* a club's nickname: stored for the league's clubs, otherwise the last word of the name */
+const nickOf=T=>T&&T.nick&&T.name.endsWith(T.nick)?T.nick:lastWord(T?T.name:'');
 const STATK=['G','PA','AB','R','H','2B','3B','HR','RBI','BB','K','SB'];
 let F=null, frMode=false, hubTab='home', hubMsg='', statScope='season', statTeam='mine', statSort='OPS';
 /* three franchise slots: slot 1 keeps the original storage key so older saves still load */
 const FR_SLOTS=3, frKey=i=>i===1?FKEY:FKEY+'-'+i;
 let frSlot=1; try{ const v=+localStorage.getItem('fdl-fr-slot'); if(v>=1&&v<=FR_SLOTS) frSlot=v; }catch(e){}
 function frPeek(i){ try{ const o=JSON.parse(localStorage.getItem(frKey(i))||'null'); return o&&o.v===1&&o.teams?o:null; }catch(e){ return null; } }
-function frLoad(){ F=frPeek(frSlot); if(F) nwInit(); }
+function frLoad(){ F=frPeek(frSlot); if(F){ nwInit(); if(F.phase==='reg'&&F.day===0&&!F.live&&F.schedV!==2){ F.sched=makeSchedule(F.ids); F.schedV=2; frSave(); } } }
 function frSave(){ if(!F) return; try{ localStorage.setItem(frKey(frSlot),JSON.stringify(F)); }catch(e){ hubMsg='Could not save to this browser (storage is full or blocked).'; } }
 function frSwitch(i){
   if(i===frSlot||busy) return;
@@ -2679,29 +2687,48 @@ function genPlayers(used,hisp,jp,keep){
   return shuffle(ps);
 }
 function frCreate(name,abbr){
-  const used=new Set([...RED_LINEUP,...BLUE_LINEUP,...namedTeam('red').lineup,...namedTeam('blue').lineup,...DHS.map(d=>d.name)]), cities=shuffle(CITIES), nicks=shuffle(NICKS), cols=shuffle(CPU_COLORS);
-  const taken=new Set([abbr]), teams={};
+  const used=new Set([...RED_LINEUP,...BLUE_LINEUP,...namedTeam('red').lineup,...namedTeam('blue').lineup,...DHS.map(d=>d.name)]);
+  const teams={}, C=FR_CLUBS.map(c=>Object.assign({},c));
+  if(abbr) for(const c of C) if(c.abbr===abbr) c.abbr=abbrOf(c.name.split(' ')[0],new Set([abbr,...C.map(x=>x.abbr)]));
   const QR=namedTeam('red'), QB=namedTeam('blue'); // start from any custom names used in quick games
-  teams.red={id:'red',name,abbr,color:'#d9493f',lineup:QR.lineup.slice(),roster:QR.roster};
-  const ab0=abbrOf(cities[0],taken); taken.add(ab0);
-  teams.blue={id:'blue',name:`${cities[0]} ${nicks[0]}`,abbr:ab0,color:'#5b8fe8',lineup:QB.lineup.slice(),roster:QB.roster};
+  teams.red={id:'red',name,abbr,color:FR_USER.color,lineup:QR.lineup.slice(),roster:QR.roster}; if(name===FR_USER.name) teams.red.nick=FR_USER.nick;
+  teams.blue=Object.assign({id:'blue'},C[0],{lineup:QB.lineup.slice(),roster:QB.roster});
   const fixedH=[...RED_LINEUP,...BLUE_LINEUP].filter(n=>ROSTER[n].hi).length, left=Math.max(0,LEAGUE_HISPANIC-fixedH), hs=shuffle([0,1,2,3].map(i=>Math.floor(left/4)+(i<left%4?1:0)));
   const allyAt=1+Math.floor(Math.random()*4), jpAt=shuffle([1,2,3,4].filter(i=>i!==allyAt)).slice(0,LEAGUE_JAPANESE); used.add(ALLY.name);
-  for(let i=1;i<=4;i++){ const ps=genPlayers(used,hs[i-1],jpAt.filter(x=>x===i).length,i===allyAt?ALLY:null), ab=abbrOf(cities[i],taken); taken.add(ab);
-    teams['t'+i]={id:'t'+i,name:`${cities[i]} ${nicks[i]}`,abbr:ab,color:cols[i-1],lineup:ps.map(p=>p.name),roster:Object.fromEntries(ps.map(p=>[p.name,Object.assign({ab:p.ab,n:p.n,f:p.f},p.hi?{hi:1}:{},p.jp?{jp:1}:{})]))}; }
+  for(let i=1;i<=4;i++){ const ps=genPlayers(used,hs[i-1],jpAt.filter(x=>x===i).length,i===allyAt?ALLY:null);
+    teams['t'+i]=Object.assign({id:'t'+i},C[i],{lineup:ps.map(p=>p.name),roster:Object.fromEntries(ps.map(p=>[p.name,Object.assign({ab:p.ab,n:p.n,f:p.f},p.hi?{hi:1}:{},p.jp?{jp:1}:{})]))}); }
   F={v:1,created:Date.now(),season:1,userId:'red',teams,ids:Object.keys(teams),history:[],records:{},career:{},live:null,retired:[]};
   F.bio={}; for(const id of F.ids) for(const n of teams[id].lineup) F.bio[n]=Object.assign(nwBioNew(n),{a:ROOKIE_AGE}); // every career starts at 18
   frNewSeason(); frSave();
 }
+/* a season: random, but no team spends more than 5 straight games at home or on the road */
 function makeSchedule(ids){
+  const streak=S=>{ let worst=0; for(const id of ids){ let run=0, last=null; for(const day of S){ const g=day.find(x=>x.includes(id)), h=g[1]===id; run=h===last?run+1:1; last=h; worst=Math.max(worst,run); } } return worst; };
+  let best=null, bw=99; for(let t=0;t<400&&bw>5;t++){ const S=makeScheduleOnce(ids), w=streak(S); if(w<bw){ best=S; bw=w; } }
+  return best;
+}
+function makeScheduleOnce(ids){
   const n=ids.length, base=[]; let arr=ids.slice(1);
   for(let r=0;r<n-1;r++){ const p=[ids[0],...arr], games=[]; for(let i=0;i<n/2;i++) games.push([p[i],p[n-1-i]]); base.push(games); arr=[arr[arr.length-1],...arr.slice(0,-1)]; }
-  const out=[];
-  for(let c=0; out.length<SEASON_GAMES; c++) for(const g of shuffle(base)){ if(out.length>=SEASON_GAMES) break; out.push(g.map(([x,y])=>Math.random()<.5?[x,y]:[y,x])); } // [away, home]
-  return out;
+  const days=[];
+  for(let c=0; days.length<SEASON_GAMES; c++) for(const g of shuffle(base)){ if(days.length>=SEASON_GAMES) break; days.push(shuffle(g.map(p=>p.slice()))); }
+  /* home and away are set here, before the season: every team gets exactly half its games at home.
+     Each pair of teams splits its meetings evenly; the odd meetings left over are pointed along Euler
+     circuits, which hands every team as many of those at home as on the road. */
+  const key=(a,b)=>a<b?a+'|'+b:b+'|'+a, meet={}, homes={}, odd=[];
+  days.forEach((day,d)=>day.forEach((g,i)=>(meet[key(g[0],g[1])]||(meet[key(g[0],g[1])]=[])).push([d,i])));
+  for(const [k,list] of Object.entries(meet)){ const [a,b]=k.split('|'), h=[]; for(let j=0;j<Math.floor(list.length/2);j++) h.push(a,b); homes[k]=h; if(list.length%2) odd.push({k,a,b}); }
+  const adj={}; ids.forEach(id=>adj[id]=[]); odd.forEach((e,j)=>{ adj[e.a].push(j); adj[e.b].push(j); }); ids.forEach(id=>adj[id]=shuffle(adj[id]));
+  const used=new Set();
+  for(const st of shuffle(ids.slice())){ const stack=[st];
+    while(stack.length){ const v=stack[stack.length-1]; while(adj[v].length&&used.has(adj[v][adj[v].length-1])) adj[v].pop();
+      if(!adj[v].length){ stack.pop(); continue; }
+      const j=adj[v].pop(), e=odd[j], w=e.a===v?e.b:e.a; used.add(j); homes[e.k].push(w); stack.push(w); } }
+  for(const [k,list] of Object.entries(meet)){ const h=shuffle(homes[k]); list.forEach(([d,i],j)=>{ const [x,y]=days[d][i]; days[d][i]=h[j]===y?[x,y]:[y,x]; }); }
+  return days; // each game is [away, home]
 }
 function frNewSeason(){
-  Object.assign(F,{phase:'reg',day:0,games:[],stats:{},pstats:{},rec:{},sched:makeSchedule(F.ids),po:null,awards:null,live:null});
+  Object.assign(F,{phase:'reg',day:0,games:[],stats:{},pstats:{},rec:{},sched:makeSchedule(F.ids),schedV:2,po:null,awards:null,live:null});
   for(const id of F.ids) F.rec[id]={w:0,l:0,rs:0,ra:0};
   nwPreseason();
 }
@@ -2804,12 +2831,12 @@ function frPregame(){
   const nx=frNext(); if(!nx) return;
   const M=me(), O=F.teams[nx.opp], rec=id=>`${F.rec[id].w}–${F.rec[id].l}`;
   closeHub();
-  openPregame({kicker:nx.label, title:`${M.name} vs ${O.name}`,
+  openPregame({kicker:nx.label, title:nx.home?`${O.name} at ${M.name}`:`${M.name} at ${O.name}`,
     sub:`<b>${esc(M.name)}</b> ${rec(M.id)} · <b>${esc(O.name)}</b> ${rec(O.id)}${nx.series?` · ${esc(seriesText(nx.series))}`:''}`,
-    homeLabel:`${M.abbr} plays`, home:nx.home,
+    venue:nx.kind==='po'?`${nx.home?'Home':'On the road'} · ${nx.home?'you bat last':'you bat first'} · the higher seed has home field`:`${nx.home?'Home game · you bat last':'Road game · you bat first'} · set on the schedule before the season`,
     cols:[{T:M,editable:true,stat:statLineShort},{T:O,editable:false,stat:statLineShort,note:'Scouting report'}],
     cancel:()=>openHub(),
-    onPlay:({lineups,home})=>{ M.lineup=lineups[0]; frSave(); frStart(nx,home); }});
+    onPlay:({lineups})=>{ M.lineup=lineups[0]; frSave(); frStart(nx,nx.home); }});
 }
 function statLineShort(n){ const s=F&&F.stats[n]; return s&&s.PA?`${f3(avg(s))} · ${s.HR} HR · ${s.RBI} RBI${s.SB?` · ${s.SB} SB`:''}`:'No at-bats yet'; }
 function frStart(nx,home){
@@ -2893,6 +2920,21 @@ function frInduct(gone){
   const cls=cand.sort((a,b)=>b.score-a.score).slice(0,HOF_CLASS); cls.forEach((x,i)=>x.rank=i+1);
   F.hof.push(...cls); return cls;
 }
+/* the five computer clubs as the league's standard clubs (older franchises were made with random ones) */
+function frClubOrder(){ return ['blue',...F.ids.filter(id=>id!==F.userId&&id!=='blue')].filter(id=>id!==F.userId&&F.teams[id]); }
+function frIsStd(){ const M=me(); return (M.name!==FR_USER.name||M.color===FR_USER.color)&&frClubOrder().every((id,i)=>FR_CLUBS[i]&&F.teams[id].name===FR_CLUBS[i].name&&F.teams[id].color===FR_CLUBS[i].color); }
+function frStdClubs(){
+  const pm={}, mine=me().abbr; if(me().name===FR_USER.name) Object.assign(me(),{color:FR_USER.color,nick:FR_USER.nick});
+  frClubOrder().forEach((id,i)=>{ const T=F.teams[id], c=FR_CLUBS[i]; if(!c) return; let ab=c.abbr; if(ab===mine) ab=abbrOf(c.name.split(' ')[0],new Set([mine,...FR_CLUBS.map(x=>x.abbr)]));
+    if(T.name!==c.name) pm[T.name]=c.name; Object.assign(T,{name:c.name,abbr:ab,nick:c.nick,color:c.color}); });
+  const sub=v=>pm[v]||v, txt=v=>{ let t=String(v); for(const [o,n] of Object.entries(pm)) t=t.split(o).join(n); return t; };
+  for(const h of F.history||[]){ h.champName=sub(h.champName); h.runnerName=sub(h.runnerName); (h.standings||[]).forEach(r=>r.name=sub(r.name)); }
+  for(const R of Object.values(F.records||{})){ if(R.team) R.team=sub(R.team); if(R.name) R.name=sub(R.name); }
+  for(const x of [...(F.hof||[]),...(F.retired||[])]) x.team=sub(x.team);
+  if(F.news) for(const it of new Set([...F.news,...((F.nx&&F.nx.arch)||[])])){ it.h=txt(it.h); it.b=txt(it.b); }
+  const live=[F.live&&F.live.G, frMode&&G].filter(Boolean); for(const g of live) for(const t of g.teams){ const T=F.teams[t.id]; if(T){ t.name=T.name; t.abbr=T.abbr; t.color=T.color; } }
+  prepCards(F.ids.map(id=>F.teams[id])); frSave(); hubMsg='The league now plays with its standard clubs.'; renderHub(); renderFbar(); if(frMode&&G) renderGame();
+}
 /* rename this year's rookies */
 function frEditRookies(){
   const rk=new Set((F.rookies||[]).filter(n=>nwInfo(n))); if(!rk.size){ hubMsg='No rookies to name right now.'; renderHub(); return; }
@@ -2958,6 +3000,7 @@ function hubAct(a,el){
   else if(a==='export') openSaves();
   else if(a==='names') frEditNames();
   else if(a==='rookies') frEditRookies();
+  else if(a==='stdclubs'){ if(confirm('Rename the other five teams to the standard clubs? Players, stats and history stay.')) frStdClubs(); }
   else if(a==='hof'){ hubTab='hof'; renderHub(); }
   else if(a==='reset'){ if(confirm(`Delete Franchise ${frSlot} and all its seasons, stats and records? Your other franchises are not touched. This cannot be undone.`)){ try{ localStorage.removeItem(frKey(frSlot)); }catch(e){} F=null; frMode=false; FR=null; setFrUI(); startExhibition(); renderHub(); } }
   else if(a==='exit') frExit();
@@ -2978,7 +3021,8 @@ function hubBody(){
 }
 function matchupHTML(nx){
   const M=me(), O=F.teams[nx.opp], rec=id=>`${F.rec[id].w}–${F.rec[id].l}`;
-  return `<div class="matchup"><div class="tm"><b style="color:${M.color}">${esc(M.name)}</b><span>${rec(M.id)}</span></div><span class="vs">vs</span><div class="tm"><b style="color:${O.color}">${esc(O.name)}</b><span>${rec(O.id)}</span></div></div>`;
+  const A=nx.home?O:M, H=nx.home?M:O;
+  return `<div class="matchup"><div class="tm"><b style="color:${ink(A.color)}">${esc(A.name)}</b><span>${rec(A.id)}</span></div><span class="vs">at</span><div class="tm"><b style="color:${ink(H.color)}">${esc(H.name)}</b><span>${rec(H.id)}</span></div></div><p class="legend" style="text-align:center">${nx.home?'Home game · you bat last':'Road game · you bat first'}</p>`;
 }
 function homeHTML(){
   const M=me(), r=F.rec[M.id], nx=frNext();
@@ -3026,9 +3070,9 @@ function leadersHTML(){
 function scheduleHTML(){
   const u=F.userId, played=F.games.filter(g=>g.a===u||g.h===u);
   const rows=F.sched.map((day,d)=>{ const g=day.find(x=>x.includes(u)), opp=g[0]===u?g[1]:g[0], res=played.find(x=>x.d===d);
-    return `<tr class="${d===F.day&&F.phase==='reg'?'me':''}"><td class="l">${d+1}</td><td class="l">${tdot(opp)}${esc(tname(opp))}</td><td class="l">${res?(res.a===u?'Away':'Home'):'You pick'}</td><td class="l">${res?resLine(res.a,res.h,res.ra,res.rh,res.inn).replace(/ (at|vs) .*/,''):d===F.day&&F.phase==='reg'?'<b>Next</b>':''}</td></tr>`; }).join('');
+    return `<tr class="${d===F.day&&F.phase==='reg'?'me':''}"><td class="l">${d+1}</td><td class="l">${tdot(opp)}${esc(tname(opp))}</td><td class="l">${g[1]===u?'Home':'Away'}</td><td class="l">${res?resLine(res.a,res.h,res.ra,res.rh,res.inn).replace(/ (at|vs) .*/,''):d===F.day&&F.phase==='reg'?'<b>Next</b>':''}</td></tr>`; }).join('');
   const po=F.po?[...F.po.series,F.po.final].filter(Boolean).flatMap(s=>s.g.filter(g=>g.a===u||g.h===u).map((g,i)=>`<tr><td class="l">${esc(s.label.split(' ').slice(0,2).join(' '))}</td><td class="l">${tdot(g.a===u?g.h:g.a)}${esc(tname(g.a===u?g.h:g.a))}</td><td class="l">${g.a===u?'Away':'Home'}</td><td class="l">${resLine(g.a,g.h,g.ra,g.rh,g.inn).replace(/ (at|vs) .*/,'')}</td></tr>`)).join(''):'';
-  return `<div class="hcard"><h4>Your schedule · Season ${F.season}</h4><div class="tscroll"><table class="tbl"><thead><tr><th class="l">Game</th><th class="l">Opponent</th><th class="l">Home / away</th><th class="l">Result</th></tr></thead><tbody>${rows}${po}</tbody></table></div><p class="legend">You choose home or away before every game you play. Simulated games use the default.</p></div>`;
+  return `<div class="hcard"><h4>Your schedule · Season ${F.season}</h4><div class="tscroll"><table class="tbl"><thead><tr><th class="l">Game</th><th class="l">Opponent</th><th class="l">Home / away</th><th class="l">Result</th></tr></thead><tbody>${rows}${po}</tbody></table></div><p class="legend">Home and away are set before the season: every team plays ${SEASON_GAMES/2} at home and ${SEASON_GAMES/2} on the road. In the playoffs the higher seed has home field: games 1 and 3 of the semifinals, and games 1, 2, 5 and 7 of the Floodlight Series.</p></div>`;
 }
 function statsHTML(){
   const store = statScope==='season'?F.stats: statScope==='post'?F.pstats: careerNow();
@@ -3073,12 +3117,13 @@ function champsHTML(){
 }
 function teamsHTML(){
   return `<div class="teams6">${F.ids.map(id=>{ const T=F.teams[id], r=F.rec[id];
-    return `<div class="hcard" style="border-color:${T.color}55"><h4 style="color:${T.color}">${esc(T.name)} · ${esc(T.abbr)}${id===F.userId?' · You':''}</h4><p>${r.w}–${r.l} this season</p><ol class="troster">${T.lineup.map((n,i)=>`<li><span>${i+1}</span><span>${esc(n)}</span>${abChip(T.roster[n].ab)}</li>`).join('')}</ol></div>`; }).join('')}</div>`;
+    return `<div class="hcard" style="border-color:${T.color}55"><h4 style="color:${ink(T.color)}">${esc(T.name)} · ${esc(T.abbr)}${id===F.userId?' · You':''}</h4><p>${r.w}–${r.l} this season</p><ol class="troster">${T.lineup.map((n,i)=>`<li><span>${i+1}</span><span>${esc(n)}</span>${abChip(T.roster[n].ab)}</li>`).join('')}</ol></div>`; }).join('')}</div>`;
 }
 function settingsHTML(){
   const M=me();
   return `<div class="hgrid"><div class="hcard"><h4>Your team</h4><div class="form"><label>Team name<input type="text" id="frName" maxlength="28" value="${esc(M.name)}"></label><label>Scoreboard abbreviation (up to 4 letters)<input type="text" id="frAbbr" maxlength="4" value="${esc(M.abbr)}"></label><div class="hbtns"><button class="btn primary" type="button" data-act="rename">Save</button></div></div></div>
 <div class="hcard"><h4>Names</h4><p>Rename any team or player in your league. Stats, records and player cards follow the new names.</p><div class="hbtns"><button class="btn" type="button" data-act="names">Edit team &amp; player names</button></div>
+${frIsStd()?'':`<h4 style="margin-top:8px">The league's clubs</h4><p>Switch to the league's standard clubs: the Boston Red Hats, Seattle Emeralds, Florida Suns, Chicago Knights and Texas Horns${M.name===FR_USER.name?', with the California Kings in purple':''}. Players, stats, records and history all stay.</p><div class="hbtns"><button class="btn" type="button" data-act="stdclubs">Use the standard clubs</button></div>`}
 <h4 style="margin-top:8px">Saving</h4><p>Your franchise saves after every at-bat. You can keep up to <b>three franchises</b> going at once: switch between them with the Franchises buttons at the top of the hub. Use <b>Save / Load</b> for save slots, or to move a franchise to your phone or another computer.</p><div class="hbtns"><button class="btn" type="button" data-act="export">Open Save / Load</button></div>
 <h4 style="margin-top:8px">Leave or restart</h4><div class="hbtns"><button class="btn" type="button" data-act="exit">Exit to quick games</button><button class="btn danger" type="button" data-act="reset">Delete franchise</button></div></div></div>`;
 }
@@ -3093,13 +3138,13 @@ function importSave(file){
 }
 function newFranchiseHTML(){
   return `<div class="hgrid"><div class="hcard nextg"><h4>Start a franchise</h4><p>You manage <b>RED</b>: Wes Wright, Ezzy Lyons, Hank Hammer and the rest. Five computer teams with their own names and abilities fill out the league. Play a <b>32-game season</b>, and the top four make the playoffs: best-of-3 semifinals, then the best-of-7 <b>Floodlight Series</b>. Every stat, record and champion is saved, and the franchise rolls on season after season.</p>
-<div class="form"><label>Team name<input type="text" id="nfName" maxlength="28" value="Seattle Reds"></label><label>Scoreboard abbreviation<input type="text" id="nfAbbr" maxlength="4" value="SEA"></label>
+<div class="form"><label>Team name<input type="text" id="nfName" maxlength="28" value="California Kings"></label><label>Scoreboard abbreviation<input type="text" id="nfAbbr" maxlength="4" value="CAL"></label>
 <div class="choice"><span style="font-size:13px;color:var(--muted);font-weight:600">Team &amp; player names</span><label><input type="radio" name="nfNames" value="keep" checked> Keep the names as they are</label><label><input type="radio" name="nfNames" value="custom"> Customize team and player names</label></div>
 <div class="hbtns"><button class="btn primary" type="button" id="nfGo">Create franchise</button></div></div></div>
 <div class="hcard"><h4>How it works</h4><p>Before every game you pick <b>home or away</b> and set your <b>batting order</b>. Games use Simulation rules: the D12, action cards, designated hitters and player abilities. Can't play them all? <b>Sim</b> any game or skip to the playoffs. Other teams' games are simulated as you go.</p><p>Saved in this browser, with room for three franchises at once. Grab a backup from Settings any time.</p></div></div>`;
 }
 function wireNewFranchise(){
-  $('nfGo').onclick=()=>{ const n=$('nfName').value.trim()||'Seattle Reds', a=($('nfAbbr').value.trim()||n.slice(0,3)).toUpperCase().slice(0,4); const custom=(document.querySelector('input[name=nfNames]:checked')||{}).value==='custom'; frCreate(n,a); prepCards(F.ids.map(id=>F.teams[id])); hubTab='home'; hubMsg=`Welcome to Season 1. Meet the league in the Teams tab.`; setFrUI(); if(custom) frEditNames(); else renderHub(); };
+  $('nfGo').onclick=()=>{ const n=$('nfName').value.trim()||'California Kings', a=($('nfAbbr').value.trim()||n.slice(0,3)).toUpperCase().slice(0,4); const custom=(document.querySelector('input[name=nfNames]:checked')||{}).value==='custom'; frCreate(n,a); prepCards(F.ids.map(id=>F.teams[id])); hubTab='home'; hubMsg=`Welcome to Season 1. Meet the league in the Teams tab.`; setFrUI(); if(custom) frEditNames(); else renderHub(); };
 }
 
 /* ---------- franchise news: The Floodlight Gazette ---------- */
@@ -3134,7 +3179,7 @@ function nwAdd(k,h,b,o={}){
   if(F.news.length>NW_MAX) F.news.length=NW_MAX;
   if((o.pr||1)>=5||['champ','record','lore','award'].includes(k)){ const A=F.nx.arch||(F.nx.arch=[]); A.unshift(F.news[0]); if(A.length>150) A.length=150; }
 }
-function nwText(s){ return esc(s).replace(/\{([TN]):(\w+)\}/g,(m,k,id)=>F.teams[id]?esc(k==='T'?tname(id):lastWord(tname(id))):'').replace(/\n/g,'<br>'); }
+function nwText(s){ return esc(s).replace(/\{([TN]):(\w+)\}/g,(m,k,id)=>F.teams[id]?esc(k==='T'?tname(id):nickOf(F.teams[id])):'').replace(/\n/g,'<br>'); }
 function nwRename(pm){
   if(!F||!F.news) return;
   const keys=Object.keys(pm).sort((a,b)=>b.length-a.length), sub=s=>{ for(const k of keys) s=s.split(k).join(pm[k]); return s; };
@@ -3543,7 +3588,7 @@ const clean=(v,max)=>String(v||'').replace(/\s+/g,' ').trim().slice(0,max);
 /* o: {kicker, title, sub, teams:[{id,name,abbr,color,players:[{key,name,ab}]}], onSave(teams), onCancel, onReset} */
 function openNameEditor(o){
   const ov=$('ov');
-  const teamHTML=T=>`<div class="nteam" data-tid="${esc(T.id)}" style="border-color:${T.color}66"><div class="tn"><input type="text" data-k="name" maxlength="28" value="${esc(T.name)}" aria-label="Team name" style="color:${T.color}"><input type="text" data-k="abbr" maxlength="4" value="${esc(T.abbr)}" aria-label="Scoreboard abbreviation" title="Scoreboard abbreviation, up to 4 letters"></div>
+  const teamHTML=T=>`<div class="nteam" data-tid="${esc(T.id)}" style="border-color:${T.color}66"><div class="tn"><input type="text" data-k="name" maxlength="28" value="${esc(T.name)}" aria-label="Team name" style="color:${ink(T.color)}"><input type="text" data-k="abbr" maxlength="4" value="${esc(T.abbr)}" aria-label="Scoreboard abbreviation" title="Scoreboard abbreviation, up to 4 letters"></div>
 ${T.players.map((p,i)=>`<div class="prow"><span class="n">${i+1}</span><input type="text" data-k="p" data-key="${esc(p.key)}" maxlength="22" value="${esc(p.name)}" aria-label="Player ${i+1}">${abChip(p.ab)}</div>`).join('')}</div>`;
   ov.innerHTML=`<div class="ovcard pre names" role="dialog" aria-modal="true" aria-labelledby="nmT">
 <button class="x" type="button" id="nmX" aria-label="Close">×</button>
@@ -3647,7 +3692,7 @@ function openPregame(o){
     ov.innerHTML=`<div class="ovcard pre" role="dialog" aria-modal="true" aria-labelledby="preT">
 <button class="x" type="button" id="preX" aria-label="Close">×</button>
 <span class="aside" style="color:var(--flood)">${esc(o.kicker)}</span><h3 id="preT">${esc(o.title)}</h3>${o.sub?`<p class="sub">${o.sub}</p>`:''}
-${o.homeLabel?`<div class="prerow"><span class="lbl">${esc(o.homeLabel)}</span><div class="seg" role="group"><button type="button" data-home="0" aria-pressed="${!st.home}">Away · bats first</button><button type="button" data-home="1" aria-pressed="${st.home}">Home · bats last</button></div></div>`:''}
+${o.venue?`<div class="prerow"><span class="lbl">Ballpark</span><span class="venue">${esc(o.venue)}</span></div>`:''}${o.homeLabel?`<div class="prerow"><span class="lbl">${esc(o.homeLabel)}</span><div class="seg" role="group"><button type="button" data-home="0" aria-pressed="${!st.home}">Away · bats first</button><button type="button" data-home="1" aria-pressed="${st.home}">Home · bats last</button></div></div>`:''}
 <div class="lcols" style="--cols:${o.cols.length}">${o.cols.map(colHTML).join('')}</div>
 <p class="hint">Tap two players to swap them, or use the arrows. Every ability can be used once a game.</p>
 <div class="ovbtns"><button class="btn primary" type="button" id="preGo">Play ball!</button>${o.extra?`<button class="btn" type="button" id="preExtra">${esc(o.extra.label)}</button>`:''}<button class="btn" type="button" id="preNo">Cancel</button></div></div>`;
