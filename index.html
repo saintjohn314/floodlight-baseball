@@ -896,6 +896,11 @@ button,select,input{font:inherit;color:inherit}
 <button class="tab" role="tab" data-opp="cpu" title="You manage RED. The computer plays the other team's cards, abilities and designated hitters."><b>vs <span class="lg">Computer</span><span class="sh">CPU</span></b></button>
 <button class="tab" role="tab" data-opp="two" title="Pass and play: you make the calls for both teams."><b>2<span class="lg"> Players</span><span class="sh">P</span></b></button>
 </nav>
+<nav class="modes lvl" id="lvlNav" role="tablist" aria-label="Computer skill">
+<button class="tab" role="tab" data-lvl="rookie" title="Rookie: the computer manager misses about half its chances to use cards and abilities. The dice are the same at every level."><b>Rookie</b></button>
+<button class="tab" role="tab" data-lvl="pro" title="Pro: a sharp manager who still takes the odd gamble."><b>Pro</b></button>
+<button class="tab" role="tab" data-lvl="allstar" title="All-Star: never misses a play that's usually right, and never wastes a card on a whim. The dice are the same at every level."><b>All<span class="lg">-Star</span><span class="sh">★</span></b></button>
+</nav>
 <div class="hdr" id="hdrBtns">
 <button class="btn small" id="menuBtn" type="button" title="Back to the main menu">Menu</button>
 <button class="btn small exh" id="newgame" type="button" title="Set home or away and your batting order, then play">New game</button>
@@ -2386,9 +2391,9 @@ function abilityCore(t,a){
 /* ---------- simulated games: both managers make the same calls the computer makes in a live game
    (action cards, designated hitters, abilities, steals). Every roll is still a fair die. ---------- */
 function smartRun(G2){
-  const keepG=G, keepBusy=busy; G=G2; busy=false;
+  const keepG=G, keepBusy=busy, keepSim=simming; G=G2; busy=false; simming=true;
   try{ let n=0; while(!G.over && n++<4000) smartStep(); }
-  finally{ G=keepG; busy=keepBusy; }
+  finally{ G=keepG; busy=keepBusy; simming=keepSim; }
   return G2;
 }
 function smartDraw(){
@@ -2705,21 +2710,28 @@ function renderGuide(){
 
 /* ---------- the computer's calls ---------- */
 const closeGame = (n=2) => Math.abs(total(G,0)-total(G,1))<=n;
+/* how sharp the computer manager is. Rookie misses about half its chances; Pro is the usual manager; All-Star never misses a play
+   that's usually right and never wastes one on a whim. League games between two computer clubs always use Pro. The dice never change. */
+let cpuLvl='pro', simming=false; try{ const v=localStorage.getItem('fdl-cpu-lvl'); if(v==='rookie'||v==='pro'||v==='allstar') cpuLvl=v; }catch(e){}
+const lvlNow=()=>simming?'pro':cpuLvl;
+const cr=()=>lvlNow()==='allstar'?.45:Math.random(); // the computer's judgment calls
+const cpuMiss=()=>lvlNow()==='rookie'&&Math.random()<.5; // a Rookie manager lets this chance go by
 function cpuPick(){
+  if(cpuMiss()) return null;
   const t=G.half, b=G.bases, inn=G.inning, outs=G.outs, on=!!(b[0]||b[1]||b[2]), close=closeGame();
   if(has(t,'INJ') && legal(t,'INJ') && (abOf(G,t,curBatter(G))==='IRN' || isInjured(G,t,curBatter(G)) || (inn>=7 && outs===2 && !on))) return 'INJ';
   if(has(t,'RC') && legal(t,'RC')) return 'RC';
   if(canDH(t)){ const lastInn=inn===8;
-    if(isInjured(G,t,curBatter(G)) || (lastInn && (on || outs>0 || G.halfPA>0)) || (on && (b[1]||b[2]) && Math.random()<.55)) return 'DH'; }
+    if(isInjured(G,t,curBatter(G)) || (lastInn && (on || outs>0 || G.halfPA>0)) || (on && (b[1]||b[2]) && cr()<.55)) return 'DH'; }
   if(has(t,'SQ') && legal(t,'SQ') && (inn>=6 || close)) return 'SQ';
   if(has(t,'SB') && legal(t,'SB') && outs<2) return 'SB';
   if(has(t,'BU') && legal(t,'BU') && outs===0 && b[1] && !b[2] && inn>=7 && close) return 'BU';
-  if(has(t,'HNR') && legal(t,'HNR') && outs<2 && !b[1] && Math.random()<.5) return 'HNR';
+  if(has(t,'HNR') && legal(t,'HNR') && outs<2 && !b[1] && cr()<.5) return 'HNR';
   return null;
 }
 function cpuAbPick(){
-  const t=G.half, key=`${t}:${G.inning}:${G.idx[t]}`; if(G.cpuAbKey===key) return null; G.cpuAbKey=key;
-  const b=G.bases, inn=G.inning, outs=G.outs, late=inn>=6, close=closeGame(), r=Math.random;
+  const t=G.half, key=`${t}:${G.inning}:${G.idx[t]}`; if(G.cpuAbKey===key) return null; G.cpuAbKey=key; if(cpuMiss()) return null;
+  const b=G.bases, inn=G.inning, outs=G.outs, late=inn>=6, close=closeGame(), r=cr;
   for(const a of activeAbils(t)){
     if(a.k==='SPD'){
       return a; // a Speed steal can't fail: always take the base (or the run)
@@ -2732,7 +2744,8 @@ function cpuAbPick(){
   return null;
 }
 function cpuAb(t,k,ctx){
-  const b=G.bases, on=!!(b[0]||b[1]||b[2]), late=G.inning>=6, r=Math.random;
+  if(cpuMiss()) return false;
+  const b=G.bases, on=!!(b[0]||b[1]||b[2]), late=G.inning>=6, r=cr;
   switch(k){
     case 'SLG': case 'CLU': case 'HUS': return true;
     case 'CON': return G.outs===2 || on || late || r()<.5;
@@ -2742,11 +2755,11 @@ function cpuAb(t,k,ctx){
   return false;
 }
 function cpuDefPick(){
-  const t=G.half, f=1-t, key=`d${t}:${G.inning}:${G.idx[t]}`; if(G.cpuDefKey===key) return null; G.cpuDefKey=key;
+  const t=G.half, f=1-t, key=`d${t}:${G.inning}:${G.idx[t]}`; if(G.cpuDefKey===key) return null; G.cpuDefKey=key; if(cpuMiss()) return null;
   const b=G.bases, inn=G.inning, close=closeGame(), bat=curBatter(G), slug=abReady(G,t,bat,'SLG');
   if(has(f,'IBB') && legal(f,'IBB') && !b[0] && G.outs<2 && (b[1]||b[2]) && ((inn>=7&&close) || (slug&&inn>=4))) return 'IBB';
   if(has(f,'IBB') && legal(f,'IBB') && slug && inn>=8 && close && !(b[0]&&b[1]&&b[2])) return 'IBB';
-  if(has(f,'PK') && legal(f,'PK') && Math.random()<.4) return 'PK';
+  if(has(f,'PK') && legal(f,'PK') && (lvlNow()==='allstar' ? (close||inn>=6) : Math.random()<.4)) return 'PK';
   return null;
 }
 
@@ -3173,7 +3186,7 @@ function frEditRookies(){
 
 /* ---------- franchise banner over the stadium ---------- */
 function setFrUI(){
-  document.querySelectorAll('.exh').forEach(el=>el.hidden=frMode);
+  document.querySelectorAll('.exh').forEach(el=>el.hidden=frMode); if(typeof paintLvl==='function') paintLvl();
   document.querySelectorAll('.tab[data-play]').forEach(b=>{ const on=(b.dataset.play==='fr')===frMode; b.setAttribute('aria-selected',on); });
   $('frLive').hidden=!(F&&F.live&&!frMode);
   renderFbar();
@@ -4019,8 +4032,11 @@ document.querySelectorAll('.tab[data-opp]').forEach(b=>b.addEventListener('click
 function setOpp(o,fresh){
   opp=o; document.querySelectorAll('.tab[data-opp]').forEach(b=>{ const on=b.dataset.opp===o; b.setAttribute('aria-selected',on); b.tabIndex=on?0:-1; });
   try{ localStorage.setItem('fdl-opp',o); }catch(e){}
-  if(fresh) startExhibition();
+  paintLvl(); if(fresh) startExhibition();
 }
+/* the computer's skill: shown whenever there's a computer to play (always in a franchise, not in a two-player game) */
+function paintLvl(){ $('lvlNav').hidden=!frMode&&opp==='two'; document.querySelectorAll('.tab[data-lvl]').forEach(b=>{ const on=b.dataset.lvl===cpuLvl; b.setAttribute('aria-selected',on); b.tabIndex=on?0:-1; }); }
+document.querySelectorAll('.tab[data-lvl]').forEach(b=>b.addEventListener('click',()=>{ cpuLvl=b.dataset.lvl; try{ localStorage.setItem('fdl-cpu-lvl',cpuLvl); }catch(e){} paintLvl(); }));
 function paintAnn(){ $('annBtn').textContent=ann.on||sfx.on||sfx.crowdOn?'Audio':'Audio off'; }
 paintAnn();
 /* the crowd is only heard while a game is on screen: not on the menu, the franchise hub or the TV show, and it fades out after the final out */
