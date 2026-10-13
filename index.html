@@ -422,6 +422,22 @@ button,select,input{font:inherit;color:inherit}
 @media (max-width:640px){.ablist{grid-template-columns:minmax(0,1fr)}}
 
 /* card pop-ups: play a reactive card, or reveal a designated hitter */
+/* trophy case */
+.tcase{position:relative;margin:auto;width:min(560px,100%);background:#0d1628;border:1px solid var(--line);border-radius:16px;padding:20px 18px;box-shadow:0 30px 70px rgba(0,0,0,.6);color:var(--cream)}
+.tcase h3{font-family:var(--f-logo);font-weight:400;font-size:clamp(28px,6vw,38px);margin:0;padding-right:80px;color:var(--cream);text-shadow:2px 2px 0 #9e2f28}
+.tcase .tcx{position:absolute;top:16px;right:16px}
+.tcase .tcsub{color:var(--muted);margin:4px 0 14px;font-size:14px}
+.tcbad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.tcbad div{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 6px;border:1px solid var(--line);border-radius:12px;background:rgba(255,215,122,.07);text-align:center}
+.tcbad div.none{opacity:.45;background:none}
+.tcbad i{font-style:normal;font-size:22px}.tcbad b{font-family:var(--f-num);font-size:20px;color:var(--flood)}.tcbad span{font-size:12px;color:var(--muted);line-height:1.2}
+.tclist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.tclist li{display:flex;gap:10px;align-items:flex-start;padding:10px;border-radius:12px;background:rgba(255,255,255,.04)}
+.tclist i{font-style:normal;font-size:20px;line-height:1.2}
+.tclist div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.tclist span{font-size:14px;color:#d8dfec}.tclist em{font-style:normal;font-weight:600}.tclist small{font-size:12px;color:var(--muted)}
+.tcnone{color:var(--muted);font-size:14px;line-height:1.5;margin:0}
+@media (max-width:420px){.tcbad{grid-template-columns:repeat(2,1fr)}}
 .ov{position:fixed;inset:0;z-index:9000;display:flex;padding:16px;background:rgba(4,8,18,.62);overflow-y:auto}
 .ov>*{margin:auto}
 .ovcard{width:min(360px,100%);display:flex;flex-direction:column;gap:12px;background:linear-gradient(180deg,var(--navy-2),var(--navy));border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 30px 60px -20px rgba(0,0,0,.85);animation:popIn .28s ease-out both}
@@ -1021,7 +1037,7 @@ button,select,input{font:inherit;color:inherit}
 <p class="mtag">Strategy baseball with dice, action cards and a lit-up mini stadium.</p>
 <button class="btn primary mplay" id="mPlay" type="button">Play ball</button>
 <p class="mresume" id="mResume" hidden></p>
-<nav class="mlinks" aria-label="Menu options"><button type="button" data-m="quick">New quick game</button><button type="button" data-m="fr">Franchise</button><button type="button" data-m="qsave" title="Save everything right now. Load it from Save / Load.">Quick save</button><button type="button" data-m="saves">Save / Load</button><button type="button" data-m="how">How to play</button></nav>
+<nav class="mlinks" aria-label="Menu options"><button type="button" data-m="quick">New quick game</button><button type="button" data-m="fr">Franchise</button><button type="button" data-m="case">Trophy case</button><button type="button" data-m="qsave" title="Save everything right now. Load it from Save / Load.">Quick save</button><button type="button" data-m="saves">Save / Load</button><button type="button" data-m="how">How to play</button></nav>
 </div>
 </div>
 <div class="ov" id="ov" hidden></div>
@@ -2084,7 +2100,40 @@ ${h.smvp?`<p>Series MVP: <b>${esc(h.smvp.n)}</b>, ${esc(h.smvp.line)}</p>`:''}
   $('trGo').onclick=()=>{ fireworks(card,true,6); setTimeout(()=>{ ov.hidden=true; ov.innerHTML=''; openHub(); }, reduce?0:900); };
   $('trGo').focus();
 }
-function maybeTrophy(wasPhase){ if(!F||wasPhase!=='post'||F.phase!=='off') return; const h=F.history[F.history.length-1]; if(h&&h.champ===F.userId) setTimeout(()=>showTrophy(h),300); }
+function maybeTrophy(wasPhase){ if(!F||wasPhase!=='post'||F.phase!=='off') return; const h=F.history[F.history.length-1]; if(h&&h.champ===F.userId){ caseTitle(h); setTimeout(()=>showTrophy(h),300); } }
+/* ---------- the trophy case: the big moments from your games, kept on this device ---------- */
+const CASE_KEY='fdl-case', CASE_KINDS={pg:['Perfect game','💎'],nh:['No-hitter','🔒'],cy:['Hit for the cycle','🔄'],gs:['Grand slam','💥'],wo:['Walk-off win','🎆'],ch:['Floodlight Series title','🏆']};
+function caseGet(){ try{ const L=JSON.parse(localStorage.getItem(CASE_KEY)); return Array.isArray(L)?L:[]; }catch(e){ return []; } }
+function caseAdd(e){ const L=caseGet(); L.push(Object.assign({d:Date.now()},e)); while(L.length>400) L.shift(); try{ localStorage.setItem(CASE_KEY,JSON.stringify(L)); }catch(x){} }
+/* your side: your club in a franchise, the team you manage against the computer, both teams in a two-player game */
+function mySides(){ if(G.isFr&&F) return [0,1].filter(i=>G.teams[i].id===F.userId); const me=G.cpu[0]!==G.cpu[1]?(G.cpu[0]?1:0):-1; return me>=0?[me]:[0,1]; }
+const caseWhere=()=>G.isFr&&F?`Franchise ${frSlot} · Season ${F.season}`:'Exhibition';
+function caseNote(t,list){ if(list.length) setTimeout(()=>toast(t,`Trophy case: <b>${list.map(e=>CASE_KINDS[e.k][0]+(e.who?` by ${esc(e.who)}`:'')).join(', ')}</b>`,'abil'),1300); }
+function casePlay(){
+  if(G.fx!=='HR'||!G.last||G.last.runs!==4) return; const t=G.last.team; if(!mySides().includes(t)) return;
+  const e={k:'gs',who:G.last.batter,team:G.teams[t].name,color:G.teams[t].color,vs:G.teams[1-t].name,inn:inningText(G),where:caseWhere()}; caseAdd(e); caseNote(t,[e]);
+}
+function caseFinal(){
+  for(const t of mySides()){ const o=1-t, got=[], base={team:G.teams[t].name,color:G.teams[t].color,vs:G.teams[o].name,score:`${total(G,t)}–${total(G,o)}`,where:caseWhere()};
+    if(total(G,t)>total(G,o)&&G.inning>=9&&G.hits[o]===0) got.push(Object.assign({k:G.bb[o]===0?'pg':'nh'},base));
+    for(const [n,b] of Object.entries(G.box)) if(b.team===t&&b.H-b['2B']-b['3B']-b.HR>0&&b['2B']>0&&b['3B']>0&&b.HR>0) got.push(Object.assign({k:'cy',who:n},base));
+    if(G.walkoff&&t===1) got.push(Object.assign({k:'wo',who:G.last&&G.last.team===1?G.last.batter:''},base));
+    got.forEach(caseAdd); caseNote(t,got); }
+}
+function caseTitle(h){ const where=`Franchise ${frSlot} · Season ${h.season}`; if(caseGet().some(e=>e.k==='ch'&&e.where===where)) return; const T=F.teams[h.champ];
+  caseAdd({k:'ch',team:T.name,color:T.color,vs:h.runnerName,score:h.score,where}); }
+function openCase(){
+  const L=caseGet().slice().reverse(), ov=$('ov'), n=k=>L.filter(e=>e.k===k).length;
+  const when=d=>new Date(d).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});
+  ov.innerHTML=`<div class="tcase" role="dialog" aria-modal="true" aria-labelledby="tcT"><button class="btn small tcx" type="button" id="tcX">Close</button><h3 id="tcT">Trophy case</h3>
+<p class="tcsub">The big moments from your games on this device.</p>
+<div class="tcbad">${Object.entries(CASE_KINDS).map(([k,[nm,ic]])=>`<div class="${n(k)?'':'none'}"><i>${ic}</i><b>${n(k)}</b><span>${nm}</span></div>`).join('')}</div>
+${L.length?`<ol class="tclist">${L.map(e=>`<li><i>${CASE_KINDS[e.k]?CASE_KINDS[e.k][1]:''}</i><div><b>${esc((CASE_KINDS[e.k]||[''])[0])}${e.who?` · ${esc(e.who)}`:''}</b>
+<span><em style="color:${ink(e.color||'#ffd77a')}">${esc(e.team)}</em>${e.score?` ${esc(e.score)}`:''} vs ${esc(e.vs)}${e.inn?` · ${esc(e.inn)}`:''}</span><small>${esc(e.where)} · ${when(e.d)}</small></div></li>`).join('')}</ol>`
+:`<p class="tcnone">Nothing here yet. No-hitters, perfect games, hitting for the cycle, grand slams, walk-off wins and Floodlight Series titles will land here.</p>`}</div>`;
+  ov.hidden=false; const close=()=>{ ov.hidden=true; ov.innerHTML=''; ov.onclick=null; document.removeEventListener('keydown',key); }, key=e=>{ if(e.key==='Escape') close(); };
+  ov.onclick=e=>{ if(e.target===ov) close(); }; $('tcX').onclick=close; document.addEventListener('keydown',key); $('tcX').focus();
+}
 
 function renderBoard(){
   const n=Math.max(9,G.inning), i0=n-9; // in extras the board rolls on, showing the latest 9 innings like a real one
@@ -2530,9 +2579,9 @@ async function doRoll(){
 function post(){
   checkDH(); checkDraw(); busy=false;
   if(G.over) G.big = G.walkoff ? (G.last&&G.last.o==='HR'&&G.last.team===1 ? (G.last.runs===4?'Walk-off Grand Slam!':'Walk-off Home Run!') : 'Walk-off!') : (G.big||'Final');
-  renderGame(); celebrate(); playFx(); maybeStretch();
+  casePlay(); renderGame(); celebrate(); playFx(); maybeStretch();
   autoSave();
-  if(G.over && !G.shownFinal){ G.shownFinal=true; gameOver(); setTimeout(showFinal, reduce?250:1900); }
+  if(G.over && !G.shownFinal){ G.shownFinal=true; caseFinal(); gameOver(); setTimeout(showFinal, reduce?250:1900); }
 }
 /* the seventh-inning stretch: once a game, as the top of the 7th ends */
 function maybeStretch(){
@@ -4126,6 +4175,7 @@ document.querySelector('.mlinks').addEventListener('click',e=>{
   if(m==='quick'){ if(frMode) quickGame(); else { startExhibition(true); toast(G.half,'New quick game. Press Roll to play ball.','abil'); } }
   else if(m==='fr'){ if(F&&F.live&&!frMode) frResume(); else openHub(); }
   else if(m==='saves') openSaves();
+  else if(m==='case') openCase();
   else if(m==='how') document.getElementById('guideTitle').scrollIntoView({behavior:reduce?'auto':'smooth'});
 });
 $('menuBtn').addEventListener('click',openMenu);
