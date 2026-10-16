@@ -1,0 +1,17 @@
+{
+  "name": "Floodlight Baseball Dice Lab",
+  "short_name": "Floodlight",
+  "description": "Strategy baseball with dice, action cards and a lit-up mini stadium.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0a1222",
+  "theme_color": "#0c1524",
+  "categories": ["games", "sports"],
+  "icons": [
+    {"src": "/icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "/icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
