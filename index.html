@@ -6,8 +6,8 @@
      like this one for free: https://netlify.new/?utm_campaign=loops&utm_source=ai-legible&utm_medium=owned&utm_content=comment&utm_id=9dc85ce7-b77c-48da-9d7d-d8794e8fd1ce
      Netlify hosting facts for this site: static/SSR served via Netlify Edge. -->
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Floodlight Baseball Dice Lab</title>
-<meta name="description" content="Play Floodlight Baseball in your browser: roll the D12 simulation or D8 arcade word dice, guess the pitch, play action cards, use player abilities, take on Clutch Challenges and run a franchise on a lit-up mini stadium, with an announcer calling every play.">
+<title>Floodlight Baseball</title>
+<meta name="description" content="Play Floodlight Baseball in your browser: roll the D12 simulation or D8 arcade word dice, play action cards, use player abilities, take on Clutch Challenges and run a franchise on a lit-up mini stadium, with an announcer calling every play.">
 <meta name="theme-color" content="#0c1524">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -17,8 +17,8 @@
 <meta name="apple-mobile-web-app-title" content="Floodlight">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='29' fill='%23f2ead8'/%3E%3Cpath d='M15 12c8 8 8 32 0 40M49 12c-8 8-8 32 0 40' fill='none' stroke='%23e65b50' stroke-width='3.5' stroke-linecap='round' stroke-dasharray='3 4'/%3E%3C/svg%3E">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Floodlight Baseball Dice Lab">
-<meta property="og:description" content="Play Floodlight Baseball in your browser: roll the D12 simulation or D8 arcade word dice, guess the pitch, play action cards, use player abilities, take on Clutch Challenges and run a franchise on a lit-up mini stadium, with an announcer calling every play.">
+<meta property="og:title" content="Floodlight Baseball">
+<meta property="og:description" content="Play Floodlight Baseball in your browser: roll the D12 simulation or D8 arcade word dice, play action cards, use player abilities, take on Clutch Challenges and run a franchise on a lit-up mini stadium, with an announcer calling every play.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@Floodlightbb">
 <meta property="og:image" content="https://floodlight-baseball-dice-lab.netlify.app/share.jpg">
@@ -1055,6 +1055,70 @@ html.rm .mnew{opacity:1}
 .ynbox p{margin:0;font-size:16px;line-height:1.5}
 .ynb{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
 .ynb .btn.yndanger{background:#c8423a;border-color:#e0675f;color:#fff}
+.form .choice label{flex-direction:row;align-items:center}
+.form .choice input[type=radio]{width:auto;flex:none;margin:0;accent-color:var(--flood,#ffd23f)}
+
+.mks{display:flex;align-items:center;gap:10px;max-width:440px;margin:14px auto 0;opacity:0;animation:mfade .6s 2.7s forwards;padding:9px 14px;border-radius:12px;border:1px dashed rgba(255,210,63,.45);color:var(--cream);text-decoration:none;font-size:13.5px;line-height:1.35;background:rgba(255,210,63,.06)}
+.mks:hover,.mks:focus-visible{background:rgba(255,210,63,.14);border-style:solid}
+.mks svg{width:22px;height:22px;flex:none;fill:var(--flood);color:var(--flood)}
+.mks b{color:var(--flood)}
+.kslink{margin:10px 0 0;text-align:center;font-size:13px}
+.kslink a{color:var(--flood);text-decoration:none;border-bottom:1px dashed rgba(255,210,63,.5)}
+html.rm .mks{opacity:1}
+/* franchise: trades and the draft */
+.trwith{display:flex;align-items:center;gap:8px;font-size:14px}
+.trcols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.trcols h5{margin:0 0 6px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+@media (max-width:640px){.trcols{grid-template-columns:1fr}}
+.plist{display:flex;flex-direction:column;gap:4px}
+.plrow{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;text-align:left;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:10px;padding:6px 10px;color:inherit;font:inherit;font-size:14px;cursor:pointer}
+.plrow:hover{border-color:#c9b98f88}
+.plrow.on{border-color:#ffd27e;background:rgba(255,210,126,.12);box-shadow:0 0 0 1px #ffd27e55 inset}
+.plrow .ab{margin-left:auto}
+.plm{font-size:12px;color:var(--muted);flex-basis:100%}
+.trmood{margin:0;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,.04);font-size:14px}
+.trmood.yes{background:rgba(99,208,145,.14);color:#9fe3b8}
+.trmood.close{background:rgba(255,200,97,.12);color:#ffd892}
+.trmood.no{background:rgba(255,122,107,.1);color:#ffb3a8}
+.drorder{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:3px;font-size:14px}
+.drorder li{display:flex;align-items:center;gap:8px;padding:3px 6px;border-radius:8px}
+.drorder li span{margin-left:auto;color:var(--muted);font-size:13px;text-align:right}
+.drorder li.me{background:rgba(255,210,126,.08)}
+.drorder li.now{outline:1px solid #ffd27e88}
+.drpool{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.drp{display:flex;flex-direction:column;gap:4px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:rgba(255,255,255,.03)}
+.drp p{margin:0;font-size:13px;color:var(--muted)}
+.drp .plm{flex-basis:auto}
+/* the Daily Challenge leaderboard */
+.lbbox{display:flex;flex-direction:column;gap:8px;align-items:center;margin:4px 0 8px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.03);width:100%;box-sizing:border-box}
+.lbbox p{margin:0;text-align:center}
+.lbpts b{font-size:20px;color:#ffd27e}
+.lbpts small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.lbform{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;justify-content:center}
+.lbform[hidden]{display:none}
+.lbform label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);text-align:left}
+.lbform input{font:inherit;font-size:16px;padding:7px 10px;border-radius:9px;border:1px solid var(--line);background:#0b1426;color:var(--cream);min-width:0;width:12em}
+.lbres{width:100%}
+.lbok{font-size:14px}
+.lbbad{color:#ffb3a8;font-size:14px}
+.lbempty{color:var(--muted);font-size:14px;text-align:center;margin:10px 0}
+.lbbody{min-height:120px;margin:10px 0 4px}
+.lbt{width:100%;font-size:14px}
+.lbt td,.lbt th{padding:5px 6px}
+.lbt tr.me td{background:rgba(255,210,126,.12)}
+.lbt tr.gap td{border-top:2px dashed var(--line)}
+.lbt td small{color:var(--muted)}
+.lbcount{margin:6px 0 0;text-align:center;font-size:13px;color:var(--muted)}
+.lbrules{font-size:12px;color:var(--muted);margin:6px 0 10px}
+.linkb{background:none;border:0;padding:0;color:#9cc3ff;text-decoration:underline;font:inherit;font-size:13px;cursor:pointer}
+/* the free demo */
+.fgwhy{margin:0 0 6px}
+.fglist{margin:6px 0 10px;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:14px;text-align:left}
+.fgnote{font-size:13px;color:var(--muted);margin:0 0 10px}
+.fgline{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0}
+.chcard.locked{opacity:.62;position:relative}
+.chcard.locked:hover{opacity:.8}
+.chlock{position:absolute;top:8px;right:10px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#16110a;background:#ffd27e;border-radius:6px;padding:2px 7px}
 </style>
 </head>
 <body>
@@ -1082,11 +1146,11 @@ html.rm .mnew{opacity:1}
 
 <div class="wrap">
 <header class="top">
-<div class="brand"><span class="logo">Floodlight Baseball</span><span class="lab">Dice Lab</span></div>
+<div class="brand"><span class="logo">Floodlight Baseball</span></div>
 <button class="btn small morebtn" id="moreBtn" type="button" aria-expanded="false" aria-controls="hdrBtns">☰ More</button>
 <nav class="modes playmode" role="tablist" aria-label="Play mode">
 <button class="tab" role="tab" data-play="quick" title="Jump right in: one game, no setup needed"><b>Quick<span class="lg"> game</span></b></button>
-<button class="tab" role="tab" data-play="fr" title="Season mode: a 32-game season against five computer teams, playoffs and the Floodlight Series"><b>Franchise</b><i class="livedot" id="frLive" hidden title="A franchise game is in progress"></i></button>
+<button class="tab" role="tab" data-play="fr" title="Season mode: a 32-game season against eleven computer teams, playoffs and the Floodlight Series"><b>Franchise</b><i class="livedot" id="frLive" hidden title="A franchise game is in progress"></i></button>
 </nav>
 <nav class="modes exh" role="tablist" aria-label="Game mode">
 <button class="tab" role="tab" id="tab-sim" data-mode="sim" title="As close to real baseball as one die gets, with action cards, designated hitters and player abilities"><b><span class="lg">Simulation</span><span class="sh">Sim</span></b><span>D12</span></button>
@@ -1159,7 +1223,7 @@ html.rm .mnew{opacity:1}
 
 <section class="guide" aria-labelledby="guideTitle">
 <h2 class="big" id="guideTitle">How to play</h2>
-<p>Floodlight Baseball is a dice baseball game played on a lit-up mini stadium, the digital edition of the tabletop game. Each at-bat is one roll of a word die, the meeples run the bases, and the LED scoreboard keeps the game. Against the computer, every at-bat is also a <b>duel</b>: guess the pitch for a better roll, or pick the pitch when you're on the mound. In Simulation mode, each team also draws action cards, gets one designated hitter, and every player has an <b>ability</b> they can use once a game. Play <b>vs Computer</b> (you're RED, pick home or away before each game) or <b>2 Players</b> to pass and play with a friend. Want a whole season? Hit <b>Franchise</b>: 32 games against five computer teams, playoffs, and the <b>Floodlight Series</b>, with every stat saved. Short on time? <b>Clutch Challenges</b> drop you into the late innings of a close game, with a new Daily Challenge every day.</p>
+<p>Floodlight Baseball is a dice baseball game played on a lit-up mini stadium, the digital edition of the tabletop game. Each at-bat is one roll of a word die, the meeples run the bases, and the LED scoreboard keeps the game. In Simulation mode, each team also draws action cards, gets one designated hitter, and every player has an <b>ability</b> they can use once a game. Play <b>vs Computer</b> (you're RED, pick home or away before each game) or <b>2 Players</b> to pass and play with a friend. Want a whole season? Hit <b>Franchise</b>: 32 games against eleven computer teams, playoffs, and the <b>Floodlight Series</b>, with every stat saved. Short on time? <b>Clutch Challenges</b> drop you into the late innings of a close game, with a new Daily Challenge every day.</p>
 <div class="guidegrid">
 <section class="card wide">
 <h2>Player abilities</h2>
@@ -1217,7 +1281,7 @@ html.rm .mnew{opacity:1}
 </svg>
 <div class="mcontent">
 <div class="mlogo">Floodlight Baseball</div>
-<div class="mlab">Dice Lab</div>
+
 <p class="mtag">Strategy baseball with dice, action cards and a lit-up mini stadium.</p>
 <button class="btn primary mplay" id="mPlay" type="button">Play ball</button>
 <p class="mresume" id="mResume" hidden></p>
@@ -1227,7 +1291,7 @@ html.rm .mnew{opacity:1}
 <div class="ov" id="ov" hidden></div>
 
 <footer class="links">
-<p><b>Floodlight Baseball</b> is a tabletop dice and strategy game with a lit-up mini stadium, coming soon to Kickstarter. These are the dice and cards we're playtesting.</p>
+<p><b>Floodlight Baseball</b> is also a tabletop game: the same dice and cards with a lit-up mini stadium for your table, coming to Kickstarter.</p>
 <nav aria-label="Floodlight Baseball links">
 <a class="main" href="https://eepurl.com/J59uhGXqR0" target="_blank" rel="noopener">Get launch updates</a>
 <a href="https://discord.gg/9GAWTtvnt" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.3 4.4A19.6 19.6 0 0 0 15.4 3l-.6 1.3a18 18 0 0 0-5.6 0L8.6 3a19.5 19.5 0 0 0-4.9 1.5C.6 9.1-.3 13.6.2 18.1a19.8 19.8 0 0 0 6 3l1.3-2.1-2-1 .5-.4a14 14 0 0 0 12 0l.5.4-2 1 1.3 2.1a19.7 19.7 0 0 0 6-3c.5-5.2-.9-9.7-3.5-13.7ZM8 15.3c-1.2 0-2.1-1.1-2.1-2.4S6.8 10.5 8 10.5s2.2 1.1 2.1 2.4c0 1.3-.9 2.4-2.1 2.4Zm8 0c-1.2 0-2.1-1.1-2.1-2.4s.9-2.4 2.1-2.4 2.2 1.1 2.1 2.4c0 1.3-.9 2.4-2.1 2.4Z"/></svg>Join the Discord</a>
@@ -1613,7 +1677,7 @@ function fit(){
 }
 
 function buildScene(){
-  fit();
+  fit(); const PK=parkNow();
   const W=VB[0], H=VB[1];
   const horizon=P(0,TY,9.5)[1];
   let s=`<defs>
@@ -1632,9 +1696,9 @@ function buildScene(){
 <pattern id="pLed" width="3.2" height="3.2" patternUnits="userSpaceOnUse"><path d="M0 0H3.2M0 0V3.2" stroke="#000" stroke-width="1.05" opacity=".7"/></pattern>
 <pattern id="pDots" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r=".9" fill="#ffffff" opacity=".07"/></pattern>
 <radialGradient id="gLedHalo" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffd27e" stop-opacity=".12"/><stop offset="1" stop-color="#ffb43a" stop-opacity="0"/></radialGradient>
-<linearGradient id="gWallIn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2c624a"/><stop offset=".12" stop-color="#21503c"/><stop offset="1" stop-color="#14362a"/></linearGradient>
-<linearGradient id="gWallOut" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#245440"/><stop offset=".45" stop-color="#173d2e"/><stop offset="1" stop-color="#0b2019"/></linearGradient>
-<linearGradient id="gCap" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3f7a5e"/><stop offset="1" stop-color="#2b5c46"/></linearGradient>
+<linearGradient id="gWallIn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${PK.wi[0]}"/><stop offset=".12" stop-color="${PK.wi[1]}"/><stop offset="1" stop-color="${PK.wi[2]}"/></linearGradient>
+<linearGradient id="gWallOut" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${PK.wo[0]}"/><stop offset=".45" stop-color="${PK.wo[1]}"/><stop offset="1" stop-color="${PK.wo[2]}"/></linearGradient>
+<linearGradient id="gCap" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${PK.cap[0]}"/><stop offset="1" stop-color="${PK.cap[1]}"/></linearGradient>
 <radialGradient id="gMound" cx=".45" cy=".4" r=".6"><stop offset="0" stop-color="#c88c58"/><stop offset="1" stop-color="#a5693b"/></radialGradient>
 <radialGradient id="gBulb" cx=".42" cy=".38" r=".6"><stop offset="0" stop-color="#fffef8"/><stop offset=".45" stop-color="#fff0c2"/><stop offset=".8" stop-color="#ffc35a"/><stop offset="1" stop-color="#c9801f"/></radialGradient>
 <radialGradient id="gGlow"><stop offset="0" stop-color="#fff1c8" stop-opacity=".95"/><stop offset=".22" stop-color="#ffd27e" stop-opacity=".5"/><stop offset=".55" stop-color="#ffb14d" stop-opacity=".12"/><stop offset="1" stop-color="#ffb14d" stop-opacity="0"/></radialGradient>
@@ -1708,16 +1772,16 @@ ${bulb('sbO1',278,30)}${bulb('sbO2',294,30)}${bulb('sbO3',310,30)}
   }
   /* sponsor stickers on the outfield wall: five across the back, three down each side */
   const sticker=(id,tl,tr,bl,br)=>{ const [w,h]=STK[id]; return `<path d="${path([tl,tr,br,bl])}" fill="#03100a" opacity=".55" transform="translate(1.2 1.8)"/><use href="#st-${id}" transform="${affine(tl,tr,bl,w,h)}"/>`; };
-  { const y0=0.09, y1=0.65, z=5.79, ws=BACK_ADS.map(id=>(y1-y0)*STK[id][0]/STK[id][1]), gap=(7.4-ws.reduce((p,q)=>p+q,0))/(BACK_ADS.length+1);
-    let x=-3.7+gap; BACK_ADS.forEach((id,k)=>{ const x1=x+ws[k]; s+=sticker(id,[x,y1,z],[x1,y1,z],[x,y0,z],[x1,y0,z]); x=x1+gap; }); }
+  { const y0=0.09, y1=0.65, z=5.79, ws=PK.back.map(id=>(y1-y0)*STK[id][0]/STK[id][1]), gap=(7.4-ws.reduce((p,q)=>p+q,0))/(PK.back.length+1);
+    let x=-3.7+gap; PK.back.forEach((id,k)=>{ const x1=x+ws[k]; s+=sticker(id,[x,y1,z],[x1,y1,z],[x,y0,z],[x1,y0,z]); x=x1+gap; }); }
   const sideRow=(X,ids)=>{ const y0=0.12, y1=0.58; let o='';
     for(const [za,zb,list] of [[2.5,4.18,ids.slice(0,2)],[4.42,5.74,ids.slice(2)]]){
       const ws=list.map(id=>(y1-y0)*STK[id][0]/STK[id][1]), gap=((zb-za)-ws.reduce((p,q)=>p+q,0))/(list.length+1); let z=za+gap;
       list.forEach((id,k)=>{ const z1=z+ws[k], flip=P(X,y1,z)[0]>P(X,y1,z1)[0], nz=flip?z1:z, fz=flip?z:z1; o+=sticker(id,[X,y1,nz],[X,y1,fz],[X,y0,nz],[X,y0,fz]); z=z1+gap; });
     }
     return o; };
-  s+=sideRow(3.69,SIDE_R)+sideRow(-3.69,SIDE_L);
-  for(const i of [2,3,4]){ const a=INNER[i], b=INNER[(i+1)%6], c=OUTER[(i+1)%6], d=OUTER[i]; s+=`<path d="${path([[a[0],OWH,a[1]],[b[0],OWH,b[1]],[c[0],OWH,c[1]],[d[0],OWH,d[1]]])}" fill="url(#gCap)"/>`+line([a[0],OWH,a[1]],[b[0],OWH,b[1]],'stroke="#5d9c7d" stroke-width="1.2" opacity=".7"'); }
+  s+=sideRow(3.69,PK.sideR)+sideRow(-3.69,PK.sideL);
+  for(const i of [2,3,4]){ const a=INNER[i], b=INNER[(i+1)%6], c=OUTER[(i+1)%6], d=OUTER[i]; s+=`<path d="${path([[a[0],OWH,a[1]],[b[0],OWH,b[1]],[c[0],OWH,c[1]],[d[0],OWH,d[1]]])}" fill="url(#gCap)"/>`+line([a[0],OWH,a[1]],[b[0],OWH,b[1]],`stroke="${PK.capLine2}" stroke-width="1.2" opacity=".7"`); }
 
   /* the field */
   let f=`<path d="${path(flat(INNER))}" fill="#9a5f35" filter="url(#fDirt)"/>`;
@@ -1751,15 +1815,16 @@ ${bulb('sbO1',278,30)}${bulb('sbO2',294,30)}${bulb('sbO3',310,30)}
     s+=`<path d="${path([[a[0],TY,a[1]],[b[0],TY,b[1]],[b[0],WH,b[1]],[a[0],WH,a[1]]])}" fill="url(#gWallOut)" filter="url(#fFelt)"/>`;
     s+=panelSeams(a,b,TY,WH,0.55)+line([a[0],0,a[1]],[b[0],0,b[1]],'stroke="#0a1d15" stroke-width="2"');
     const ia=INNER[i], ib=INNER[(i+1)%6];
-    s+=`<path d="${path([[ia[0],WH,ia[1]],[ib[0],WH,ib[1]],[b[0],WH,b[1]],[a[0],WH,a[1]]])}" fill="url(#gCap)"/>`+line([a[0],WH,a[1]],[b[0],WH,b[1]],'stroke="#6fae8e" stroke-width="1.4" opacity=".8"');
+    s+=`<path d="${path([[ia[0],WH,ia[1]],[ib[0],WH,ib[1]],[b[0],WH,b[1]],[a[0],WH,a[1]]])}" fill="url(#gCap)"/>`+line([a[0],WH,a[1]],[b[0],WH,b[1]],`stroke="${PK.capLine}" stroke-width="1.4" opacity=".8"`);
+    if(PK.bunting&&i!==0) s+=parkBunting(a,b);
     if(i===0){
       const ux=(b[0]-a[0]), uz=(b[1]-a[1]), at=t=>[a[0]+ux*t,a[1]+uz*t], L=at(0.07), Rr=at(0.93), y1=WH-0.07, y0=TY+0.1;
-      s+=`<path d="${path([[L[0],y1,L[1]],[Rr[0],y1,Rr[1]],[Rr[0],y0,Rr[1]],[L[0],y0,L[1]]])}" fill="#12203b" stroke="#c9b98f" stroke-width="2"/>`;
-      s+=`<g transform="${affine([L[0],y1,L[1]],[Rr[0],y1,Rr[1]],[L[0],y0,L[1]],400,100)}" font-family="Yellowtail, Brush Script MT, cursive" font-size="66" text-anchor="middle"><text x="203" y="70" fill="#9e2f28" textLength="350" lengthAdjust="spacingAndGlyphs">Floodlight Baseball</text><text x="200" y="67" fill="#f1e6c8" textLength="350" lengthAdjust="spacingAndGlyphs">Floodlight Baseball</text></g>`;
+      s+=`<path d="${path([[L[0],y1,L[1]],[Rr[0],y1,Rr[1]],[Rr[0],y0,Rr[1]],[L[0],y0,L[1]]])}" fill="${PK.bannerBg}" stroke="${PK.bannerEdge}" stroke-width="2"/>`;
+      s+=parkBanner(affine([L[0],y1,L[1]],[Rr[0],y1,Rr[1]],[L[0],y0,L[1]],400,100),PK);
     }
   }
   /* where the taller outfield wall steps up from the near walls */
-  for(const i of [2,5]){ const a=INNER[i], o=OUTER[i]; s+=`<path d="${path([[a[0],WH,a[1]],[o[0],WH,o[1]],[o[0],OWH,o[1]],[a[0],OWH,a[1]]])}" fill="url(#gWallOut)" stroke="#0a1d15" stroke-width="1"/>`+line([a[0],OWH,a[1]],[o[0],OWH,o[1]],'stroke="#5d9c7d" stroke-width="1.2" opacity=".7"'); }
+  for(const i of [2,5]){ const a=INNER[i], o=OUTER[i]; s+=`<path d="${path([[a[0],WH,a[1]],[o[0],WH,o[1]],[o[0],OWH,o[1]],[a[0],OWH,a[1]]])}" fill="url(#gWallOut)" stroke="#0a1d15" stroke-width="1"/>`+line([a[0],OWH,a[1]],[o[0],OWH,o[1]],`stroke="${PK.capLine2}" stroke-width="1.2" opacity=".7"`); }
   /* night shade, light glow and a flash layer for big moments */
   s+=`<rect class="shade" width="${W}" height="${H}" fill="#040812"/>`;
   s+='<g class="glow">';
@@ -3030,9 +3095,9 @@ const userSide = () => G.cpu[0]!==G.cpu[1] ? (G.cpu[0]?1:0) : -1;
 function finalWords(){
   const a=total(G,0), h=total(G,1), w=a>h?0:1, hi=Math.max(a,h), lo=Math.min(a,h), x=G.inning>9?` in ${G.inning}`:'', u=userSide();
   if(u>=0){ const them=G.isFr?G.teams[1-u].name:'the computer';
-    return w===u ? {head:`You beat ${them} ${hi}–${lo}${x}${G.walkoff?' on a walk-off':''}!`, share:`I beat ${them} ${hi}–${lo}${x} in the Floodlight Baseball Dice Lab.`}
-      : {head:`${G.isFr?G.teams[1-u].name:'The computer'} wins ${hi}–${lo}${x}.`, share:`${G.isFr?G.teams[1-u].name:'The computer'} beat me ${hi}–${lo}${x} in the Floodlight Baseball Dice Lab.`}; }
-  return {head:`${TN(w)} wins ${hi}–${lo}${x}${G.walkoff?' on a walk-off':''}.`, share:`${TN(w)} beat ${TN(1-w)} ${hi}–${lo}${x}${G.walkoff?' on a walk-off':''} in the Floodlight Baseball Dice Lab.`};
+    return w===u ? {head:`You beat ${them} ${hi}–${lo}${x}${G.walkoff?' on a walk-off':''}!`, share:`I beat ${them} ${hi}–${lo}${x} in Floodlight Baseball.`}
+      : {head:`${G.isFr?G.teams[1-u].name:'The computer'} wins ${hi}–${lo}${x}.`, share:`${G.isFr?G.teams[1-u].name:'The computer'} beat me ${hi}–${lo}${x} in Floodlight Baseball.`}; }
+  return {head:`${TN(w)} wins ${hi}–${lo}${x}${G.walkoff?' on a walk-off':''}.`, share:`${TN(w)} beat ${TN(1-w)} ${hi}–${lo}${x}${G.walkoff?' on a walk-off':''} in Floodlight Baseball.`};
 }
 function showFinal(){
   if(!G || !G.over) return;
@@ -3054,6 +3119,7 @@ ${tops?`<ul class="tops">${tops}</ul>`:''}
 ${fr?`<p class="frnote">${fr}</p>`:''}
 <div class="ovbtns">${G.isFr?`<button class="btn primary" type="button" id="fHub">Franchise hub</button><button class="btn" type="button" id="fShare">Share result</button>`:`<button class="btn primary" type="button" id="fShare">Share result</button><button class="btn" type="button" id="fAgain">Play again</button>`}</div>
 <p class="fnote" id="fNote" hidden></p>
+${ADDON_READY?ksLine():""}
 </div>`;
   ov.hidden=false; ($('fHub')||$('fShare')).focus();
   if(!G.annEnd){ G.annEnd=true; ann.say(annPostgame(),true); }
@@ -3066,7 +3132,7 @@ ${fr?`<p class="frnote">${fr}</p>`:''}
     const text=F.share+(best?` Player of the game: ${best.name} (${statLine(best.b)}).`:''), full=text+' Play it: '+SITE_URL, note=$('fNote');
     const show=html=>{ note.hidden=false; note.innerHTML=html; };
     const manual=()=>show(`Copy this and post it anywhere:<span class="sel">${esc(full)}</span>`);
-    if(navigator.share){ navigator.share({title:'Floodlight Baseball Dice Lab', text, url:SITE_URL}).catch(e=>{ if(e && e.name!=='AbortError') manual(); }); return; }
+    if(navigator.share){ navigator.share({title:'Floodlight Baseball', text, url:SITE_URL}).catch(e=>{ if(e && e.name!=='AbortError') manual(); }); return; }
     if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(full).then(()=>show('Copied. Paste it anywhere: X, Discord, a text.')).catch(manual); return; }
     manual();
   };
@@ -3088,10 +3154,11 @@ const LASTS=['Abbott','Barlow','Calloway','Dempsey','Ellison','Fontaine','Holt',
 const CPU_COLORS=['#3fbf7f','#f08a2c','#9b6be0','#2cc4c4','#e6c23a','#e85b9a'];
 /* the league's clubs: you're California (RED's roster); Boston has BLUE's roster; the other four are computer clubs */
 const FR_USER={name:'California Kings',abbr:'CAL',nick:'Kings',color:'#9b5de5',logo:'crown'};
-const FR_CLUBS=[{name:'Boston Red Hats',abbr:'BOS',nick:'Red Hats',color:'#d9493f',logo:'cap'},{name:'Seattle Emeralds',abbr:'SEA',nick:'Emeralds',color:'#2fa865',logo:'needle'},{name:'Florida Suns',abbr:'FLA',nick:'Suns',color:'#e8c33a',logo:'sun'},{name:'Chicago Knights',abbr:'CHI',nick:'Knights',color:'#17171b',logo:'sword'},{name:'Texas Horns',abbr:'TEX',nick:'Horns',color:'#f0802a',logo:'horns'}];
+const FR_CLUBS=[{name:'Boston Red Hats',abbr:'BOS',nick:'Red Hats',color:'#d9493f',logo:'cap'},{name:'Seattle Emeralds',abbr:'SEA',nick:'Emeralds',color:'#2fa865',logo:'needle'},{name:'Florida Suns',abbr:'FLA',nick:'Suns',color:'#e8c33a',logo:'sun'},{name:'Chicago Knights',abbr:'CHI',nick:'Knights',color:'#17171b',logo:'sword'},{name:'Texas Horns',abbr:'TEX',nick:'Horns',color:'#f0802a',logo:'horns'},{"name":"Brooklyn Bridgers","abbr":"BKN","nick":"Bridgers","color":"#1f9aa8","logo":"bridge"},{"name":"Las Vegas High Rollers","abbr":"LV","nick":"High Rollers","color":"#d6408f","logo":"dice"},{"name":"Denver Summits","abbr":"DEN","nick":"Summits","color":"#45a6e6","logo":"peaks"},{"name":"Portland Pines","abbr":"POR","nick":"Pines","color":"#6b8e23","logo":"pine"},{"name":"Detroit Motormen","abbr":"DET","nick":"Motormen","color":"#7a8aa0","logo":"gear"},{"name":"Kansas City Cyclones","abbr":"KC","nick":"Cyclones","color":"#8b5e3c","logo":"twister"}];
 /* club logos: a crown, a red cap, the Space Needle, a sun, a sword and bull horns */
 const LOGOS={crown:`<circle cx="32" cy="32" r="30" fill="#f4eefe" stroke="#9b5de5" stroke-width="3"/><path d="M13 44 L16 21 L25.5 31 L32 14 L38.5 31 L48 21 L51 44 Z" fill="#9b5de5" stroke="#4b2386" stroke-width="2" stroke-linejoin="round"/><rect x="12" y="43" width="40" height="7" rx="2" fill="#7a3fd0" stroke="#4b2386" stroke-width="2"/><g fill="#ffd23f" stroke="#4b2386" stroke-width="1.2"><circle cx="16" cy="21" r="3"/><circle cx="32" cy="14" r="3"/><circle cx="48" cy="21" r="3"/></g><g fill="#fff" opacity=".9"><circle cx="24" cy="46.5" r="1.6"/><circle cx="32" cy="46.5" r="1.6"/><circle cx="40" cy="46.5" r="1.6"/></g>`,cap:`<circle cx="32" cy="32" r="30" fill="#fdf1ef" stroke="#d9493f" stroke-width="3"/><path d="M10 42 C9.5 25 19.5 14 31 14 C43 14 51 23.5 51 37 L51 42 Z" fill="#d9493f" stroke="#7d1d17" stroke-width="2" stroke-linejoin="round"/><path d="M31.5 14.5 Q34 28 34.5 42" stroke="#7d1d17" stroke-width="1.2" fill="none" opacity=".55"/><circle cx="31" cy="14" r="2.4" fill="#b8352c" stroke="#7d1d17" stroke-width="1"/><path d="M30 41 L58 39.5 Q61.5 45.5 54.5 48 L30 47.5 Z" fill="#b8352c" stroke="#7d1d17" stroke-width="2" stroke-linejoin="round"/><text x="21.5" y="37" font-family="Georgia,'Times New Roman',serif" font-weight="700" font-size="18" fill="#fff" text-anchor="middle">B</text>`,needle:`<circle cx="32" cy="32" r="30" fill="#e8f7ee" stroke="#2fa865" stroke-width="3"/><path d="M7.2 46 Q14.5 42 22 46 T37 46 T56.8 46 A28.5 28.5 0 0 1 7.2 46 Z" fill="#3a8fc7"/><path d="M11 51.5 Q17 48.5 23 51.5 T35 51.5 T53 51.5" stroke="#e8f7ee" stroke-width="1.6" fill="none" opacity=".75"/><path d="M32 5 V15" stroke="#1d6b42" stroke-width="2" stroke-linecap="round"/><path d="M28.5 15 H35.5 L34.5 18 H29.5 Z" fill="#1d6b42"/><ellipse cx="32" cy="20.5" rx="15" ry="3.6" fill="#2fa865" stroke="#1d6b42" stroke-width="1.5"/><path d="M19 21 L25.5 25.5 H38.5 L45 21 Z" fill="#1d6b42"/><path d="M28.5 25.5 L30.6 37 L26.5 47 H29.5 L32 40 L34.5 47 H37.5 L33.4 37 L35.5 25.5 Z" fill="#2fa865" stroke="#1d6b42" stroke-width="1.2" stroke-linejoin="round"/><path d="M29.4 33 H34.6" stroke="#1d6b42" stroke-width="1.4"/>`,sun:`<circle cx="32" cy="32" r="30" fill="#103a6b" stroke="#e8c33a" stroke-width="3"/><path d="M32.0 7.5L30.1 18.1L33.9 18.1ZM44.2 10.8L37.2 19.0L40.6 21.0ZM53.2 19.7L43.0 23.4L45.0 26.8ZM56.5 32.0L45.9 30.1L45.9 33.9ZM53.2 44.2L45.0 37.2L43.0 40.6ZM44.2 53.2L40.6 43.0L37.2 45.0ZM32.0 56.5L33.9 45.9L30.1 45.9ZM19.7 53.2L26.8 45.0L23.4 43.0ZM10.8 44.3L21.0 40.6L19.0 37.2ZM7.5 32.0L18.1 33.9L18.1 30.1ZM10.8 19.7L19.0 26.8L21.0 23.4ZM19.7 10.8L23.4 21.0L26.8 19.0Z" fill="#ffd23f"/><circle cx="32" cy="32" r="11.5" fill="#ffd23f" stroke="#f08a1c" stroke-width="2"/><circle cx="28.5" cy="28.5" r="3.5" fill="#fff3b0" opacity=".7"/>`,sword:`<circle cx="32" cy="32" r="30" fill="#17171b" stroke="#c9ced6" stroke-width="3"/><path d="M32 6 L36 13 V40 H28 V13 Z" fill="#dfe3e9" stroke="#8a919c" stroke-width="1.2" stroke-linejoin="round"/><path d="M32 12 V39" stroke="#8a919c" stroke-width="1.4"/><rect x="18.5" y="39.5" width="27" height="5" rx="2.5" fill="#c9ced6" stroke="#8a919c" stroke-width="1"/><rect x="29.5" y="44.5" width="5" height="9" rx="1.5" fill="#3a3a42" stroke="#c9ced6" stroke-width="1"/><circle cx="32" cy="56" r="3.2" fill="#c9ced6" stroke="#8a919c" stroke-width="1"/>`,horns:`<circle cx="32" cy="32" r="30" fill="#f0802a" stroke="#fff" stroke-width="3"/><path d="M24.5 25 C15 26 8.5 19 10 8.5 C13.5 15 18 18.5 25.5 19.5 Z" fill="#fff"/><path d="M39.5 25 C49 26 55.5 19 54 8.5 C50.5 15 46 18.5 38.5 19.5 Z" fill="#fff"/><path d="M21 22.5 Q17 23 15.5 26.5 Q19 27.5 22.5 26 Z M43 22.5 Q47 23 48.5 26.5 Q45 27.5 41.5 26 Z" fill="#fff"/><path d="M22 21 Q32 16.5 42 21 L40.5 31 Q39.5 38 37.5 44 Q35 51 32 51 Q29 51 26.5 44 Q24.5 38 23.5 31 Z" fill="#fff"/><ellipse cx="32" cy="45" rx="6.5" ry="5" fill="#ffd9bd"/><g fill="#f0802a"><circle cx="29.3" cy="45.5" r="1.4"/><circle cx="34.7" cy="45.5" r="1.4"/><ellipse cx="27.2" cy="30" rx="1.8" ry="2.2"/><ellipse cx="36.8" cy="30" rx="1.8" ry="2.2"/></g>`};
-const LOGO_OF={'California Kings':'crown','Boston Red Hats':'cap','Seattle Emeralds':'needle','Florida Suns':'sun','Chicago Knights':'sword','Texas Horns':'horns'};
+Object.assign(LOGOS,{"bridge":"<circle cx=\"32\" cy=\"32\" r=\"30\" fill=\"#e6f6f8\" stroke=\"#1f9aa8\" stroke-width=\"3\"/><path d=\"M8.5 48 Q32 54 55.5 48 Q50 57 32 59 Q14 57 8.5 48 Z\" fill=\"#3a8fc7\" opacity=\".85\"/><g stroke=\"#0f5560\" stroke-width=\"1.1\" opacity=\".75\"><path d=\"M10 33 V43 M14 37 V43 M28 31 V43 M32 33 V43 M36 31 V43 M50 37 V43 M54 33 V43\"/></g><path d=\"M5 29 Q13 40 21.5 19 Q32 40 42.5 19 Q51 40 59 29\" fill=\"none\" stroke=\"#0f5560\" stroke-width=\"2.2\"/><path d=\"M18 17 h7 v27 h-7 Z M39 17 h7 v27 h-7 Z\" fill=\"#1f9aa8\" stroke=\"#0f5560\" stroke-width=\"2\" stroke-linejoin=\"round\"/><path d=\"M19.8 33 q1.7 -5 3.4 0 v7 h-3.4 Z M40.8 33 q1.7 -5 3.4 0 v7 h-3.4 Z M20.3 22 h2.4 v4 h-2.4 Z M41.3 22 h2.4 v4 h-2.4 Z\" fill=\"#e6f6f8\"/><path d=\"M6 44 H58\" stroke=\"#0f5560\" stroke-width=\"3\" stroke-linecap=\"round\"/>","dice":"<circle cx=\"32\" cy=\"32\" r=\"30\" fill=\"#fdeef5\" stroke=\"#d6408f\" stroke-width=\"3\"/><g transform=\"rotate(-14 22 37)\"><rect x=\"10\" y=\"25\" width=\"24\" height=\"24\" rx=\"5\" fill=\"#fff\" stroke=\"#7a1748\" stroke-width=\"2\"/><g fill=\"#d6408f\"><circle cx=\"16.5\" cy=\"31.5\" r=\"2.6\"/><circle cx=\"22\" cy=\"37\" r=\"2.6\"/><circle cx=\"27.5\" cy=\"42.5\" r=\"2.6\"/></g></g><g transform=\"rotate(12 42 27)\"><rect x=\"30\" y=\"15\" width=\"24\" height=\"24\" rx=\"5\" fill=\"#d6408f\" stroke=\"#7a1748\" stroke-width=\"2\"/><g fill=\"#fff\"><circle cx=\"36.5\" cy=\"21.5\" r=\"2.6\"/><circle cx=\"47.5\" cy=\"21.5\" r=\"2.6\"/><circle cx=\"42\" cy=\"27\" r=\"2.6\"/><circle cx=\"36.5\" cy=\"32.5\" r=\"2.6\"/><circle cx=\"47.5\" cy=\"32.5\" r=\"2.6\"/></g></g>","peaks":"<circle cx=\"32\" cy=\"32\" r=\"30\" fill=\"#eaf5fd\" stroke=\"#45a6e6\" stroke-width=\"3\"/><circle cx=\"46\" cy=\"17\" r=\"5\" fill=\"#ffd23f\" stroke=\"#c99a12\" stroke-width=\"1.2\"/><path d=\"M5 47 L21 20 L30 34 L40 15 L59 47 Z\" fill=\"#2c6fa3\" stroke=\"#173f60\" stroke-width=\"2\" stroke-linejoin=\"round\"/><path d=\"M21 20 L26.6 29.4 L23.6 27.4 L20.6 30.4 L17.8 25.4 Z M40 15 L46.6 27.4 L42.6 25 L39.4 28.6 L36.2 24.6 L34 27.2 Z\" fill=\"#fff\" stroke=\"#173f60\" stroke-width=\"1\" stroke-linejoin=\"round\"/><path d=\"M7 47 H57\" stroke=\"#173f60\" stroke-width=\"2.2\" stroke-linecap=\"round\"/>","pine":"<circle cx=\"32\" cy=\"32\" r=\"30\" fill=\"#f0f6e6\" stroke=\"#6b8e23\" stroke-width=\"3\"/><path d=\"M32 8 L42 22 H37 L46.5 34 H40.5 L51 47 H13 L23.5 34 H17.5 L27 22 H22 Z\" fill=\"#6b8e23\" stroke=\"#2d4210\" stroke-width=\"2\" stroke-linejoin=\"round\"/><path d=\"M32 13 L36.5 20 M32 13 L27.5 20\" stroke=\"#a7c46b\" stroke-width=\"1.4\" stroke-linecap=\"round\" opacity=\".8\"/><rect x=\"28.5\" y=\"47\" width=\"7\" height=\"8\" rx=\"1\" fill=\"#7b4a22\" stroke=\"#2d4210\" stroke-width=\"2\"/>","gear":"<circle cx=\"32\" cy=\"32\" r=\"30\" fill=\"#eef1f5\" stroke=\"#7a8aa0\" stroke-width=\"3\"/><path d=\"M28.2 16.0 L28.8 11.2 L35.2 11.2 L35.8 16.0 L38.3 16.8 L41.6 13.3 L46.8 17.1 L44.5 21.3 L46.1 23.4 L50.8 22.6 L52.7 28.6 L48.4 30.7 L48.4 33.3 L52.7 35.4 L50.8 41.4 L46.1 40.6 L44.5 42.7 L46.8 46.9 L41.6 50.7 L38.3 47.2 L35.8 48.0 L35.2 52.8 L28.8 52.8 L28.2 48.0 L25.7 47.2 L22.4 50.7 L17.2 46.9 L19.5 42.7 L17.9 40.6 L13.2 41.4 L11.3 35.4 L15.6 33.3 L15.6 30.7 L11.3 28.6 L13.2 22.6 L17.9 23.4 L19.5 21.3 L17.2 17.1 L22.4 13.3 L25.7 16.8 Z\" fill=\"#7a8aa0\" stroke=\"#38414f\" stroke-width=\"2\" stroke-linejoin=\"round\"/><circle cx=\"32\" cy=\"32\" r=\"9.5\" fill=\"#eef1f5\" stroke=\"#38414f\" stroke-width=\"2\"/><text x=\"32\" y=\"37\" font-family=\"Georgia,'Times New Roman',serif\" font-weight=\"700\" font-size=\"14\" fill=\"#38414f\" text-anchor=\"middle\">D</text>","twister":"<circle cx=\"32\" cy=\"32\" r=\"30\" fill=\"#f6efe6\" stroke=\"#8b5e3c\" stroke-width=\"3\"/><g fill=\"none\" stroke=\"#5a3a20\" stroke-width=\"7\" stroke-linecap=\"round\" opacity=\".35\"><path d=\"M12 15 Q32 22 52 15\"/><path d=\"M16 23 Q32 29 47 22\"/></g><g fill=\"none\" stroke=\"#8b5e3c\" stroke-width=\"4.6\" stroke-linecap=\"round\"><path d=\"M12 15 Q32 22 52 15\"/><path d=\"M16 23 Q32 29 47 22\"/><path d=\"M20.5 31 Q31 36 42 29.5\"/><path d=\"M24.5 38.5 Q31 42 37.5 37\"/><path d=\"M27.5 45 Q31.5 47.5 34 44\"/><path d=\"M30.5 50.5 Q31.5 53 30 55\"/></g>"}); // the expansion clubs: a bridge, dice, mountain peaks, a pine, a gear and a twister
+const LOGO_OF={'California Kings':'crown','Boston Red Hats':'cap','Seattle Emeralds':'needle','Florida Suns':'sun','Chicago Knights':'sword','Texas Horns':'horns','Brooklyn Bridgers':'bridge','Las Vegas High Rollers':'dice','Denver Summits':'peaks','Portland Pines':'pine','Detroit Motormen':'gear','Kansas City Cyclones':'twister'};
 const logoKey=T=>T?(LOGOS[T.logo]?T.logo:LOGO_OF[T.name]||null):null;
 /* a team's mark: its logo, or a color dot for a team without one */
 const teamMark=(T,cls='')=>{ const k=logoKey(T); return k?`<svg class="tlogo ${cls}" viewBox="0 0 64 64" role="img" aria-label="${esc(T.name)}"><use href="#lg-${k}"/></svg>`:`<i style="background:${T&&T.color}"></i>`; };
@@ -3159,16 +3226,17 @@ function genPlayers(used,hisp,jp,keep){
   if(keep){ const k=ps[0], o=ps.find(p=>p.ab===keep.ab); if(o&&o!==k) [o.ab,k.ab]=[k.ab,o.ab]; else k.ab=keep.ab; }
   return shuffle(ps);
 }
-function frCreate(name,abbr){
+function frCreate(name,abbr,size){
+  size=size===6?6:12;
   const used=new Set([...RED_LINEUP,...BLUE_LINEUP,...namedTeam('red').lineup,...namedTeam('blue').lineup,...DHS.map(d=>d.name)]);
-  const teams={}, C=FR_CLUBS.map(c=>Object.assign({},c));
+  const teams={}, C=FR_CLUBS.slice(0,size-1).map(c=>Object.assign({},c)), NG=C.length-1; // NG clubs get generated players
   if(abbr) for(const c of C) if(c.abbr===abbr) c.abbr=abbrOf(c.name.split(' ')[0],new Set([abbr,...C.map(x=>x.abbr)]));
   const QR=namedTeam('red'), QB=namedTeam('blue'); // start from any custom names used in quick games
   teams.red={id:'red',name,abbr,color:FR_USER.color,lineup:QR.lineup.slice(),roster:QR.roster}; if(name===FR_USER.name) Object.assign(teams.red,{nick:FR_USER.nick,logo:FR_USER.logo});
   teams.blue=Object.assign({id:'blue'},C[0],{lineup:QB.lineup.slice(),roster:QB.roster});
-  const fixedH=[...RED_LINEUP,...BLUE_LINEUP].filter(n=>ROSTER[n].hi).length, left=Math.max(0,LEAGUE_HISPANIC-fixedH), hs=shuffle([0,1,2,3].map(i=>Math.floor(left/4)+(i<left%4?1:0)));
-  const allyAt=1+Math.floor(Math.random()*4), jpAt=shuffle([1,2,3,4].filter(i=>i!==allyAt)).slice(0,LEAGUE_JAPANESE); used.add(ALLY.name);
-  for(let i=1;i<=4;i++){ const ps=genPlayers(used,hs[i-1],jpAt.filter(x=>x===i).length,i===allyAt?ALLY:null);
+  const fixedH=[...RED_LINEUP,...BLUE_LINEUP].filter(n=>ROSTER[n].hi).length, left=Math.max(0,Math.round(LEAGUE_HISPANIC*size/6)-fixedH), hs=shuffle([...Array(NG)].map((_,i)=>Math.floor(left/NG)+(i<left%NG?1:0)));
+  const allyAt=1+Math.floor(Math.random()*NG), jpAt=shuffle([...Array(NG)].map((_,i)=>i+1).filter(i=>i!==allyAt)).slice(0,Math.round(LEAGUE_JAPANESE*size/6)); used.add(ALLY.name);
+  for(let i=1;i<=NG;i++){ const ps=genPlayers(used,hs[i-1],jpAt.filter(x=>x===i).length,i===allyAt?ALLY:null);
     teams['t'+i]=Object.assign({id:'t'+i},C[i],{lineup:ps.map(p=>p.name),roster:Object.fromEntries(ps.map(p=>[p.name,Object.assign({ab:p.ab,n:p.n,f:p.f},p.hi?{hi:1}:{},p.jp?{jp:1}:{})]))}); }
   F={v:1,created:Date.now(),season:1,userId:'red',teams,ids:Object.keys(teams),history:[],records:{},career:{},live:null,retired:[]};
   F.bio={}; for(const id of F.ids) for(const n of teams[id].lineup) F.bio[n]=Object.assign(nwBioNew(n),{a:ROOKIE_AGE}); // every career starts at 18
@@ -3230,6 +3298,7 @@ function frFinishDay(userG){
   }
   nwDay(day);
   F.day++;
+  try{ if(ADDON_READY) trCpuDay(); }catch(e){}
   if(F.day>=F.sched.length) frStartPlayoffs();
   return lines;
 }
@@ -3345,8 +3414,9 @@ function frSimUser(){
 function frSimToPlayoffs(){ if(!F||F.live) return; let w=0,l=0; const before=Object.assign({},F.rec[F.userId]); while(F.phase==='reg') frFinishDay(null); const r=F.rec[F.userId]; hubMsg=`Simulated the rest of the regular season: ${r.w-before.w}–${r.l-before.l} the rest of the way.`; frSave(); renderHub(); tvMaybe(); }
 function frSimPlayoffs(){ if(!F||F.live) return; const was=F.phase; let g=0; while(F.phase==='post' && g++<40) frPlayoffDay(null); hubMsg='Simulated the rest of the playoffs.'; frSave(); renderHub(); maybeTrophy(was); }
 function frNextSeason(){
+  try{ if(ADDON_READY) drAuto(); }catch(e){}
   const gone=frRetire(), cls=frInduct(gone); F.season++; frNewSeason(); nwRetire(gone); nwHof(cls); F.rookies=gone.map(g=>g.rookie);
-  hubMsg=`Season ${F.season} is set. Same six teams, a fresh 32-game schedule.`+(gone.length?` ${gone.length} player${gone.length===1?'':'s'} retired at ${RETIRE_AGE} and ${gone.length===1?'a rookie takes that spot':'rookies take their spots'}. <button class="btn small" type="button" data-act="rookies">Name the rookies</button>`:'')
+  hubMsg=`Season ${F.season} is set. Same ${frCountWord(F.ids.length)} teams, a fresh 32-game schedule.`+(gone.length?` ${gone.length} player${gone.length===1?'':'s'} retired at ${RETIRE_AGE} and ${gone.length===1?'a rookie takes that spot':'rookies take their spots'}. <button class="btn small" type="button" data-act="rookies">Name the rookies</button>`:'')
     +(cls.length?` ${cls.length} ${cls.length===1?'legend was':'legends were'} voted into the Hall of Fame. <button class="btn small" type="button" data-act="hof">See the Hall of Fame</button>`:'');
   frSave(); renderHub();
 }
@@ -3432,7 +3502,7 @@ function setFrUI(){
 function renderFbar(){
   const el=$('fbar'); el.classList.remove('chbar'); if(G&&G.challenge&&!frMode){ chBar(el); return; } if(!frMode||!F){ el.hidden=true; return; }
   el.hidden=false; const M=me(), r=F.rec[M.id];
-  el.innerHTML=`<span class="tagx">Franchise · Season ${F.season}</span><span>${tdot(M.id)}<b>${esc(M.name)}</b> ${r.w}–${r.l}</span><span style="color:var(--muted)">${esc(G&&G.frLabel||'')}</span>${F.news&&F.news[0]?`<span class="fbnews" title="Latest from the Floodlight Gazette">${nwText(F.news[0].h)}</span>`:''}<span class="sp"><button class="btn small" type="button" id="fbHub">Franchise hub</button><button class="btn small" type="button" id="fbExit" title="Back to quick games. Your franchise stays saved.">Exit franchise</button></span>`;
+  el.innerHTML=`<span class="tagx">Franchise · Season ${F.season}</span><span>${tdot(M.id)}<b>${esc(M.name)}</b> ${r.w}–${r.l}</span><span style="color:var(--muted)">${esc(G&&G.frLabel||'')}${G&&G.isFr&&ADDON_READY?' · '+esc(parkFor(G).text):''}</span>${F.news&&F.news[0]?`<span class="fbnews" title="Latest from the Floodlight Gazette">${nwText(F.news[0].h)}</span>`:''}<span class="sp"><button class="btn small" type="button" id="fbHub">Franchise hub</button><button class="btn small" type="button" id="fbExit" title="Back to quick games. Your franchise stays saved.">Exit franchise</button></span>`;
   $('fbHub').onclick=openHub; $('fbExit').onclick=frExit;
 }
 function frExit(){ autoSave(); frMode=false; FR=null; setFrUI(); closeHub(); setWhere('quick'); if(!resumeQuick(jparse(lsGet(QKEY)))||G.over) startExhibition(); }
@@ -3456,9 +3526,10 @@ function renderHub(){
   hub.onclick=e=>{ if(e.target===hub) closeHub(); const a=e.target.closest('[data-act]'); if(a) hubAct(a.dataset.act,a); };
   hub.querySelectorAll('select[data-sel]').forEach(s=>s.onchange=()=>{ if(s.dataset.sel==='scope') statScope=s.value; else if(s.dataset.sel==='spot') newsSpot=s.value; else statTeam=s.value; renderHub(); });
   const imp=$('frImport'); if(imp) imp.onchange=()=>importSave(imp.files[0]);
-  wireSlots();
+  wireSlots(); if(ADDON_READY) movesWire();
 }
 function hubAct(a,el){
+  if(ADDON_READY&&(a==='full'?(fullAsk(F&&F.phase==='off'?'season':'locked'),true):demoGate(a))) return;
   if(a==='play') frPregame();
   else if(a==='resume') frResume();
   else if(a==='sim') frSimUser();
@@ -3473,10 +3544,12 @@ function hubAct(a,el){
   else if(a==='export') openSaves();
   else if(a==='names') frEditNames();
   else if(a==='rookies') frEditRookies();
-  else if(a==='stdclubs'){ askYes('Rename the other five teams to the standard clubs? Players, stats and history stay.','Rename').then(ok=>{ if(ok) frStdClubs(); }); }
+  else if(a==='stdclubs'){ askYes('Rename the computer teams to the league’s standard clubs? Players, stats and history stay.','Rename').then(ok=>{ if(ok) frStdClubs(); }); }
   else if(a==='hof'){ hubTab='hof'; renderHub(); }
+  else if(a==='expand') frExpand();
   else if(a==='reset'){ askYes(`Delete Franchise ${frSlot} and all its seasons, stats and records? Your other franchises are not touched. This cannot be undone.`,'Delete franchise',true).then(ok=>{ if(!ok) return; try{ localStorage.removeItem(frKey(frSlot)); }catch(e){} F=null; frMode=false; FR=null; setFrUI(); startExhibition(); renderHub(); }); }
   else if(a==='exit') frExit();
+  else if(ADDON_READY&&/^(tr|dr)/.test(a)) movesAct(a,el);
 }
 function hubBody(){
   switch(hubTab){
@@ -3488,6 +3561,7 @@ function hubBody(){
     case 'hof': return hofHTML();
     case 'champs': return champsHTML();
     case 'teams': return teamsHTML();
+    case 'moves': return ADDON_READY?movesHTML():'';
     case 'settings': return settingsHTML();
   }
   return homeHTML();
@@ -3511,8 +3585,9 @@ function homeHTML(){
   } else {
     const h=F.history[F.history.length-1];
     main=`<div class="champ"><span class="aside">Season ${h.season} · Floodlight Series champions</span><b>${esc(h.champName)}</b><span>Beat ${esc(h.runnerName)} ${h.score}</span></div>
-<div class="hcard"><h4>Your season</h4><p><b>${esc(M.name)}</b> went <b>${h.user.w}–${h.user.l}</b>, finished ${ordinal(h.user.rank)} and <b>${h.user.result.toLowerCase()}</b>.</p><div class="hbtns"><button class="btn primary" type="button" data-act="next">Start Season ${F.season+1}</button></div></div>${awardsHTML(h.awards)}${bracketHTML()}`;
+<div class="hcard"><h4>Your season</h4><p><b>${esc(M.name)}</b> went <b>${h.user.w}–${h.user.l}</b>, finished ${ordinal(h.user.rank)} and <b>${h.user.result.toLowerCase()}</b>.</p>${ADDON_READY?drHomeLine()+demoHomeLine():""}<div class="hbtns"><button class="btn primary" type="button" data-act="next">Start Season ${F.season+1}${ADDON_READY&&!FULL_GAME?" · full game":""}</button></div></div>${awardsHTML(h.awards)}${bracketHTML()}`;
   }
+  if(ADDON_READY&&demoFrLocked()&&F.phase!=='off') main=`<div class="hcard">${demoHomeLine()}</div>`+main;
   main+=newsCardHTML();
   const mine=F.games.filter(g=>g.a===M.id||g.h===M.id).slice(-5).reverse();
   return `<div class="hgrid"><div style="display:flex;flex-direction:column;gap:14px">${main}${F.phase==='reg'&&F.awards==null&&F.day>4?leadersHTML():''}</div>
@@ -3596,8 +3671,8 @@ function settingsHTML(){
   const M=me();
   return `<div class="hgrid"><div class="hcard"><h4>Your team</h4><div class="form"><label>Team name<input type="text" id="frName" maxlength="28" value="${esc(M.name)}"></label><label>Scoreboard abbreviation (up to 4 letters)<input type="text" id="frAbbr" maxlength="4" value="${esc(M.abbr)}"></label><div class="hbtns"><button class="btn primary" type="button" data-act="rename">Save</button></div></div></div>
 <div class="hcard"><h4>Names</h4><p>Rename any team or player in your league. Stats, records and player cards follow the new names.</p><div class="hbtns"><button class="btn" type="button" data-act="names">Edit team &amp; player names</button></div>
-${frIsStd()?'':`<h4 style="margin-top:8px">The league's clubs</h4><p>Switch to the league's standard clubs: the Boston Red Hats, Seattle Emeralds, Florida Suns, Chicago Knights and Texas Horns${M.name===FR_USER.name?', with the California Kings in purple':''}. Players, stats, records and history all stay.</p><div class="hbtns"><button class="btn" type="button" data-act="stdclubs">Use the standard clubs</button></div>`}
-<h4 style="margin-top:8px">Saving</h4><p>Your franchise saves after every at-bat. You can keep up to <b>three franchises</b> going at once: switch between them with the Franchises buttons at the top of the hub. Use <b>Save / Load</b> for save slots, or to move a franchise to your phone or another computer.</p><div class="hbtns"><button class="btn" type="button" data-act="export">Open Save / Load</button></div>
+${frIsStd()?'':`<h4 style="margin-top:8px">The league's clubs</h4><p>Switch to the league's standard clubs, with their names, colors and logos${M.name===FR_USER.name?', and the California Kings in purple':''}. Players, stats, records and history all stay.</p><div class="hbtns"><button class="btn" type="button" data-act="stdclubs">Use the standard clubs</button></div>`}
+${frExpandHTML()}<h4 style="margin-top:8px">Saving</h4><p>Your franchise saves after every at-bat. You can keep up to <b>three franchises</b> going at once: switch between them with the Franchises buttons at the top of the hub. Use <b>Save / Load</b> for save slots, or to move a franchise to your phone or another computer.</p><div class="hbtns"><button class="btn" type="button" data-act="export">Open Save / Load</button></div>
 <h4 style="margin-top:8px">Leave or restart</h4><div class="hbtns"><button class="btn" type="button" data-act="exit">Exit to quick games</button><button class="btn danger" type="button" data-act="reset">Delete franchise</button></div></div></div>`;
 }
 function exportSave(){
@@ -3610,14 +3685,15 @@ function importSave(file){
   rd.readAsText(file);
 }
 function newFranchiseHTML(){
-  return `<div class="hgrid"><div class="hcard nextg"><h4>Start a franchise</h4><p>You manage <b>RED</b>: Wes Wright, Ezzy Lyons, Hank Hammer and the rest. Five computer teams with their own names and abilities fill out the league. Play a <b>32-game season</b>, and the top four make the playoffs: best-of-3 semifinals, then the best-of-7 <b>Floodlight Series</b>. Every stat, record and champion is saved, and the franchise rolls on season after season.</p>
+  return `<div class="hgrid"><div class="hcard nextg"><h4>Start a franchise</h4><p>You manage <b>RED</b>: Wes Wright, Ezzy Lyons, Hank Hammer and the rest. Eleven computer teams with their own names, logos and abilities fill out the league. Play a <b>32-game season</b>, and the top four make the playoffs: best-of-3 semifinals, then the best-of-7 <b>Floodlight Series</b>. Every stat, record and champion is saved, and the franchise rolls on season after season.</p>
 <div class="form"><label>Team name<input type="text" id="nfName" maxlength="28" value="California Kings"></label><label>Scoreboard abbreviation<input type="text" id="nfAbbr" maxlength="4" value="CAL"></label>
+<div class="choice"><span style="font-size:13px;color:var(--muted);font-weight:600">League size</span><label><input type="radio" name="nfSize" value="12" checked> 12 clubs</label><label><input type="radio" name="nfSize" value="6"> 6 clubs (the classic league)</label></div>
 <div class="choice"><span style="font-size:13px;color:var(--muted);font-weight:600">Team &amp; player names</span><label><input type="radio" name="nfNames" value="keep" checked> Keep the names as they are</label><label><input type="radio" name="nfNames" value="custom"> Customize team and player names</label></div>
 <div class="hbtns"><button class="btn primary" type="button" id="nfGo">Create franchise</button></div></div></div>
-<div class="hcard"><h4>How it works</h4><p>Before every game you pick <b>home or away</b> and set your <b>batting order</b>. Games use Simulation rules: the D12, action cards, designated hitters and player abilities. Can't play them all? <b>Sim</b> any game or skip to the playoffs. Other teams' games are simulated as you go.</p><p>Saved in this browser, with room for three franchises at once. Grab a backup from Settings any time.</p></div></div>`;
+<div class="hcard"><h4>How it works</h4><p>Before every game you pick <b>home or away</b> and set your <b>batting order</b>. Games use Simulation rules: the D12, action cards, designated hitters and player abilities. Can't play them all? <b>Sim</b> any game or skip to the playoffs. Other teams' games are simulated as you go.</p><p>Every club has its <b>own ballpark</b>, and the Floodlight Series is played in a grand neutral stadium. Make <b>trades</b> with the other general managers until the deadline, and pick a rookie in the <b>draft</b> every offseason.</p><p>${ADDON_READY&&!FULL_GAME?'The free demo includes your whole first season, all the way through the Floodlight Series. ':''}Saved in this browser, with room for three franchises at once. Grab a backup from Settings any time.</p></div></div>`;
 }
 function wireNewFranchise(){
-  $('nfGo').onclick=()=>{ const n=$('nfName').value.trim()||'California Kings', a=($('nfAbbr').value.trim()||n.slice(0,3)).toUpperCase().slice(0,4); const custom=(document.querySelector('input[name=nfNames]:checked')||{}).value==='custom'; frCreate(n,a); prepCards(F.ids.map(id=>F.teams[id])); hubTab='home'; hubMsg=`Welcome to Season 1. Meet the league in the Teams tab.`; setFrUI(); if(custom) frEditNames(); else renderHub(); };
+  $('nfGo').onclick=()=>{ const n=$('nfName').value.trim()||'California Kings', a=($('nfAbbr').value.trim()||n.slice(0,3)).toUpperCase().slice(0,4); const custom=(document.querySelector('input[name=nfNames]:checked')||{}).value==='custom', size=+((document.querySelector('input[name=nfSize]:checked')||{}).value||12); frCreate(n,a,size); prepCards(F.ids.map(id=>F.teams[id])); hubTab='home'; hubMsg=`Welcome to Season 1. Meet the league in the Teams tab.`; setFrUI(); if(custom) frEditNames(); else renderHub(); };
 }
 
 /* ---------- franchise news: The Floodlight Gazette ---------- */
@@ -3816,7 +3892,7 @@ function nwPreseason(){
   N.hs={}; N.ts={}; N.lead=null; N.fs={}; N.hrm={}; N.feat=0;
   nwArcs();
   if(F.season===1){
-    nwAdd('pre',`A new league under the lights`,`Six clubs, one 32-game season and a best-of-7 Floodlight Series at the end of it. ${nwT(u)} open play against ${F.ids.filter(i=>i!==u).map(nwT).join(', ')}. The rivalry to watch: ${nwN(u)} and ${nwN(nwRival())}.`,{w:'Preseason',t:[u],pr:3});
+    nwAdd('pre',`A new league under the lights`,`${frCountWord(F.ids.length,true)} clubs, one 32-game season and a best-of-7 Floodlight Series at the end of it. ${nwT(u)} open play against ${F.ids.filter(i=>i!==u).map(nwT).join(', ')}. The rivalry to watch: ${nwN(u)} and ${nwN(nwRival())}.`,{w:'Preseason',t:[u],pr:3});
     const star=me().lineup.find(n=>me().roster[n].ab==='SLG')||me().lineup[0], B=nwBio(star);
     nwAdd('club',`Meet the ${nwN(u)}: ${star}`,`“${B.nick}” is ${B.age}, from ${B.town}. ${B.back}. ${B.quirk}.`,{w:'Preseason',t:[u],p:{n:star,tid:u},pr:2});
     return;
@@ -4383,7 +4459,8 @@ if(/(^|[#&])play\b/.test(location.hash)) closeMenu(); else openMenu();
 var ADDON_READY = false; // the game's own start-up runs before this code; hooks wait for it
 const NATIVE = (typeof window!=='undefined' && window.fdlNative) || null; // set by the desktop app's preload script
 const IS_DESKTOP = !!(NATIVE && NATIVE.isDesktop);
-const GAME_VERSION = '1.2.0';
+const GAME_VERSION = '1.4.0';
+const FULL_GAME = false; /*@edition*/ // the website is the free demo; build.py turns this on for the Steam game
 
 /* ---------- a shared add-on dialog layer (sits above the menu, never touches the game's own pop-ups) ---------- */
 const ov2 = (()=>{ const d=document.createElement('div'); d.className='ov2'; d.id='ov2'; d.hidden=true; document.body.appendChild(d); return d; })();
@@ -4435,8 +4512,7 @@ function openSettings(back){
   const html=`<div class="xpanel" role="dialog" aria-modal="true" aria-labelledby="setT">${xHead('<span id="setT">Settings</span>','Saved on this device. Changes apply right away.')}
 <section class="xsec"><h4>Gameplay</h4>
 <div class="srow"><span class="sl"><b>Game speed</b><small>How fast the dice tumble and plays unfold.</small></span>${segHTML('speed',[['normal','Normal'],['fast','Fast'],['turbo','Turbo']],FSET.speed)}</div>
-<div class="srow"><span class="sl"><b>The duel</b><small>Guess the pitch before each swing, and pick the pitch when you're in the field (Simulation, against the computer).</small></span>${segHTML('duel',[['true','On'],['false','Off']],FSET.duel!==false)}</div>
-<div class="srow"><span class="sl"><b>Computer at-bats</b><small>Roll for the computer yourself (and pick your pitch), or let it roll on its own.</small></span>${segHTML('autoCpu',[['false','I roll'],['true','Auto']],FSET.autoCpu)}</div>
+<div class="srow"><span class="sl"><b>Computer at-bats</b><small>Roll for the computer yourself, or let it roll on its own.</small></span>${segHTML('autoCpu',[['false','I roll'],['true','Auto']],FSET.autoCpu)}</div>
 <div class="srow"><span class="sl"><b>Computer skill</b><small>How sharp the computer manager is with cards and abilities. The dice never change.</small></span>${segHTML('lvl',[['rookie','Rookie'],['pro','Pro'],['allstar','All-Star']],lvl)}</div>
 <div class="srow"><span class="sl"><b>Tips</b><small>One plain-language hint about what you can do right now.</small></span>${segHTML('tips',[['true','On'],['false','Off']],tipsOn)}</div>
 </section>
@@ -4455,7 +4531,7 @@ ${IS_DESKTOP?`<div class="srow"><span class="sl"><b>Interface size</b><small>Big
 <section class="xsec"><h4>Controls</h4>${controlsHTML()}</section>
 <section class="xsec"><h4>More</h4>
 <div class="ovbtns"><button class="btn" type="button" id="setAch">Achievements</button><button class="btn" type="button" id="setCh">Clutch Challenges</button><button class="btn" type="button" id="setTut">Guided first game</button><button class="btn" type="button" id="setCred">Credits</button>${IS_DESKTOP?'':'<button class="btn" type="button" id="setGuide">How to play</button>'}</div>
-<p class="xsub" style="margin:0;color:var(--muted);font-size:12px">Floodlight Baseball Dice Lab ${GAME_VERSION}${IS_DESKTOP?' · desktop':''}</p>
+<p class="xsub" style="margin:0;color:var(--muted);font-size:12px">Floodlight Baseball ${GAME_VERSION}${IS_DESKTOP?' · desktop':''}</p>
 </section></div>`;
   openX(html, {back});
   ov2.querySelectorAll('[data-set]').forEach(g=>g.addEventListener('click',e=>{
@@ -4567,7 +4643,6 @@ const ACHS=[
   {id:'clutch_all', t:'p', g:'star',   name:'Clutch Legend',         desc:'Earn every star in Clutch Challenges.', stat:'chStars', goal:36},
   {id:'daily',      t:'b', g:'cal',    name:'Daily Grind',           desc:'Win a Daily Challenge.'},
   {id:'daily5',     t:'g', g:'flame',  name:'Hot Streak',            desc:'Win the Daily Challenge five days in a row.', stat:'dailyStreak', goal:5},
-  {id:'mind_reader',t:'s', g:'eye',    name:'Mind Reader',           desc:'Win the duel at the plate five times in a row.'},
   {id:'tutorial',   t:'b', g:'ball',   name:'Rookie Camp',           desc:'Finish the guided first game.'},
   {id:'lights',     t:'b', g:'bulb',   name:'Lights Out',            desc:'Switch the stadium lights off, then back on.', hidden:true}
 ];
@@ -4610,6 +4685,7 @@ function achPA(){
   if(!G||G.event===achLastEv) return; achLastEv=G.event;
   const mine=mySides(), ev=G.last, E=G.event||{};
   if(cpuLvl!=='allstar') G.lvlAll=false;
+  lbTrack();
   G.achDef=G.achDef||[0,0]; for(const s of [0,1]) G.achDef[s]=Math.max(G.achDef[s], total(G,1-s)-total(G,s));
   if(ev && ev!==G.achLastPA){ G.achLastPA=ev; const t=ev.team;
     if(mine.includes(t)){
@@ -4788,6 +4864,10 @@ function describePlay(){
   const toF=(i,y=.42)=>[FPOS(i)[0],FPOS(i)[1],y], toB=(n,y=.4)=>[BASES[n][0],BASES[n][1],y];
   const hit=(legs,kind)=>({kind,ball:{from:P0,legs:[{to:PLATE,peak:.06,ms:240},...legs]}});
   const fresh=ev&&ev!==FIELD.lastEv; if(ev) FIELD.lastEv=ev;
+  /* the announcer's line is picked first, so the ball goes where he says: to short, to third, into left... */
+  const pickCall=k=>{ try{ return voPick(k); }catch(e){ return null; } }, callN=id=>id?+String(id).split('.').pop():-1, withCall=(d,c)=>(c&&(d.call=c),d);
+  const groundOut=()=>{ const c=pickCall('ground'), n=callN(c), f=n===0||n===3?4:n===1?5:n===2?3:inf;
+    return withCall(hit([{to:toF(f,.05),peak:.06,ms:430,react:f},...(f===2?[]:[{to:toB(0),peak:.1,ms:360,react:2}])],'ground'),c); };
   switch(t){
     case 'Injured': return {kind:'injured'}; // the trainer comes out: no pitch, no ball in play
     case 'Stolen base': case 'Steals home!': return {kind:'steal',ball:{from:toF(1,.4),legs:[{to:toB(1),peak:.15,ms:420,react:3}]}};
@@ -4806,17 +4886,25 @@ function describePlay(){
   switch(ev.o){
     case 'K': return {kind:'k',ball:{from:P0,legs:[Object.assign({},pitch,{sfx:'pop'})]}};
     case 'BB': return {kind:'bb',ball:{from:P0,legs:[{to:[0.45,0.3,.55],peak:.08,ms:300,sfx:'pop'}]}};
-    case '1B': return hit([{to:[rnd(-2,2),rnd(3.7,4.4),.05],peak:rnd(.15,.45),ms:700}],'1b');
-    case '2B': { const s=Math.random()<.5?-1:1; return hit([{to:[s*rnd(2.5,3.1),5.3,.1],peak:.9,ms:850},{to:[s*2.3,4.7,.05],peak:.15,ms:300}],'2b'); }
-    case '3B': return hit([{to:[3.25,4.6,.05],peak:.5,ms:820}],'3b');
+    case '1B': { const c=pickCall('1b'), n=callN(c); // the ball goes where the announcer says it went
+      const x=n===0?rnd(-2.3,-1.3):n===1?rnd(-.45,.45):n===3?rnd(1.3,2.3):n===2?(Math.random()<.5?-1:1)*rnd(1.4,1.8):rnd(-2,2);
+      return withCall(hit([{to:[x,n===2?rnd(3.6,3.9):rnd(3.7,4.4),.05],peak:n===3?.65:n===1?.2:rnd(.15,.45),ms:700}],'1b'),c); }
+    case '2B': { const c=pickCall('2b'), n=callN(c), s=Math.random()<.5?-1:1;
+      if(n===2) return withCall(hit([{to:[s*3.3,4.5,.05],peak:.25,ms:800},{to:[s*2.6,4.35,.05],peak:.1,ms:300}],'2b'),c); // down the line
+      if(n===1) return withCall(hit([{to:[s*rnd(1,2.2),5.5,.6],peak:1.4,ms:950},{to:[s*rnd(1,1.8),4.9,.05],peak:.2,ms:320}],'2b'),c); // off the wall
+      return withCall(hit([{to:[s*rnd(2.5,3.1),5.3,.1],peak:.9,ms:850},{to:[s*2.3,4.7,.05],peak:.15,ms:300}],'2b'),c); }
+    case '3B': return withCall(hit([{to:[3.25,4.6,.05],peak:.5,ms:820}],'3b'),pickCall('3b'));
     case 'HR': return hit([{to:[rnd(-2.6,2.6),7.4,1.6],peak:2.7,ms:1400,fade:true,hold:0}],'hr');
-    case 'DP': return ev.dp ? hit([{to:toF(4,.05),peak:.06,ms:420,react:4},{to:toB(1),peak:.1,ms:260,react:3},{to:toB(0),peak:.1,ms:340,react:2}],'dp')
-                            : hit([{to:toF(inf,.05),peak:.06,ms:420,react:inf},{to:toB(0),peak:.1,ms:360,react:2}],'ground');
+    case 'DP': return ev.dp ? withCall(hit([{to:toF(4,.05),peak:.06,ms:420,react:4},{to:toB(1),peak:.1,ms:260,react:3},{to:toB(0),peak:.1,ms:340,react:2}],'dp'),pickCall('dp'))
+                            : groundOut();
     case 'FC': return hit([{to:toF(4,.05),peak:.06,ms:420,react:4},{to:toB(1),peak:.1,ms:260,react:3}],'fc');
     case 'OUT': { const r=Math.random();
-      if(r<.5) return hit([{to:toF(of,.5),peak:1.6,ms:1050,react:of}],'fly');
-      if(r<.85) return hit([{to:toF(inf,.05),peak:.06,ms:430,react:inf},...(inf===2?[]:[{to:toB(0),peak:.1,ms:360,react:2}])],'ground');
-      return hit([{to:toF(inf,.4),peak:.12,ms:300,react:inf}],'liner'); }
+      if(r<.5){ const c=pickCall('fly'), n=callN(c);
+        if(n===3){ const f=[2,3,4,5][Math.floor(Math.random()*4)]; return withCall(hit([{to:toF(f,.5),peak:1.5,ms:950,react:f}],'fly'),c); } // popped up on the infield
+        const f=n===0?7:n===2?8:of; return withCall(hit([{to:toF(f,.5),peak:1.6,ms:1050,react:f}],'fly'),c); }
+      if(r<.85) return groundOut();
+      const c=pickCall('liner'), n=callN(c), f=n===1?5:inf; // "lined right at the third baseman" goes to the third baseman
+      return withCall(hit([{to:toF(f,.4),peak:.12,ms:300,react:f}],'liner'),c); }
   }
   return null;
 }
@@ -4839,6 +4927,64 @@ function fieldCheck(){
   const f=box.querySelectorAll('.mp[data-k^="f"]').length; if(f!==9) bad.push('fielders '+f);
   if(box.querySelectorAll('.fball').length>1) bad.push('balls '+box.querySelectorAll('.fball').length);
   return bad;
+}
+
+/* ---------- ballparks: every club plays at home in its own park, and the Floodlight Series is played at a grand, neutral stadium ----------
+   The stadium is drawn once by buildScene(); a park only changes its colors, its banner, the sponsor stickers and
+   (for the Series) bunting. parkNow() is read by buildScene, so it must work before the add-ons finish loading. */
+var PARK_CUR=null, PARK_KEY='';
+const PARK_NAMES={'California Kings':'Crown Field','Boston Red Hats':'The Brickyard','Seattle Emeralds':'Emerald Park','Florida Suns':'Sunshine Field',
+  'Chicago Knights':'Castle Park','Texas Horns':'Prairie Grounds','Brooklyn Bridgers':'Harbor Field','Las Vegas High Rollers':'The Jackpot',
+  'Denver Summits':'Summit Park','Portland Pines':'Timber Grove','Detroit Motormen':'Motor Works Field','Kansas City Cyclones':'Twister Field'};
+const ADS_ALL=['ghostrunner','pizza','curveball','hallofgood','strikezone','badhops','hotdogs','umpire','warningtrack','popcorn','giftshop'];
+function parkClassic(){ return {key:'classic', wi:['#2c624a','#21503c','#14362a'], wo:['#245440','#173d2e','#0b2019'], cap:['#3f7a5e','#2b5c46'], capLine:'#6fae8e', capLine2:'#5d9c7d',
+  bannerBg:'#12203b', bannerEdge:'#c9b98f', text:'Floodlight Baseball', fill:'#f1e6c8', shadow:'#9e2f28', logos:[],
+  back:['ghostrunner','pizza','curveball','hallofgood','strikezone'], sideR:['badhops','hotdogs','umpire'], sideL:['warningtrack','popcorn','giftshop'], bunting:false}; }
+function parkNow(){ return PARK_CUR||parkClassic(); }
+function parkHSL(hex){ const n=parseInt(String(hex||'#2fa865').slice(1,7),16); let r=(n>>16&255)/255, g=(n>>8&255)/255, b=(n&255)/255;
+  const mx=Math.max(r,g,b), mn=Math.min(r,g,b), l=(mx+mn)/2, d=mx-mn; let h=0, s=0;
+  if(d){ s=d/(1-Math.abs(2*l-1)); h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4; h=(h*60+360)%360; }
+  return [h,s]; }
+const parkC=(h,s,l)=>`hsl(${Math.round(h)} ${Math.round(s*100)}% ${l}%)`;
+/* a club's home park: walls in its colors, its name on the banner, its logo at both ends and its own sponsor lineup */
+function parkForTeam(T){
+  const [h,s0]=parkHSL(T.color), s=Math.min(s0,.55), seed=[...String(T.name)].reduce((a,c)=>(a*31+c.charCodeAt(0))>>>0,7);
+  const ads=ADS_ALL.slice(); let x=seed; for(let i=ads.length-1;i>0;i--){ x=(x*1103515245+12345)>>>0; const j=x%(i+1); [ads[i],ads[j]]=[ads[j],ads[i]]; }
+  const k=logoKey(T), dark=s0<.12, name=PARK_NAMES[T.name]||`${String(T.name).split(' ')[0]} Ballpark`;
+  return {key:'t:'+T.name+T.color, wi:[parkC(h,s,30),parkC(h,s,24),parkC(h,s,15)], wo:[parkC(h,s,27),parkC(h,s,19),parkC(h,s,10)], cap:[parkC(h,s,40),parkC(h,s,29)],
+    capLine:parkC(h,s,58), capLine2:parkC(h,s,50), bannerBg:parkC(h,Math.min(s,.5),12), bannerEdge:'#c9b98f', text:name, fill:'#f4ead0', shadow:dark?'#8f98ab':T.color,
+    logos:k?[k,k]:[], back:ads.slice(0,5), sideR:ads.slice(5,8), sideL:ads.slice(8,11), bunting:false}; }
+/* the Floodlight Series: navy and gold, bunting on the rails, both clubs' logos on the banner */
+function parkSeries(A,H){ return {key:'series:'+A.name+'|'+H.name, wi:['#26375f','#1d2c4e','#111b33'], wo:['#22325a','#18243f','#0c1426'], cap:['#e2bd55','#a8822a'], capLine:'#f6d98a', capLine2:'#e2bd55',
+  bannerBg:'#0d1530', bannerEdge:'#e8c25a', text:'Floodlight Series', fill:'#ffe9a8', shadow:'#9e2f28', logos:[logoKey(A),logoKey(H)].filter(Boolean).length===2?[logoKey(A),logoKey(H)]:[],
+  back:['hallofgood','curveball','pizza','strikezone','ghostrunner'], sideR:['hotdogs','umpire','badhops'], sideL:['popcorn','giftshop','warningtrack'], bunting:true}; }
+/* which park this game is in: quick games keep the classic stadium */
+function parkFor(G){
+  if(!G||!G.isFr) return parkClassic();
+  const A=G.teams[0], H=G.teams[1];
+  if(/Floodlight Series/.test(G.frLabel||'')) return parkSeries(A,H);
+  return parkForTeam(H);
+}
+/* the banner on the front wall (drawn by buildScene in a 400 x 100 box) */
+function parkBanner(tf,PK){
+  const two=PK.logos.length===2, room=two?250:350, len=Math.min(room,Math.round(PK.text.length*19.5)), lg=(k,x)=>`<use href="#lg-${k}" x="${x}" y="17" width="66" height="66"/>`;
+  return `<g transform="${tf}">${two?lg(PK.logos[0],6)+lg(PK.logos[1],328):''}<g font-family="Yellowtail, Brush Script MT, cursive" font-size="66" text-anchor="middle"><text x="203" y="70" fill="${PK.shadow}" textLength="${len}" lengthAdjust="spacingAndGlyphs">${esc(PK.text)}</text><text x="200" y="67" fill="${PK.fill}" textLength="${len}" lengthAdjust="spacingAndGlyphs">${esc(PK.text)}</text></g></g>`;
+}
+/* red, white and blue bunting fans hung from the top of a near wall */
+function parkBunting(a,b){
+  let o=''; const N=4, R=0.2, at=t=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t];
+  for(let k=0;k<N;k++){ const t0=(k+0.08)/N, t1=(k+0.92)/N, tm=(t0+t1)/2;
+    for(const [f,c] of [[1,'#c8423a'],[.68,'#f4ead0'],[.36,'#2b4c8f']]){ const pts=[];
+      for(let j=0;j<=10;j++){ const th=Math.PI*j/10, t=tm+(t1-t0)/2*f*Math.cos(Math.PI-th), p=at(t); pts.push([p[0],WH-0.012-R*f*Math.sin(th),p[1]]); }
+      o+=`<path d="${path(pts)}" fill="${c}" stroke="#7a1f1a" stroke-width=".6" stroke-opacity=".5"/>`; } }
+  return o;
+}
+/* switch parks when a game moves somewhere else (only the stadium is redrawn; the scoreboard is filled in again) */
+function parkSync(){
+  const PK=G?parkFor(G):parkClassic(); if(PK.key===(PARK_KEY||'classic')) return;
+  PARK_CUR=PK; PARK_KEY=PK.key;
+  try{ buildScene(); }catch(e){ console.warn('park',e); PARK_CUR=null; PARK_KEY='classic'; buildScene(); }
+  if(G) try{ setScoreboard(); }catch(e){}
 }
 
 /* the streak flame (an icon, so it looks the same on every system) */
@@ -4929,14 +5075,17 @@ function dailyStreak(){ let n=0; const d=new Date(); for(let i=0;i<400;i++){ con
 function openChallenges(back){
   const dt=today(), dc=dailyFor(dt), dd=DAYD[dt]||{}, streak=dailyStreak();
   const card=(c,daily)=>{ const st=daily?(dd.stars||0):((CHD[c.id]||{}).stars||0);
-    return `<li><button type="button" class="chcard${daily?' daily':''}" data-ch="${daily?'daily':c.id}">
+    const lock=!daily&&!demoChOk(c);
+    return `<li><button type="button" class="chcard${daily?' daily':''}${lock?' locked':''}" data-ch="${daily?'daily':c.id}">${lock?'<span class="chlock">Full game</span>':''}
 <span class="chk">${daily?`Daily Challenge · ${new Date().toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'})}`:c.mode==='arcade'?'Arcade · D8':'Simulation · D12'}</span>
 <span class="chrow">${diagramSafe(c)}<span style="display:flex;flex-direction:column;gap:4px;min-width:0"><span class="chname">${esc(c.title)}</span><span class="chsit">${esc(sitText(c))}</span></span></span>
 <span class="chblurb">${esc(c.story)}</span><span class="chrow">${daily&&streak?`<span class="streak">${flameIc()}${streak}-day streak</span>`:''}${starsHTML(st)}</span></button></li>`; };
   openX(`<div class="xpanel wide" role="dialog" aria-modal="true" aria-labelledby="chT">${xHead('<span id="chT">Clutch Challenges</span>','Late-inning spots to win. Earn a star for each goal. The dice are fair, so try again as often as you like.')}
 <div class="chtop"><span class="chtot">★ ${chStarsTotal()} / ${CH_STARS}</span><span style="color:var(--muted);font-size:13px">Computer skill: <b style="color:var(--cream)">${cpuLvl==='allstar'?'All-Star':cpuLvl==='rookie'?'Rookie':'Pro'}</b> (change it in Settings)</span></div>
+<div class="hbtns" style="margin:-4px 0 10px"><button class="btn small" type="button" id="chLB">Daily Challenge leaderboard</button></div>
 <ul class="chgrid">${card(dc,true)}${CHALL.map(c=>card(c,false)).join('')}</ul></div>`, {back});
-  ov2.querySelectorAll('[data-ch]').forEach(b=>b.onclick=()=>{ const id=b.dataset.ch; closeX(true); startChallenge(id==='daily'?dailyFor(today()):CH_BY[id]); });
+  ov2.querySelectorAll('[data-ch]').forEach(b=>b.onclick=()=>{ const id=b.dataset.ch; if(id!=='daily'&&!demoChOk(CH_BY[id])){ fullAsk('ch',()=>openChallenges(back)); return; } closeX(true); startChallenge(id==='daily'?dailyFor(today()):CH_BY[id]); });
+  const lb=$('chLB'); if(lb) lb.onclick=()=>lbView(today(),()=>openChallenges(back));
 }
 const diagramSafe=c=>{ try{ return diamondSVG(c); }catch(e){ return ''; } };
 
@@ -4975,6 +5124,7 @@ function buildChallenge(c){
 }
 function startChallenge(c){
   if(!c||busy) return;
+  if(!demoChOk(c)){ fullAsk('ch'); return; }
   const from=frMode?'fr':(G&&G.challenge&&G.challenge.from)||'quick';
   closeMenu(); pendingToast='';
   if(frMode){ autoSave(); frMode=false; FR=null; setFrUI(); closeHub(); }
@@ -5011,7 +5161,7 @@ function chFinal(){
   if(won){ if(daily){ achUnlock('daily'); achSet('dailyStreak',Math.max(ACHD.s.dailyStreak||0,dailyStreak())); }
     else achSet('chWins',CHALL.filter(x=>(CHD[x.id]||{}).wins).length); }
   achSet('chStars',chStarsTotal());
-  const idx=CHALL.findIndex(x=>x.id===c.id), next=daily?CHALL.find(x=>!((CHD[x.id]||{}).stars>=3)):CHALL[(idx+1)%CHALL.length];
+  const CL=CHALL.filter(demoChOk), idx=CL.findIndex(x=>x.id===c.id), next=daily?CL.find(x=>!((CHD[x.id]||{}).stars>=3)):CL[(idx+1)%CL.length];
   const a=total(G,0), h=total(G,1);
   const html=`<div class="xpanel chres" role="dialog" aria-modal="true" aria-labelledby="crT">
 <span class="aside" style="color:var(--flood)">${esc(c.title)}${daily?' · '+esc(c.date):''}</span>
@@ -5020,6 +5170,7 @@ ${starsHTML(stars,'big')}
 <p class="fin">Final: ${esc(G.teams[0].abbr)} ${a}, ${esc(G.teams[1].abbr)} ${h}${G.inning>9?` in ${G.inning}`:''}${newBest&&won?' · New best!':''}${sim?'<br>Finish game hands your calls to the computer, so no stars this time.':''}</p>
 <ul class="goals">${c.goals.map((g,i)=>`<li class="${ok[i]&&won?'on':''}">${esc(goalText(g))}</li>`).join('')}</ul>
 ${daily?`<p class="fin">${dailyStreak()?`<span class="streak">${flameIc()}${dailyStreak()}-day streak</span> · `:''}A new Daily Challenge every day.</p>`:''}
+${daily?lbFinalHTML(won&&!sim,stars):''}
 <div class="ovbtns"><button class="btn primary" type="button" id="crRetry" data-focus>Try again</button>${next&&!daily?`<button class="btn" type="button" id="crNext">Next: ${esc(next.title)}</button>`:''}<button class="btn" type="button" id="crAll">All challenges</button></div>
 <div class="ovbtns"><button class="btn small" type="button" id="crBox">See the box score</button><button class="btn small" type="button" id="crExit">Back to my game</button></div></div>`;
   openX(html);
@@ -5030,6 +5181,7 @@ ${daily?`<p class="fin">${dailyStreak()?`<span class="streak">${flameIc()}${dail
   $('crAll').onclick=()=>{ closeX(true); openChallenges(); };
   $('crBox').onclick=()=>{ closeX(true); G.challengeShown=true; showFinal(); };
   $('crExit').onclick=()=>{ closeX(true); exitChallenge(); };
+  if(daily) lbFinalWire(won&&!sim,c.date);
   return true;
 }
 /* leave a challenge: back to the quick game you had going (challenges never touch your saves) */
@@ -5050,6 +5202,74 @@ function chBar(el){
   $('cbExit').onclick=()=>{ if(busy) return; exitChallenge(); };
 }
 
+/* ---------- the Daily Challenge leaderboard: everyone plays the same spot each day; a win posts your points ----------
+   Points: 100 per star, 10 per run you score, 20 per run you win by, 50 for winning on your first try that day,
+   times the computer's skill (Rookie x0.75, Pro x1, All-Star x1.25). The server keeps each player's best of the day. */
+const LB_API=window.__fdlLB||((/\.netlify\.app$/.test(location.hostname)?location.origin:SITE_URL)+'/api/leaderboard');
+const LVR={rookie:0,pro:1,allstar:2}, LV_MULT=[.75,1,1.25], LV_NAME=['Rookie','Pro','All-Star'], LV_KEY=['rookie','pro','allstar'];
+function lbId(){ let id=lsGet('fdl-lbid'); if(!id||!/^[a-z0-9]{12,40}$/.test(id)){ id=Array.from(crypto.getRandomValues(new Uint8Array(18)),b=>'abcdefghijklmnopqrstuvwxyz0123456789'[b%36]).join(''); try{ localStorage.setItem('fdl-lbid',id); }catch(e){} } return id; }
+const lbName=()=>lsGet('fdl-nick')||'';
+const lbClean=s=>String(s||'').normalize('NFKC').replace(/[^\p{L}\p{N} ._'-]/gu,'').replace(/\s+/g,' ').trim().slice(0,16);
+/* the computer's skill for the whole challenge: the easiest level it was set to at any point */
+function lbTrack(){ if(G&&G.challenge){ const v=LVR[cpuLvl]??1; G.lbLvl=G.lbLvl==null?v:Math.min(G.lbLvl,v); } }
+function lbScore(stars){
+  const c=G.challenge, u=c.u, ran=Math.max(0,Math.min(30,total(G,u)-c.start[u])), by=Math.max(0,Math.min(30,total(G,u)-total(G,1-u)));
+  const first=((DAYD[c.date]||{}).tries||1)<=1; lbTrack(); const lv=G.lbLvl==null?1:G.lbLvl;
+  return {pts:Math.round((stars*100+ran*10+by*20+(first?50:0))*LV_MULT[lv]), stars, ran, by, first, lv};
+}
+function lbWhy(S){ const p=[`${S.stars*100} for ${S.stars} star${S.stars===1?'':'s'}`]; if(S.ran) p.push(`${S.ran*10} for ${S.ran} run${S.ran===1?'':'s'}`); if(S.by) p.push(`${S.by*20} for winning by ${S.by}`); if(S.first) p.push('50 for your first try');
+  return p.join(' + ')+(S.lv!==1?`, ×${LV_MULT[S.lv]} for ${LV_NAME[S.lv]}`:''); }
+async function lbFetch(opts,q){ const ctl=new AbortController(), t=setTimeout(()=>ctl.abort(),9000);
+  try{ const r=await fetch(LB_API+(q||''),Object.assign({signal:ctl.signal},opts||{})); const j=await r.json().catch(()=>({})); if(!r.ok) throw new Error(j.error||'The leaderboard is not available right now.'); return j; }
+  catch(e){ throw new Error(e.name==='AbortError'||/fetch|network|load/i.test(e.message)?'Couldn’t reach the leaderboard. Check your internet connection.':e.message); }
+  finally{ clearTimeout(t); } }
+const lbGet=date=>lbFetch(null,`?date=${date}&me=${lbId()}`);
+const lbPost=(date,S,name)=>lbFetch({method:'POST',headers:{'content-type':'text/plain'},body:JSON.stringify({date,id:lbId(),name,score:S.pts,stars:S.stars,lv:LV_KEY[S.lv]})});
+function lbTable(B,limit){
+  if(!B.count) return B.date&&B.date!==today()?`<p class="lbempty">Nobody posted a score that day.</p>`:`<p class="lbempty">Nobody has posted a score yet. Win today’s challenge to be first.</p>`;
+  const rows=B.top.slice(0,limit||25).map((e,i)=>`<tr class="${e.me?'me':''}"><td>${i+1}</td><td class="l">${esc(e.n)}${e.me?' <small>(you)</small>':''}</td><td>${'★'.repeat(e.st)}</td><td><small>${LV_NAME[LVR[e.lv]??1]}</small></td><td><b>${e.s}</b></td></tr>`).join('');
+  const meRow=B.rank>(limit||25)&&B.you?`<tr class="me gap"><td>${B.rank}</td><td class="l">${esc(B.you.n)} <small>(you)</small></td><td>${'★'.repeat(B.you.st)}</td><td><small>${LV_NAME[LVR[B.you.lv]??1]}</small></td><td><b>${B.you.s}</b></td></tr>`:'';
+  return `<table class="tbl lbt"><thead><tr><th>#</th><th class="l">Player</th><th>Stars</th><th>Skill</th><th>Points</th></tr></thead><tbody>${rows}${meRow}</tbody></table><p class="lbcount">${B.count} player${B.count===1?'':'s'}${B.date&&B.date!==today()?'':' today'}${B.rank?` · You’re <b>#${B.rank}</b>`:''}</p>`;
+}
+/* the leaderboard screen (from the challenge list or after a challenge) */
+function lbView(date,back){
+  date=date||today(); const y=(()=>{ const d=new Date(date+'T12:00:00'); d.setDate(d.getDate()-1); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; })();
+  const isToday=date===today();
+  openX(`<div class="xpanel" role="dialog" aria-modal="true" aria-labelledby="lbT">${xHead('<span id="lbT">Daily Challenge leaderboard</span>',`${isToday?'Today':'Yesterday'} · ${esc(new Date(date+'T12:00:00').toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'}))}. Everyone plays the same spot. Win to post your points.`)}
+<div class="seg" role="group"><button type="button" data-d="${today()}" aria-pressed="${isToday}">Today</button><button type="button" data-d="${isToday?y:date}" aria-pressed="${!isToday}">Yesterday</button></div>
+<div id="lbBody" class="lbbody"><p class="lbempty">Loading…</p></div>
+<p class="lbrules">Points: 100 per star, 10 per run you score, 20 per run you win by and 50 for winning on your first try of the day. All-Star skill counts ×1.25, Rookie ×0.75. Your best score of the day counts.</p>
+<div class="ovbtns">${isToday?'<button class="btn primary" type="button" id="lbPlay">Play today’s challenge</button>':''}<button class="btn" type="button" data-x>Close</button></div></div>`,{back});
+  ov2.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{ if(b.getAttribute('aria-pressed')!=='true') lbView(b.dataset.d,back); });
+  const play=$('lbPlay'); if(play) play.onclick=()=>{ closeX(true); startChallenge(dailyFor(today())); };
+  lbGet(date).then(B=>{ const el=$('lbBody'); if(el) el.innerHTML=lbTable(B); }).catch(e=>{ const el=$('lbBody'); if(el) el.innerHTML=`<p class="lbempty">${esc(e.message)}</p>`; });
+}
+/* the part of the challenge result screen that posts your score */
+function lbFinalHTML(won,stars){
+  if(!won) return `<div class="lbbox"><p>Win today’s challenge to post your points on the leaderboard.</p><button class="btn small" type="button" id="lbSee">See today’s leaderboard</button></div>`;
+  const S=lbScore(stars); G.lbS=S;
+  return `<div class="lbbox"><p class="lbpts"><b>${S.pts} points</b> <small>${esc(lbWhy(S))}</small></p>
+<div class="lbform" ${lbName()?'hidden':''}><label>Your name on the leaderboard<input type="text" id="lbName" maxlength="16" autocomplete="nickname" value="${esc(lbName())}" placeholder="2 to 16 letters"></label><button class="btn primary small" type="button" id="lbGo">Post my score</button></div>
+<div id="lbRes" class="lbres">${lbName()?'<p class="lbempty">Posting your score…</p>':''}</div>
+<button class="btn small" type="button" id="lbSee">See today’s leaderboard</button></div>`;
+}
+function lbFinalWire(won,date){
+  const see=$('lbSee'); if(see) see.onclick=()=>lbView(date,()=>{ if(G&&G.challenge){ G.challengeShown=true; showFinal(); } });
+  if(!won||!G||!G.lbS) return;
+  const S=G.lbS, rec=DAYD[date]=DAYD[date]||{};
+  const send=name=>{ const res=$('lbRes'), go=$('lbGo'); if(go) go.disabled=true; if(res) res.innerHTML='<p class="lbempty">Posting your score…</p>';
+    lbPost(date,S,name).then(B=>{ try{ localStorage.setItem('fdl-nick',name); }catch(e){} rec.pts=Math.max(rec.pts||0,S.pts); chSave();
+      const f=ov2.querySelector('.lbform'); if(f) f.hidden=true;
+      const el=$('lbRes'); if(el) el.innerHTML=`<p class="lbok">${B.best?`Posted! You’re <b>#${B.rank}</b> of ${B.count} today.`:`Your best today is still <b>${B.you?B.you.s:S.pts}</b> points: <b>#${B.rank}</b> of ${B.count}.`} <button class="linkb" type="button" id="lbRename">Change name</button></p>${lbTable(B,5)}`;
+      const rn=$('lbRename'); if(rn) rn.onclick=()=>{ const f2=ov2.querySelector('.lbform'); if(f2){ f2.hidden=false; const i=$('lbName'); if(i) i.focus(); } };
+    }).catch(e=>{ const el=$('lbRes'); if(el) el.innerHTML=`<p class="lbbad">${esc(e.message)}</p>`; const f=ov2.querySelector('.lbform'); if(f) f.hidden=false; const g=$('lbGo'); if(g) g.disabled=false; });
+  };
+  const go=$('lbGo'), inp=$('lbName');
+  if(go) go.onclick=()=>{ const n=lbClean(inp.value); if(n.length<2){ $('lbRes').innerHTML='<p class="lbbad">Pick a name with at least 2 letters or numbers.</p>'; inp.focus(); return; } send(n); };
+  if(inp) inp.onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); go.click(); } };
+  if(lbName()) send(lbName());
+}
+
 /* ---------- The Duel: a decision on every at-bat (Simulation mode, against the computer) ----------
    The pitcher secretly picks Heat or Junk. The batter Sits on Heat, Sits on Junk, or Just Swings.
    Guess right: Batter's edge, roll the die twice and the batter keeps one.
@@ -5058,7 +5278,7 @@ function chBar(el){
 let duelPick=null, duelPA=null, duelLast=null, duelG=null; // duelPA: the at-bat already dueled, in game duelG
 const DUEL_ICON={H:ABIL_ICON.SLG, J:'<path d="M12 3a9 9 0 1 0 9 9h-2.6A6.4 6.4 0 1 1 12 5.6a4 4 0 1 1-4 4h-2.6A6.6 6.6 0 1 0 12 3z"/>'};
 const duelIc=v=>`<svg class="dic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${DUEL_ICON[v]}</svg>`;
-function duelOn(){ return (FSET.duel!==false || !!(G&&G.tutorial)) && !!G && !G.over && cardsOn() && G.cpu[0]!==G.cpu[1]; }
+function duelOn(){ return false; } // the pitch-guessing duel was taken out of the game (Oct 2026); its code stays here unused
 const PITCH_NAME={H:'Heat',J:'Junk'};
 
 /* the computer on the mound: tendencies you can learn (Rookie shows them plainly, All-Star reads you back) */
@@ -5360,8 +5580,8 @@ function padBar(on){
 }
 
 /* generated by voice/sprite.py: where each recorded line sits in the voice files [start s, length s, text] */
-const VOICE_MAP={"calls":{"c.k.0":[0.3,1.156,"Strike three, swinging!"],"c.k.1":[1.756,1.348,"Caught looking! Strike three."],"c.k.2":[3.405,1.581,"Swing and a miss! Struck out."],"c.k.3":[5.285,1.288,"Got 'em! Strike three."],"c.fly.0":[6.873,2.225,"Fly ball to center... and it's caught."],"c.fly.1":[9.398,2.52,"High fly ball... settles under it. Out."],"c.fly.2":[12.218,2.07,"Lazy fly to right. Easy out."],"c.fly.3":[14.588,1.313,"Popped up... and caught."],"c.ground.0":[16.201,2.502,"Ground ball to short, over to first. Out."],"c.ground.1":[19.002,2.318,"Chopper to third... the throw... got 'em."],"c.ground.2":[21.62,2.446,"Bouncer to second, flips to first. Out."],"c.ground.3":[24.366,2.404,"Hard grounder, but right at the shortstop."],"c.liner.0":[27.07,1.519,"Line drive... snagged!"],"c.liner.1":[28.889,2.388,"Lined right at the third baseman. Out."],"c.dp.0":[31.577,3.619,"Ground ball to short, to second, on to first... double play!"],"c.dp.1":[35.497,0.934,"They turn two!"],"c.dp.2":[36.731,2.099,"Two for the price of one! Double play."],"c.bb.0":[39.13,1.53,"Ball four. Take your base."],"c.bb.1":[40.959,1.552,"Ball four. A free pass."],"c.bb.2":[42.811,1.432,"Walked on four pitches."],"c.bbrun.0":[44.543,2.071,"Ball four, and that forces in a run!"],"c.1b.0":[46.913,1.477,"Base hit into left field!"],"c.1b.1":[48.691,1.72,"Line drive single to center!"],"c.1b.2":[50.711,1.313,"Through the hole! Base hit."],"c.1b.3":[52.323,1.603,"Blooped into right. That's a hit!"],"c.2b.0":[54.226,1.468,"Into the gap! That's a double!"],"c.2b.1":[55.994,2.234,"Off the wall! Extra bases, a double."],"c.2b.2":[58.528,1.762,"Down the line, and in for a double!"],"c.3b.0":[60.59,2.342,"Into the corner... on to third... a triple!"],"c.3b.1":[63.232,2.043,"Triple! Racing all the way to third!"],"c.hr.0":[65.575,2.802,"There's a drive... deep... it is gone! Home run!"],"c.hr.1":[68.677,2.501,"Swung on and belted! Goodbye, baseball!"],"c.hr.2":[71.478,1.756,"Way back... way back... gone!"],"c.hr.3":[73.534,1.754,"That ball is crushed! Home run!"],"c.gs.0":[75.588,2.101,"Grand slam! Everybody comes home!"],"c.gs.1":[77.989,2.701,"It's a grand slam! Four runs on one swing!"],"c.wo.0":[80.99,1.45,"They win it! A walk-off!"],"c.wo.1":[82.74,1.688,"Walk-off! The ballgame is over!"],"c.wohr.0":[84.728,2.5,"Walk-off home run! Good night, everybody!"],"c.wall.0":[87.529,1.51,"Back, back... caught at the wall!"],"c.wall.1":[89.339,2.823,"Deep fly ball... hauled in on the warning track."],"c.trifail.0":[92.462,2.399,"Going for three... and thrown out at third!"],"c.rollhr.0":[95.161,1.239,"Hit high, and deep..."],"c.rollhr.1":[96.7,1.39,"That one's got a chance..."],"c.rolltri.0":[98.389,2.422,"Into the gap, and the runner's not stopping..."],"c.sacfly.0":[101.112,2.144,"Deep enough! The runner tags, and scores."],"c.steal.0":[103.555,1.631,"There goes the runner... safe!"],"c.steal.1":[105.487,0.946,"Stolen base!"],"c.caught.0":[106.733,1.155,"Thrown out stealing!"],"c.stealhome.0":[108.189,2.301,"Stealing home... safe! Unbelievable!"],"c.pick.0":[110.79,0.665,"Picked off!"],"c.picksafe.0":[111.755,1.04,"Back in safely."],"c.ibb.0":[113.095,1.975,"They'll put this one on intentionally."],"c.bunt.0":[115.37,2.391,"Sacrifice bunt. The runners move up."],"c.drag.0":[118.061,1.492,"Drag bunt... beats it out!"],"c.squeeze.0":[119.853,1.621,"Squeeze play! The run scores!"],"c.squeezefail.0":[121.774,2.282,"The squeeze is on... tagged out at the plate!"],"c.diving.0":[124.356,1.447,"Diving catch! What a play!"],"c.robbed.0":[126.103,3.528,"Back at the wall... leaps... robbed! A home run taken away!"],"c.glove.0":[129.931,2.361,"Oh, what a grab! That's a Gold Glove play."],"c.hustle.0":[132.591,2.301,"Hustle! Beats the throw. No double play."],"c.eagle.0":[135.192,2.047,"Lays off everything. Ball four."],"c.rally.0":[137.54,1.635,"Rally caps are on in the dugout!"],"c.injured.0":[139.474,2.594,"The trainer's out... that's an automatic out."],"c.ironman.0":[142.369,1.73,"Shakes it off! Stays in the game."],"c.dh.0":[144.398,1.357,"Here comes a pinch hitter."],"c.hitrun.0":[146.055,1.342,"The hit and run is on!"],"c.fc.0":[147.698,2.417,"Fielder's choice. They get the lead runner."],"c.right.0":[150.414,1.093,"Sitting on that pitch!"],"c.right.1":[151.807,0.751,"Guessed right!"],"c.wrong.0":[152.858,1.238,"Fooled on that one."],"c.wrong.1":[154.396,1.134,"Didn't see that coming."],"c.out1.0":[155.83,0.762,"One away."],"c.out2.0":[156.891,0.774,"Two down."],"c.out3.0":[157.965,1.642,"And that'll retire the side."],"c.run1.0":[159.907,0.968,"A run scores!"],"c.run2.0":[161.175,1.015,"Two runs score!"],"c.run3.0":[162.49,1.21,"Three runs come in!"],"c.tied.0":[164.0,0.871,"We're tied at"],"c.to.0":[165.172,0.48,"to"],"c.nowbat.0":[165.952,0.818,"Now batting,"],"c.leadoff.0":[167.07,0.824,"Leading off,"],"c.stepin.0":[168.194,0.825,"Stepping in,"],"c.top.0":[169.319,0.823,"Top of the"],"c.bottom.0":[170.442,0.889,"Bottom of the"],"c.middle.0":[171.631,0.835,"Middle of the"],"c.end.0":[172.766,0.775,"End of the"],"c.playball.0":[173.841,0.729,"Play ball!"],"c.welcome.0":[174.871,2.202,"Good evening, and welcome to the ballpark!"],"c.final.0":[177.373,1.218,"And that's the ballgame!"],"c.final.1":[178.891,0.966,"Ballgame over!"],"c.stretch.0":[180.156,1.981,"It's time for the seventh-inning stretch!"],"c.extras.0":[182.437,1.549,"We're going to extra innings!"],"c.situation.0":[184.286,1.354,"Here's the situation."],"c.clutch.0":[185.94,0.588,"Clutch!"],"c.simrules.0":[186.829,5.375,"Simulation rules tonight. The twelve-sided die, action cards, and player abilities."],"c.arcaderules.0":[192.504,2.606,"Arcade rules tonight. Nothing but the dice!"],"c.playoffs.0":[195.409,2.032,"It's playoff baseball under the lights!"],"c.letsplay.0":[197.741,1.034,"Let's play ball!"],"c.potg.0":[199.074,1.062,"Player of the game,"],"ord.1":[200.436,0.873,"first inning."],"ord.2":[201.61,0.902,"second inning."],"ord.3":[202.812,0.825,"third inning."],"ord.4":[203.937,0.873,"fourth inning."],"ord.5":[205.11,0.842,"fifth inning."],"ord.6":[206.252,0.878,"sixth inning."],"ord.7":[207.43,0.899,"seventh inning."],"ord.8":[208.629,0.841,"eighth inning."],"ord.9":[209.77,0.853,"ninth inning."],"ord.10":[210.923,0.82,"tenth inning."],"ord.11":[212.043,0.977,"eleventh inning."],"ord.12":[213.32,0.921,"twelfth inning."],"ord.13":[214.541,1.034,"thirteenth inning."],"ord.14":[215.875,1.023,"fourteenth inning."],"ord.15":[217.198,0.995,"fifteenth inning."],"num.0":[218.493,0.658,"Zero."],"num.1":[219.451,0.506,"One."],"num.2":[220.257,0.506,"Two."],"num.3":[221.063,0.601,"Three."],"num.4":[221.963,0.589,"Four."],"num.5":[222.853,0.617,"Five."],"num.6":[223.77,0.604,"Six."],"num.7":[224.674,0.645,"Seven."],"num.8":[225.619,0.524,"Eight."],"num.9":[226.443,0.598,"Nine."],"num.10":[227.341,0.535,"Ten."],"num.11":[228.176,0.63,"Eleven."],"num.12":[229.106,0.646,"Twelve."],"num.13":[230.052,0.74,"Thirteen."],"num.14":[231.091,0.808,"Fourteen."],"num.15":[232.199,0.74,"Fifteen."],"num.16":[233.24,0.796,"Sixteen."],"num.17":[234.336,0.866,"Seventeen."],"num.18":[235.502,0.693,"Eighteen."],"num.19":[236.496,0.774,"Nineteen."],"num.20":[237.57,0.646,"Twenty."],"num.21":[238.517,0.819,"Twenty-one."],"num.22":[239.635,0.86,"Twenty-two."],"num.23":[240.795,0.859,"Twenty-three."],"num.24":[241.954,0.874,"Twenty-four."],"num.25":[243.128,0.911,"Twenty-five."],"team.red":[244.339,0.551,"Red,"],"team.blue":[245.19,0.558,"Blue,"],"team.california_kings":[246.048,0.918,"California,"],"team.boston_red_hats":[247.267,0.702,"Boston,"],"team.seattle_emeralds":[248.269,0.695,"Seattle,"],"team.florida_suns":[249.264,0.771,"Florida,"],"team.chicago_knights":[250.335,0.812,"Chicago,"],"team.texas_horns":[251.447,0.678,"Texas,"],"m.red.blue":[252.425,1.476,"Tonight, it's Red at Blue."],"m.red.california_kings":[254.201,1.785,"Tonight, it's Red at California."],"m.red.boston_red_hats":[256.286,1.56,"Tonight, it's Red at Boston."],"m.red.seattle_emeralds":[258.145,1.564,"Tonight, it's Red at Seattle."],"m.red.florida_suns":[260.009,1.642,"Tonight, it's Red at Florida."],"m.red.chicago_knights":[261.951,1.686,"Tonight, it's Red at Chicago."],"m.red.texas_horns":[263.937,1.477,"Tonight, it's Red at Texas."],"m.blue.red":[265.714,1.385,"Tonight, it's Blue at Red."],"m.blue.california_kings":[267.399,1.836,"Tonight, it's Blue at California."],"m.blue.boston_red_hats":[269.535,1.535,"Tonight, it's Blue at Boston."],"m.blue.seattle_emeralds":[271.37,1.542,"Tonight, it's Blue at Seattle."],"m.blue.florida_suns":[273.212,1.692,"Tonight, it's Blue at Florida."],"m.blue.chicago_knights":[275.203,1.661,"Tonight, it's Blue at Chicago."],"m.blue.texas_horns":[277.164,1.527,"Tonight, it's Blue at Texas."],"m.california_kings.red":[278.991,1.924,"Tonight, it's California at Red."],"m.california_kings.blue":[281.216,1.941,"Tonight, it's California at Blue."],"m.california_kings.boston_red_hats":[283.457,2.086,"Tonight, it's California at Boston."],"m.california_kings.seattle_emeralds":[285.843,2.114,"Tonight, it's California at Seattle."],"m.california_kings.florida_suns":[288.256,2.231,"Tonight, it's California at Florida."],"m.california_kings.chicago_knights":[290.788,2.23,"Tonight, it's California at Chicago."],"m.california_kings.texas_horns":[293.318,2.046,"Tonight, it's California at Texas."],"m.boston_red_hats.red":[295.663,1.674,"Tonight, it's Boston at Red."],"m.boston_red_hats.blue":[297.637,1.707,"Tonight, it's Boston at Blue."],"m.boston_red_hats.california_kings":[299.644,2.132,"Tonight, it's Boston at California."],"m.boston_red_hats.seattle_emeralds":[302.077,1.836,"Tonight, it's Boston at Seattle."],"m.boston_red_hats.florida_suns":[304.213,1.976,"Tonight, it's Boston at Florida."],"m.boston_red_hats.chicago_knights":[306.488,1.955,"Tonight, it's Boston at Chicago."],"m.boston_red_hats.texas_horns":[308.743,1.771,"Tonight, it's Boston at Texas."],"m.seattle_emeralds.red":[310.815,1.555,"Tonight, it's Seattle at Red."],"m.seattle_emeralds.blue":[312.67,1.682,"Tonight, it's Seattle at Blue."],"m.seattle_emeralds.california_kings":[314.652,2.104,"Tonight, it's Seattle at California."],"m.seattle_emeralds.boston_red_hats":[317.057,1.805,"Tonight, it's Seattle at Boston."],"m.seattle_emeralds.florida_suns":[319.161,1.932,"Tonight, it's Seattle at Florida."],"m.seattle_emeralds.chicago_knights":[321.394,1.955,"Tonight, it's Seattle at Chicago."],"m.seattle_emeralds.texas_horns":[323.649,1.763,"Tonight, it's Seattle at Texas."],"m.florida_suns.red":[325.712,1.654,"Tonight, it's Florida at Red."],"m.florida_suns.blue":[327.665,1.734,"Tonight, it's Florida at Blue."],"m.florida_suns.california_kings":[329.699,2.172,"Tonight, it's Florida at California."],"m.florida_suns.boston_red_hats":[332.171,1.932,"Tonight, it's Florida at Boston."],"m.florida_suns.seattle_emeralds":[334.403,1.889,"Tonight, it's Florida at Seattle."],"m.florida_suns.chicago_knights":[336.592,2.005,"Tonight, it's Florida at Chicago."],"m.florida_suns.texas_horns":[338.897,1.813,"Tonight, it's Florida at Texas."],"m.chicago_knights.red":[341.01,1.679,"Tonight, it's Chicago at Red."],"m.chicago_knights.blue":[342.988,1.669,"Tonight, it's Chicago at Blue."],"m.chicago_knights.california_kings":[344.957,2.124,"Tonight, it's Chicago at California."],"m.chicago_knights.boston_red_hats":[347.381,1.904,"Tonight, it's Chicago at Boston."],"m.chicago_knights.seattle_emeralds":[349.585,1.914,"Tonight, it's Chicago at Seattle."],"m.chicago_knights.florida_suns":[351.799,2.004,"Tonight, it's Chicago at Florida."],"m.chicago_knights.texas_horns":[354.103,1.845,"Tonight, it's Chicago at Texas."],"m.texas_horns.red":[356.247,1.575,"Tonight, it's Texas at Red."],"m.texas_horns.blue":[358.123,1.578,"Tonight, it's Texas at Blue."],"m.texas_horns.california_kings":[360.001,2.079,"Tonight, it's Texas at California."],"m.texas_horns.boston_red_hats":[362.38,1.828,"Tonight, it's Texas at Boston."],"m.texas_horns.seattle_emeralds":[364.508,1.787,"Tonight, it's Texas at Seattle."],"m.texas_horns.florida_suns":[366.596,1.91,"Tonight, it's Texas at Florida."],"m.texas_horns.chicago_knights":[368.806,1.904,"Tonight, it's Texas at Chicago."],"win.red":[371.01,0.784,"Red wins it!"],"win.blue":[372.094,0.816,"Blue wins it!"],"win.california_kings":[373.21,1.216,"California wins it!"],"win.boston_red_hats":[374.726,0.952,"Boston wins it!"],"win.seattle_emeralds":[375.979,1.04,"Seattle wins it!"],"win.florida_suns":[377.319,1.03,"Florida wins it!"],"win.chicago_knights":[378.648,1.127,"Chicago wins it!"],"win.texas_horns":[380.076,0.959,"Texas wins it!"],"champ.red":[381.335,1.771,"Red wins the Floodlight Series!"],"champ.blue":[383.406,1.781,"Blue wins the Floodlight Series!"],"champ.california_kings":[385.487,2.311,"California wins the Floodlight Series!"],"champ.boston_red_hats":[388.098,1.941,"Boston wins the Floodlight Series!"],"champ.seattle_emeralds":[390.339,1.992,"Seattle wins the Floodlight Series!"],"champ.florida_suns":[392.631,2.08,"Florida wins the Floodlight Series!"],"champ.chicago_knights":[395.011,2.113,"Chicago wins the Floodlight Series!"],"champ.texas_horns":[397.424,1.804,"Texas wins the Floodlight Series!"]},"names":{"full.wes_wright":[0.3,0.805,"Wes Wright."],"full.john_doom":[1.405,0.873,"John Doom."],"full.jack_fox":[2.578,0.975,"Jack Fox."],"full.tommy_williams":[3.853,1.06,"Tommy Williams."],"full.jay_dubb":[5.213,0.873,"Jay Dubb."],"full.ezzy_lyons":[6.386,1.066,"Ezzy Lyons."],"full.hank_hammer":[7.752,0.862,"Hank Hammer."],"full.mateo_cruz":[8.913,1.213,"Mateo Cruz."],"full.cay_rod":[10.426,0.849,"Cay Rod."],"full.walt_briggs":[11.575,0.957,"Walt Briggs."],"full.sonny_cole":[12.832,0.868,"Sonny Cole."],"full.roy_baxter":[14.0,0.984,"Roy Baxter."],"full.lefty_mercer":[15.284,1.031,"Lefty Mercer."],"full.gus_reyes":[16.615,0.926,"Gus Reyes."],"full.marty_shaw":[17.842,0.892,"Marty Shaw."],"full.deacon_price":[19.034,1.026,"Deacon Price."],"full.chick_farrow":[20.359,0.864,"Chick Farrow."],"full.dawn_dawson":[21.524,0.956,"Dawn Dawson."],"full.ned_corrigan":[22.779,0.939,"Ned Corrigan."],"full.felix_duran":[24.018,1.049,"Felix Duran."],"full.otis_wilder":[25.366,1.043,"Otis Wilder."],"full.josie_kincaid":[26.709,1.222,"Josie Kincaid."],"full.gil_petrakis":[28.231,1.196,"Gil Petrakis."],"full.lyle_brannock":[29.728,0.966,"Lyle Brannock."],"full.royce_tanner":[30.993,0.966,"Royce Tanner."],"full.zeke_holloway":[32.26,1.033,"Zeke Holloway."],"full.rosie_callahan":[33.593,1.164,"Rosie Callahan."],"full.clint_marlowe":[35.057,0.968,"Clint Marlowe."],"full.brock_mallory":[36.325,0.98,"Brock Mallory."],"full.moose_ellery":[37.605,0.913,"Moose Ellery."],"full.hank_pruitt":[38.818,0.886,"Hank Pruitt."],"full.lou_whitcomb":[40.004,0.909,"Lou Whitcomb."],"full.dutch_kessler":[41.213,0.989,"Dutch Kessler."],"full.ace_mulvaney":[42.503,1.009,"Ace Mulvaney."],"full.ally_nico":[43.811,0.936,"Ally Nico."],"first.abe":[45.047,0.467,"Abe"],"first.benny":[45.814,0.596,"Benny"],"first.cal":[46.711,0.494,"Cal"],"first.dutch":[47.505,0.556,"Dutch"],"first.eddie":[48.361,0.54,"Eddie"],"first.frankie":[49.201,0.727,"Frankie"],"first.gabe":[50.228,0.483,"Gabe"],"first.hal":[51.01,0.522,"Hal"],"first.ike":[51.833,0.53,"Ike"],"first.joey":[52.663,0.61,"Joey"],"first.kip":[53.573,0.368,"Kip"],"first.lou":[54.241,0.522,"Lou"],"first.mickey":[55.063,0.682,"Mickey"],"first.nate":[56.045,0.58,"Nate"],"first.ozzie":[56.925,0.585,"Ozzie"],"first.pete":[57.809,0.558,"Pete"],"first.rusty":[58.668,0.707,"Rusty"],"first.sal":[59.675,0.562,"Sal"],"first.tex":[60.537,0.554,"Tex"],"first.vic":[61.391,0.508,"Vic"],"first.woody":[62.199,0.548,"Woody"],"first.zack":[63.048,0.505,"Zack"],"first.buck":[63.852,0.481,"Buck"],"first.dom":[64.633,0.528,"Dom"],"first.marcus":[65.462,0.77,"Marcus"],"first.dante":[66.532,0.743,"Dante"],"first.ray":[67.575,0.524,"Ray"],"first.bo":[68.399,0.514,"Bo"],"first.cole":[69.213,0.463,"Cole"],"first.finn":[69.976,0.601,"Finn"],"first.ollie":[70.877,0.531,"Ollie"],"first.mack":[71.708,0.529,"Mack"],"first.andre":[72.537,0.722,"Andre"],"first.theo":[73.559,0.619,"Theo"],"first.rocco":[74.479,0.687,"Rocco"],"first.jesse":[75.465,0.662,"Jesse"],"first.ada":[76.427,0.552,"Ada"],"first.bea":[77.279,0.506,"Bea"],"first.dot":[78.086,0.575,"Dot"],"first.edie":[78.96,0.54,"Edie"],"first.maggie":[79.801,0.587,"Maggie"],"first.nell":[80.688,0.531,"Nell"],"first.tess":[81.519,0.538,"Tess"],"first.vi":[82.357,0.536,"Vi"],"first.mae":[83.192,0.528,"Mae"],"first.jo":[84.02,0.569,"Jo"],"first.kit":[84.889,0.479,"Kit"],"first.lena":[85.668,0.637,"Lena"],"first.mira":[86.605,0.619,"Mira"],"first.sadie":[87.524,0.628,"Sadie"],"first.june":[88.453,0.631,"June"],"first.hattie":[89.384,0.538,"Hattie"],"first.lola":[90.222,0.633,"Lola"],"first.rafa":[91.155,0.699,"Rafa"],"first.tito":[92.155,0.578,"Tito"],"first.luis":[93.033,0.632,"Luis"],"first.mateo":[93.965,0.788,"Mateo"],"first.diego":[95.053,0.701,"Diego"],"first.javi":[96.054,0.571,"Javi"],"first.carlos":[96.926,0.804,"Carlos"],"first.miguel":[98.029,0.658,"Miguel"],"first.alejandro":[98.988,0.932,"Alejandro"],"first.esteban":[100.22,0.76,"Esteban"],"first.joaquin":[101.279,0.738,"Joaquin"],"first.ruben":[102.317,0.634,"Ruben"],"first.santiago":[103.25,0.93,"Santiago"],"first.hector":[104.481,0.687,"Hector"],"first.ramon":[105.468,0.744,"Ramon"],"first.andres":[106.512,0.8,"Andres"],"first.emilio":[107.612,0.744,"Emilio"],"first.felipe":[108.656,0.74,"Felipe"],"first.julio":[109.696,0.755,"Julio"],"first.marco":[110.75,0.732,"Marco"],"first.pablo":[111.782,0.664,"Pablo"],"first.rogelio":[112.747,0.862,"Rogelio"],"first.teo":[113.908,0.554,"Teo"],"first.vicente":[114.763,0.717,"Vicente"],"first.rosa":[115.78,0.744,"Rosa"],"first.lucia":[116.824,0.679,"Lucia"],"first.marisol":[117.803,0.788,"Marisol"],"first.inez":[118.891,0.672,"Inez"],"first.paloma":[119.864,0.679,"Paloma"],"first.carmen":[120.843,0.673,"Carmen"],"first.elena":[121.816,0.685,"Elena"],"first.sofia":[122.802,0.733,"Sofia"],"first.kenji":[123.835,0.723,"Kenji"],"first.hiro":[124.858,0.661,"Hiro"],"first.takeshi":[125.819,0.697,"Takeshi"],"first.daisuke":[126.816,0.731,"Daisuke"],"first.shohei":[127.847,0.676,"Shohei"],"first.kazuo":[128.823,0.741,"Kazuo"],"first.yuki":[129.863,0.695,"Yuki"],"first.ryo":[130.858,0.611,"Ryo"],"first.masato":[131.769,0.79,"Masato"],"first.haruto":[132.859,0.823,"Haruto"],"last.abbott":[133.982,0.61,"Abbott."],"last.barlow":[134.892,0.701,"Barlow."],"last.calloway":[135.893,0.697,"Calloway."],"last.dempsey":[136.89,0.685,"Dempsey."],"last.ellison":[137.875,0.711,"Ellison."],"last.fontaine":[138.886,0.789,"Fontaine."],"last.holt":[139.975,0.631,"Holt."],"last.ingram":[140.906,0.631,"Ingram."],"last.jessup":[141.837,0.731,"Jessup."],"last.kowalski":[142.868,0.879,"Kowalski."],"last.lindqvist":[144.047,0.862,"Lindqvist."],"last.maddox":[145.209,0.787,"Maddox."],"last.pruitt":[146.296,0.578,"Pruitt."],"last.quinlan":[147.173,0.669,"Quinlan."],"last.rourke":[148.143,0.617,"Rourke."],"last.tolliver":[149.06,0.706,"Tolliver."],"last.underwood":[150.065,0.76,"Underwood."],"last.vance":[151.126,0.632,"Vance."],"last.whitaker":[152.057,0.786,"Whitaker."],"last.yates":[153.144,0.65,"Yates."],"last.booker":[154.093,0.64,"Booker."],"last.delacroix":[155.033,0.828,"Delacroix."],"last.esposito":[156.161,0.922,"Esposito."],"last.fairbanks":[157.383,0.816,"Fairbanks."],"last.gallo":[158.499,0.672,"Gallo."],"last.hargrove":[159.471,0.809,"Hargrove."],"last.keane":[160.58,0.619,"Keane."],"last.lockhart":[161.499,0.849,"Lockhart."],"last.pike":[162.648,0.585,"Pike."],"last.ramsey":[163.533,0.707,"Ramsey."],"last.stroud":[164.541,0.752,"Stroud."],"last.voss":[165.592,0.632,"Voss."],"last.webb":[166.524,0.6,"Webb."],"last.brannigan":[167.424,0.697,"Brannigan."],"last.corbett":[168.422,0.663,"Corbett."],"last.duval":[169.385,0.636,"Duval."],"last.flynn":[170.321,0.615,"Flynn."],"last.hagen":[171.237,0.728,"Hagen."],"last.mccoy":[172.264,0.715,"McCoy."],"last.sutter":[173.279,0.603,"Sutter."],"last.tate":[174.182,0.584,"Tate."],"last.wilder":[175.066,0.685,"Wilder."],"last.garza":[176.051,0.688,"Garza."],"last.navarro":[177.039,0.859,"Navarro."],"last.sandoval":[178.198,0.805,"Sandoval."],"last.zamora":[179.304,0.767,"Zamora."],"last.castillo":[180.371,0.804,"Castillo."],"last.ibarra":[181.475,0.712,"Ibarra."],"last.juarez":[182.487,0.874,"Juarez."],"last.moreno":[183.661,0.672,"Moreno."],"last.mendez":[184.632,0.766,"Mendez."],"last.pardo":[185.699,0.676,"Pardo."],"last.rios":[186.675,0.749,"Rios."],"last.alvarez":[187.724,0.816,"Alvarez."],"last.delgado":[188.84,0.912,"Delgado."],"last.fuentes":[190.052,0.827,"Fuentes."],"last.herrera":[191.178,0.708,"Herrera."],"last.ortega":[192.186,0.745,"Ortega."],"last.quintana":[193.231,0.813,"Quintana."],"last.salazar":[194.344,0.871,"Salazar."],"last.vega":[195.515,0.652,"Vega."],"last.cabrera":[196.467,0.76,"Cabrera."],"last.espinoza":[197.527,0.919,"Espinoza."],"last.guerrero":[198.746,0.786,"Guerrero."],"last.lozano":[199.832,0.805,"Lozano."],"last.medina":[200.937,0.655,"Medina."],"last.ochoa":[201.892,0.795,"Ochoa."],"last.rosales":[202.986,0.849,"Rosales."],"last.valdez":[204.136,0.82,"Valdez."],"last.aguilar":[205.256,0.742,"Aguilar."],"last.benitez":[206.297,0.874,"Benitez."],"last.cordero":[207.471,0.842,"Cordero."],"last.nakamura":[208.613,0.954,"Nakamura."],"last.tanaka":[209.868,0.792,"Tanaka."],"last.kimura":[210.959,0.774,"Kimura."],"last.sato":[212.033,0.708,"Sato."],"last.suzuki":[213.041,0.856,"Suzuki."],"last.takahashi":[214.197,0.949,"Takahashi."],"last.watanabe":[215.446,0.815,"Watanabe."],"last.yamamoto":[216.561,0.94,"Yamamoto."],"last.kobayashi":[217.8,0.98,"Kobayashi."],"last.matsui":[219.081,0.787,"Matsui."]}};
-const VOICE_META={"calls":{"v":"bab788ea7e","dur":399.528},"names":{"v":"eaebca7f77","dur":220.168}};
+const VOICE_MAP={"calls":{"c.k.0":[0.3,1.156,"Strike three, swinging!"],"c.k.1":[1.756,1.348,"Caught looking! Strike three."],"c.k.2":[3.405,1.581,"Swing and a miss! Struck out."],"c.k.3":[5.285,1.288,"Got 'em! Strike three."],"c.fly.0":[6.873,2.225,"Fly ball to center... and it's caught."],"c.fly.1":[9.398,2.52,"High fly ball... settles under it. Out."],"c.fly.2":[12.218,2.07,"Lazy fly to right. Easy out."],"c.fly.3":[14.588,1.313,"Popped up... and caught."],"c.ground.0":[16.201,2.502,"Ground ball to short, over to first. Out."],"c.ground.1":[19.002,2.318,"Chopper to third... the throw... got 'em."],"c.ground.2":[21.62,2.446,"Bouncer to second, flips to first. Out."],"c.ground.3":[24.366,2.404,"Hard grounder, but right at the shortstop."],"c.liner.0":[27.07,1.519,"Line drive... snagged!"],"c.liner.1":[28.889,2.388,"Lined right at the third baseman. Out."],"c.dp.0":[31.577,3.619,"Ground ball to short, to second, on to first... double play!"],"c.dp.1":[35.497,0.934,"They turn two!"],"c.dp.2":[36.731,2.099,"Two for the price of one! Double play."],"c.bb.0":[39.13,1.53,"Ball four. Take your base."],"c.bb.1":[40.959,1.552,"Ball four. A free pass."],"c.bb.2":[42.811,1.432,"Walked on four pitches."],"c.bbrun.0":[44.543,2.071,"Ball four, and that forces in a run!"],"c.1b.0":[46.913,1.477,"Base hit into left field!"],"c.1b.1":[48.691,1.72,"Line drive single to center!"],"c.1b.2":[50.711,1.313,"Through the hole! Base hit."],"c.1b.3":[52.323,1.603,"Blooped into right. That's a hit!"],"c.2b.0":[54.226,1.468,"Into the gap! That's a double!"],"c.2b.1":[55.994,2.234,"Off the wall! Extra bases, a double."],"c.2b.2":[58.528,1.762,"Down the line, and in for a double!"],"c.3b.0":[60.59,2.342,"Into the corner... on to third... a triple!"],"c.3b.1":[63.232,2.043,"Triple! Racing all the way to third!"],"c.hr.0":[65.575,2.802,"There's a drive... deep... it is gone! Home run!"],"c.hr.1":[68.677,2.501,"Swung on and belted! Goodbye, baseball!"],"c.hr.2":[71.478,1.756,"Way back... way back... gone!"],"c.hr.3":[73.534,1.754,"That ball is crushed! Home run!"],"c.gs.0":[75.588,2.101,"Grand slam! Everybody comes home!"],"c.gs.1":[77.989,2.701,"It's a grand slam! Four runs on one swing!"],"c.wo.0":[80.99,1.45,"They win it! A walk-off!"],"c.wo.1":[82.74,1.688,"Walk-off! The ballgame is over!"],"c.wohr.0":[84.728,2.5,"Walk-off home run! Good night, everybody!"],"c.wall.0":[87.529,1.51,"Back, back... caught at the wall!"],"c.wall.1":[89.339,2.823,"Deep fly ball... hauled in on the warning track."],"c.trifail.0":[92.462,2.399,"Going for three... and thrown out at third!"],"c.rollhr.0":[95.161,1.239,"Hit high, and deep..."],"c.rollhr.1":[96.7,1.39,"That one's got a chance..."],"c.rolltri.0":[98.389,2.422,"Into the gap, and the runner's not stopping..."],"c.sacfly.0":[101.112,2.144,"Deep enough! The runner tags, and scores."],"c.steal.0":[103.555,1.631,"There goes the runner... safe!"],"c.steal.1":[105.487,0.946,"Stolen base!"],"c.caught.0":[106.733,1.155,"Thrown out stealing!"],"c.stealhome.0":[108.189,2.301,"Stealing home... safe! Unbelievable!"],"c.pick.0":[110.79,0.665,"Picked off!"],"c.picksafe.0":[111.755,1.04,"Back in safely."],"c.ibb.0":[113.095,1.975,"They'll put this one on intentionally."],"c.bunt.0":[115.37,2.391,"Sacrifice bunt. The runners move up."],"c.drag.0":[118.061,1.492,"Drag bunt... beats it out!"],"c.squeeze.0":[119.853,1.621,"Squeeze play! The run scores!"],"c.squeezefail.0":[121.774,2.282,"The squeeze is on... tagged out at the plate!"],"c.diving.0":[124.356,1.447,"Diving catch! What a play!"],"c.robbed.0":[126.103,3.528,"Back at the wall... leaps... robbed! A home run taken away!"],"c.glove.0":[129.931,2.361,"Oh, what a grab! That's a Gold Glove play."],"c.hustle.0":[132.591,2.301,"Hustle! Beats the throw. No double play."],"c.eagle.0":[135.192,2.047,"Lays off everything. Ball four."],"c.rally.0":[137.54,1.635,"Rally caps are on in the dugout!"],"c.injured.0":[139.474,2.594,"The trainer's out... that's an automatic out."],"c.ironman.0":[142.369,1.73,"Shakes it off! Stays in the game."],"c.dh.0":[144.398,1.357,"Here comes a pinch hitter."],"c.hitrun.0":[146.055,1.342,"The hit and run is on!"],"c.fc.0":[147.698,2.417,"Fielder's choice. They get the lead runner."],"c.right.0":[150.414,1.093,"Sitting on that pitch!"],"c.right.1":[151.807,0.751,"Guessed right!"],"c.wrong.0":[152.858,1.238,"Fooled on that one."],"c.wrong.1":[154.396,1.134,"Didn't see that coming."],"c.out1.0":[155.83,0.762,"One away."],"c.out2.0":[156.891,0.774,"Two down."],"c.out3.0":[157.965,1.642,"And that'll retire the side."],"c.run1.0":[159.907,0.968,"A run scores!"],"c.run2.0":[161.175,1.015,"Two runs score!"],"c.run3.0":[162.49,1.21,"Three runs come in!"],"c.tied.0":[164.0,0.871,"We're tied at"],"c.to.0":[165.172,0.48,"to"],"c.nowbat.0":[165.952,0.818,"Now batting,"],"c.leadoff.0":[167.07,0.824,"Leading off,"],"c.stepin.0":[168.194,0.825,"Stepping in,"],"c.top.0":[169.319,0.823,"Top of the"],"c.bottom.0":[170.442,0.889,"Bottom of the"],"c.middle.0":[171.631,0.835,"Middle of the"],"c.end.0":[172.766,0.775,"End of the"],"c.playball.0":[173.841,0.729,"Play ball!"],"c.welcome.0":[174.871,2.202,"Good evening, and welcome to the ballpark!"],"c.final.0":[177.373,1.218,"And that's the ballgame!"],"c.final.1":[178.891,0.966,"Ballgame over!"],"c.stretch.0":[180.156,1.981,"It's time for the seventh-inning stretch!"],"c.extras.0":[182.437,1.549,"We're going to extra innings!"],"c.situation.0":[184.286,1.354,"Here's the situation."],"c.clutch.0":[185.94,0.588,"Clutch!"],"c.simrules.0":[186.829,5.375,"Simulation rules tonight. The twelve-sided die, action cards, and player abilities."],"c.arcaderules.0":[192.504,2.606,"Arcade rules tonight. Nothing but the dice!"],"c.playoffs.0":[195.409,2.032,"It's playoff baseball under the lights!"],"c.letsplay.0":[197.741,1.034,"Let's play ball!"],"c.potg.0":[199.074,1.062,"Player of the game,"],"ord.1":[200.436,0.873,"first inning."],"ord.2":[201.61,0.902,"second inning."],"ord.3":[202.812,0.825,"third inning."],"ord.4":[203.937,0.873,"fourth inning."],"ord.5":[205.11,0.842,"fifth inning."],"ord.6":[206.252,0.878,"sixth inning."],"ord.7":[207.43,0.899,"seventh inning."],"ord.8":[208.629,0.841,"eighth inning."],"ord.9":[209.77,0.853,"ninth inning."],"ord.10":[210.923,0.82,"tenth inning."],"ord.11":[212.043,0.977,"eleventh inning."],"ord.12":[213.32,0.921,"twelfth inning."],"ord.13":[214.541,1.034,"thirteenth inning."],"ord.14":[215.875,1.023,"fourteenth inning."],"ord.15":[217.198,0.995,"fifteenth inning."],"num.0":[218.493,0.658,"Zero."],"num.1":[219.451,0.506,"One."],"num.2":[220.257,0.506,"Two."],"num.3":[221.063,0.601,"Three."],"num.4":[221.963,0.589,"Four."],"num.5":[222.853,0.617,"Five."],"num.6":[223.77,0.604,"Six."],"num.7":[224.674,0.645,"Seven."],"num.8":[225.619,0.524,"Eight."],"num.9":[226.443,0.598,"Nine."],"num.10":[227.341,0.535,"Ten."],"num.11":[228.176,0.63,"Eleven."],"num.12":[229.106,0.646,"Twelve."],"num.13":[230.052,0.74,"Thirteen."],"num.14":[231.091,0.808,"Fourteen."],"num.15":[232.199,0.74,"Fifteen."],"num.16":[233.24,0.796,"Sixteen."],"num.17":[234.336,0.866,"Seventeen."],"num.18":[235.502,0.693,"Eighteen."],"num.19":[236.496,0.774,"Nineteen."],"num.20":[237.57,0.646,"Twenty."],"num.21":[238.517,0.819,"Twenty-one."],"num.22":[239.635,0.86,"Twenty-two."],"num.23":[240.795,0.859,"Twenty-three."],"num.24":[241.954,0.874,"Twenty-four."],"num.25":[243.128,0.911,"Twenty-five."],"team.red":[244.339,0.551,"Red,"],"team.blue":[245.19,0.558,"Blue,"],"team.california_kings":[246.048,0.918,"California,"],"team.boston_red_hats":[247.267,0.702,"Boston,"],"team.seattle_emeralds":[248.269,0.695,"Seattle,"],"team.florida_suns":[249.264,0.771,"Florida,"],"team.chicago_knights":[250.335,0.812,"Chicago,"],"team.texas_horns":[251.447,0.678,"Texas,"],"team.brooklyn_bridgers":[252.425,0.687,"Brooklyn,"],"team.las_vegas_high_rollers":[253.411,0.945,"Las Vegas,"],"team.denver_summits":[254.656,0.597,"Denver,"],"team.portland_pines":[255.553,0.721,"Portland,"],"team.detroit_motormen":[256.574,0.748,"Detroit,"],"team.kansas_city_cyclones":[257.622,0.923,"Kansas City,"],"m.red.blue":[258.845,1.476,"Tonight, it's Red at Blue."],"m.blue.red":[260.621,1.385,"Tonight, it's Blue at Red."],"m.california_kings.boston_red_hats":[262.306,2.086,"Tonight, it's California at Boston."],"m.california_kings.seattle_emeralds":[264.692,2.114,"Tonight, it's California at Seattle."],"m.california_kings.florida_suns":[267.106,2.231,"Tonight, it's California at Florida."],"m.california_kings.chicago_knights":[269.637,2.23,"Tonight, it's California at Chicago."],"m.california_kings.texas_horns":[272.167,2.046,"Tonight, it's California at Texas."],"m.california_kings.brooklyn_bridgers":[274.513,2.066,"Tonight, it's California at Brooklyn."],"m.california_kings.las_vegas_high_rollers":[276.879,2.392,"Tonight, it's California at Las Vegas."],"m.california_kings.denver_summits":[279.571,2.089,"Tonight, it's California at Denver."],"m.california_kings.portland_pines":[281.96,2.241,"Tonight, it's California at Portland."],"m.california_kings.detroit_motormen":[284.501,2.059,"Tonight, it's California at Detroit."],"m.california_kings.kansas_city_cyclones":[286.859,2.265,"Tonight, it's California at Kansas City."],"m.boston_red_hats.california_kings":[289.424,2.132,"Tonight, it's Boston at California."],"m.boston_red_hats.seattle_emeralds":[291.856,1.836,"Tonight, it's Boston at Seattle."],"m.boston_red_hats.florida_suns":[293.992,1.976,"Tonight, it's Boston at Florida."],"m.boston_red_hats.chicago_knights":[296.268,1.955,"Tonight, it's Boston at Chicago."],"m.boston_red_hats.texas_horns":[298.523,1.771,"Tonight, it's Boston at Texas."],"m.boston_red_hats.brooklyn_bridgers":[300.595,1.886,"Tonight, it's Boston at Brooklyn."],"m.boston_red_hats.las_vegas_high_rollers":[302.78,2.148,"Tonight, it's Boston at Las Vegas."],"m.boston_red_hats.denver_summits":[305.228,1.841,"Tonight, it's Boston at Denver."],"m.boston_red_hats.portland_pines":[307.369,1.918,"Tonight, it's Boston at Portland."],"m.boston_red_hats.detroit_motormen":[309.587,1.845,"Tonight, it's Boston at Detroit."],"m.boston_red_hats.kansas_city_cyclones":[311.732,2.027,"Tonight, it's Boston at Kansas City."],"m.seattle_emeralds.california_kings":[314.06,2.104,"Tonight, it's Seattle at California."],"m.seattle_emeralds.boston_red_hats":[316.464,1.805,"Tonight, it's Seattle at Boston."],"m.seattle_emeralds.florida_suns":[318.569,1.932,"Tonight, it's Seattle at Florida."],"m.seattle_emeralds.chicago_knights":[320.801,1.955,"Tonight, it's Seattle at Chicago."],"m.seattle_emeralds.texas_horns":[323.056,1.763,"Tonight, it's Seattle at Texas."],"m.seattle_emeralds.brooklyn_bridgers":[325.119,1.824,"Tonight, it's Seattle at Brooklyn."],"m.seattle_emeralds.las_vegas_high_rollers":[327.243,2.089,"Tonight, it's Seattle at Las Vegas."],"m.seattle_emeralds.denver_summits":[329.632,1.789,"Tonight, it's Seattle at Denver."],"m.seattle_emeralds.portland_pines":[331.721,1.892,"Tonight, it's Seattle at Portland."],"m.seattle_emeralds.detroit_motormen":[333.914,1.846,"Tonight, it's Seattle at Detroit."],"m.seattle_emeralds.kansas_city_cyclones":[336.06,2.003,"Tonight, it's Seattle at Kansas City."],"m.florida_suns.california_kings":[338.363,2.172,"Tonight, it's Florida at California."],"m.florida_suns.boston_red_hats":[340.834,1.932,"Tonight, it's Florida at Boston."],"m.florida_suns.seattle_emeralds":[343.066,1.889,"Tonight, it's Florida at Seattle."],"m.florida_suns.chicago_knights":[345.255,2.005,"Tonight, it's Florida at Chicago."],"m.florida_suns.texas_horns":[347.56,1.813,"Tonight, it's Florida at Texas."],"m.florida_suns.brooklyn_bridgers":[349.673,1.875,"Tonight, it's Florida at Brooklyn."],"m.florida_suns.las_vegas_high_rollers":[351.848,2.167,"Tonight, it's Florida at Las Vegas."],"m.florida_suns.denver_summits":[354.315,1.816,"Tonight, it's Florida at Denver."],"m.florida_suns.portland_pines":[356.431,1.991,"Tonight, it's Florida at Portland."],"m.florida_suns.detroit_motormen":[358.723,1.816,"Tonight, it's Florida at Detroit."],"m.florida_suns.kansas_city_cyclones":[360.838,2.063,"Tonight, it's Florida at Kansas City."],"m.chicago_knights.california_kings":[363.202,2.124,"Tonight, it's Chicago at California."],"m.chicago_knights.boston_red_hats":[365.625,1.904,"Tonight, it's Chicago at Boston."],"m.chicago_knights.seattle_emeralds":[367.83,1.914,"Tonight, it's Chicago at Seattle."],"m.chicago_knights.florida_suns":[370.043,2.004,"Tonight, it's Chicago at Florida."],"m.chicago_knights.texas_horns":[372.347,1.845,"Tonight, it's Chicago at Texas."],"m.chicago_knights.brooklyn_bridgers":[374.492,1.876,"Tonight, it's Chicago at Brooklyn."],"m.chicago_knights.las_vegas_high_rollers":[376.668,2.148,"Tonight, it's Chicago at Las Vegas."],"m.chicago_knights.denver_summits":[379.116,1.866,"Tonight, it's Chicago at Denver."],"m.chicago_knights.portland_pines":[381.282,1.942,"Tonight, it's Chicago at Portland."],"m.chicago_knights.detroit_motormen":[383.524,1.867,"Tonight, it's Chicago at Detroit."],"m.chicago_knights.kansas_city_cyclones":[385.691,2.103,"Tonight, it's Chicago at Kansas City."],"m.texas_horns.california_kings":[388.095,2.079,"Tonight, it's Texas at California."],"m.texas_horns.boston_red_hats":[390.474,1.828,"Tonight, it's Texas at Boston."],"m.texas_horns.seattle_emeralds":[392.602,1.787,"Tonight, it's Texas at Seattle."],"m.texas_horns.florida_suns":[394.689,1.91,"Tonight, it's Texas at Florida."],"m.texas_horns.chicago_knights":[396.9,1.904,"Tonight, it's Texas at Chicago."],"m.texas_horns.brooklyn_bridgers":[399.104,1.779,"Tonight, it's Texas at Brooklyn."],"m.texas_horns.las_vegas_high_rollers":[401.183,2.013,"Tonight, it's Texas at Las Vegas."],"m.texas_horns.denver_summits":[403.496,1.733,"Tonight, it's Texas at Denver."],"m.texas_horns.portland_pines":[405.529,1.839,"Tonight, it's Texas at Portland."],"m.texas_horns.detroit_motormen":[407.667,1.791,"Tonight, it's Texas at Detroit."],"m.texas_horns.kansas_city_cyclones":[409.758,2.0,"Tonight, it's Texas at Kansas City."],"m.brooklyn_bridgers.california_kings":[412.058,2.061,"Tonight, it's Brooklyn at California."],"m.brooklyn_bridgers.boston_red_hats":[414.419,1.849,"Tonight, it's Brooklyn at Boston."],"m.brooklyn_bridgers.seattle_emeralds":[416.568,1.864,"Tonight, it's Brooklyn at Seattle."],"m.brooklyn_bridgers.florida_suns":[418.732,1.935,"Tonight, it's Brooklyn at Florida."],"m.brooklyn_bridgers.chicago_knights":[420.966,1.936,"Tonight, it's Brooklyn at Chicago."],"m.brooklyn_bridgers.texas_horns":[423.202,1.774,"Tonight, it's Brooklyn at Texas."],"m.brooklyn_bridgers.las_vegas_high_rollers":[425.277,2.058,"Tonight, it's Brooklyn at Las Vegas."],"m.brooklyn_bridgers.denver_summits":[427.635,1.82,"Tonight, it's Brooklyn at Denver."],"m.brooklyn_bridgers.portland_pines":[429.754,1.873,"Tonight, it's Brooklyn at Portland."],"m.brooklyn_bridgers.detroit_motormen":[431.928,1.77,"Tonight, it's Brooklyn at Detroit."],"m.brooklyn_bridgers.kansas_city_cyclones":[433.997,2.014,"Tonight, it's Brooklyn at Kansas City."],"m.las_vegas_high_rollers.california_kings":[436.312,2.394,"Tonight, it's Las Vegas at California."],"m.las_vegas_high_rollers.boston_red_hats":[439.005,2.119,"Tonight, it's Las Vegas at Boston."],"m.las_vegas_high_rollers.seattle_emeralds":[441.424,2.089,"Tonight, it's Las Vegas at Seattle."],"m.las_vegas_high_rollers.florida_suns":[443.813,2.226,"Tonight, it's Las Vegas at Florida."],"m.las_vegas_high_rollers.chicago_knights":[446.339,2.254,"Tonight, it's Las Vegas at Chicago."],"m.las_vegas_high_rollers.texas_horns":[448.893,2.036,"Tonight, it's Las Vegas at Texas."],"m.las_vegas_high_rollers.brooklyn_bridgers":[451.229,2.092,"Tonight, it's Las Vegas at Brooklyn."],"m.las_vegas_high_rollers.denver_summits":[453.621,2.064,"Tonight, it's Las Vegas at Denver."],"m.las_vegas_high_rollers.portland_pines":[455.985,2.216,"Tonight, it's Las Vegas at Portland."],"m.las_vegas_high_rollers.detroit_motormen":[458.501,2.162,"Tonight, it's Las Vegas at Detroit."],"m.las_vegas_high_rollers.kansas_city_cyclones":[460.963,2.338,"Tonight, it's Las Vegas at Kansas City."],"m.denver_summits.california_kings":[463.602,2.035,"Tonight, it's Denver at California."],"m.denver_summits.boston_red_hats":[465.936,1.734,"Tonight, it's Denver at Boston."],"m.denver_summits.seattle_emeralds":[467.971,1.742,"Tonight, it's Denver at Seattle."],"m.denver_summits.florida_suns":[470.012,1.86,"Tonight, it's Denver at Florida."],"m.denver_summits.chicago_knights":[472.172,1.861,"Tonight, it's Denver at Chicago."],"m.denver_summits.texas_horns":[474.333,1.724,"Tonight, it's Denver at Texas."],"m.denver_summits.brooklyn_bridgers":[476.358,1.705,"Tonight, it's Denver at Brooklyn."],"m.denver_summits.las_vegas_high_rollers":[478.362,2.029,"Tonight, it's Denver at Las Vegas."],"m.denver_summits.portland_pines":[480.691,1.77,"Tonight, it's Denver at Portland."],"m.denver_summits.detroit_motormen":[482.762,1.719,"Tonight, it's Denver at Detroit."],"m.denver_summits.kansas_city_cyclones":[484.781,1.939,"Tonight, it's Denver at Kansas City."],"m.portland_pines.california_kings":[487.02,2.085,"Tonight, it's Portland at California."],"m.portland_pines.boston_red_hats":[489.405,1.884,"Tonight, it's Portland at Boston."],"m.portland_pines.seattle_emeralds":[491.59,1.864,"Tonight, it's Portland at Seattle."],"m.portland_pines.florida_suns":[493.754,1.966,"Tonight, it's Portland at Florida."],"m.portland_pines.chicago_knights":[496.02,1.956,"Tonight, it's Portland at Chicago."],"m.portland_pines.texas_horns":[498.276,1.803,"Tonight, it's Portland at Texas."],"m.portland_pines.brooklyn_bridgers":[500.379,1.802,"Tonight, it's Portland at Brooklyn."],"m.portland_pines.las_vegas_high_rollers":[502.481,2.105,"Tonight, it's Portland at Las Vegas."],"m.portland_pines.denver_summits":[504.886,1.819,"Tonight, it's Portland at Denver."],"m.portland_pines.detroit_motormen":[507.006,1.816,"Tonight, it's Portland at Detroit."],"m.portland_pines.kansas_city_cyclones":[509.122,2.064,"Tonight, it's Portland at Kansas City."],"m.detroit_motormen.california_kings":[511.486,2.107,"Tonight, it's Detroit at California."],"m.detroit_motormen.boston_red_hats":[513.894,1.857,"Tonight, it's Detroit at Boston."],"m.detroit_motormen.seattle_emeralds":[516.051,1.839,"Tonight, it's Detroit at Seattle."],"m.detroit_motormen.florida_suns":[518.19,1.939,"Tonight, it's Detroit at Florida."],"m.detroit_motormen.chicago_knights":[520.429,1.958,"Tonight, it's Detroit at Chicago."],"m.detroit_motormen.texas_horns":[522.687,1.798,"Tonight, it's Detroit at Texas."],"m.detroit_motormen.brooklyn_bridgers":[524.785,1.836,"Tonight, it's Detroit at Brooklyn."],"m.detroit_motormen.las_vegas_high_rollers":[526.921,2.098,"Tonight, it's Detroit at Las Vegas."],"m.detroit_motormen.denver_summits":[529.319,1.864,"Tonight, it's Detroit at Denver."],"m.detroit_motormen.portland_pines":[531.483,1.943,"Tonight, it's Detroit at Portland."],"m.detroit_motormen.kansas_city_cyclones":[533.726,2.064,"Tonight, it's Detroit at Kansas City."],"m.kansas_city_cyclones.california_kings":[536.09,2.341,"Tonight, it's Kansas City at California."],"m.kansas_city_cyclones.boston_red_hats":[538.731,1.993,"Tonight, it's Kansas City at Boston."],"m.kansas_city_cyclones.seattle_emeralds":[541.024,2.082,"Tonight, it's Kansas City at Seattle."],"m.kansas_city_cyclones.florida_suns":[543.407,2.141,"Tonight, it's Kansas City at Florida."],"m.kansas_city_cyclones.chicago_knights":[545.848,2.176,"Tonight, it's Kansas City at Chicago."],"m.kansas_city_cyclones.texas_horns":[548.324,1.955,"Tonight, it's Kansas City at Texas."],"m.kansas_city_cyclones.brooklyn_bridgers":[550.579,1.969,"Tonight, it's Kansas City at Brooklyn."],"m.kansas_city_cyclones.las_vegas_high_rollers":[552.848,2.358,"Tonight, it's Kansas City at Las Vegas."],"m.kansas_city_cyclones.denver_summits":[555.506,1.927,"Tonight, it's Kansas City at Denver."],"m.kansas_city_cyclones.portland_pines":[557.732,2.136,"Tonight, it's Kansas City at Portland."],"m.kansas_city_cyclones.detroit_motormen":[560.168,1.99,"Tonight, it's Kansas City at Detroit."],"win.red":[562.458,0.784,"Red wins it!"],"win.blue":[563.542,0.816,"Blue wins it!"],"win.california_kings":[564.658,1.216,"California wins it!"],"win.boston_red_hats":[566.174,0.952,"Boston wins it!"],"win.seattle_emeralds":[567.427,1.04,"Seattle wins it!"],"win.florida_suns":[568.767,1.03,"Florida wins it!"],"win.chicago_knights":[570.096,1.127,"Chicago wins it!"],"win.texas_horns":[571.524,0.959,"Texas wins it!"],"win.brooklyn_bridgers":[572.783,0.904,"Brooklyn wins it!"],"win.las_vegas_high_rollers":[573.988,1.173,"Las Vegas wins it!"],"win.denver_summits":[575.461,0.951,"Denver wins it!"],"win.portland_pines":[576.712,0.959,"Portland wins it!"],"win.detroit_motormen":[577.97,0.969,"Detroit wins it!"],"win.kansas_city_cyclones":[579.239,1.249,"Kansas City wins it!"],"champ.red":[580.788,1.771,"Red wins the Floodlight Series!"],"champ.blue":[582.859,1.781,"Blue wins the Floodlight Series!"],"champ.california_kings":[584.94,2.311,"California wins the Floodlight Series!"],"champ.boston_red_hats":[587.551,1.941,"Boston wins the Floodlight Series!"],"champ.seattle_emeralds":[589.792,1.992,"Seattle wins the Floodlight Series!"],"champ.florida_suns":[592.084,2.08,"Florida wins the Floodlight Series!"],"champ.chicago_knights":[594.464,2.113,"Chicago wins the Floodlight Series!"],"champ.texas_horns":[596.877,1.804,"Texas wins the Floodlight Series!"],"champ.brooklyn_bridgers":[598.981,1.917,"Brooklyn wins the Floodlight Series!"],"champ.las_vegas_high_rollers":[601.197,2.054,"Las Vegas wins the Floodlight Series!"],"champ.denver_summits":[603.551,1.923,"Denver wins the Floodlight Series!"],"champ.portland_pines":[605.774,1.952,"Portland wins the Floodlight Series!"],"champ.detroit_motormen":[608.026,1.98,"Detroit wins the Floodlight Series!"],"champ.kansas_city_cyclones":[610.306,2.226,"Kansas City wins the Floodlight Series!"]},"names":{"full.wes_wright":[0.3,0.805,"Wes Wright."],"full.john_doom":[1.405,0.873,"John Doom."],"full.jack_fox":[2.578,0.975,"Jack Fox."],"full.tommy_williams":[3.853,1.06,"Tommy Williams."],"full.jay_dubb":[5.213,0.873,"Jay Dubb."],"full.ezzy_lyons":[6.386,1.066,"Ezzy Lyons."],"full.hank_hammer":[7.752,0.862,"Hank Hammer."],"full.mateo_cruz":[8.913,1.213,"Mateo Cruz."],"full.cay_rod":[10.426,0.849,"Cay Rod."],"full.walt_briggs":[11.575,0.957,"Walt Briggs."],"full.sonny_cole":[12.832,0.868,"Sonny Cole."],"full.roy_baxter":[14.0,0.984,"Roy Baxter."],"full.lefty_mercer":[15.284,1.031,"Lefty Mercer."],"full.gus_reyes":[16.615,0.926,"Gus Reyes."],"full.marty_shaw":[17.842,0.892,"Marty Shaw."],"full.deacon_price":[19.034,1.026,"Deacon Price."],"full.chick_farrow":[20.359,0.864,"Chick Farrow."],"full.dawn_dawson":[21.524,0.956,"Dawn Dawson."],"full.ned_corrigan":[22.779,0.939,"Ned Corrigan."],"full.felix_duran":[24.018,1.049,"Felix Duran."],"full.otis_wilder":[25.366,1.043,"Otis Wilder."],"full.josie_kincaid":[26.709,1.222,"Josie Kincaid."],"full.gil_petrakis":[28.231,1.196,"Gil Petrakis."],"full.lyle_brannock":[29.728,0.966,"Lyle Brannock."],"full.royce_tanner":[30.993,0.966,"Royce Tanner."],"full.zeke_holloway":[32.26,1.033,"Zeke Holloway."],"full.rosie_callahan":[33.593,1.164,"Rosie Callahan."],"full.clint_marlowe":[35.057,0.968,"Clint Marlowe."],"full.brock_mallory":[36.325,0.98,"Brock Mallory."],"full.moose_ellery":[37.605,0.913,"Moose Ellery."],"full.hank_pruitt":[38.818,0.886,"Hank Pruitt."],"full.lou_whitcomb":[40.004,0.909,"Lou Whitcomb."],"full.dutch_kessler":[41.213,0.989,"Dutch Kessler."],"full.ace_mulvaney":[42.503,1.009,"Ace Mulvaney."],"full.ally_nico":[43.811,0.936,"Ally Nico."],"first.abe":[45.047,0.467,"Abe"],"first.benny":[45.814,0.596,"Benny"],"first.cal":[46.711,0.494,"Cal"],"first.dutch":[47.505,0.556,"Dutch"],"first.eddie":[48.361,0.54,"Eddie"],"first.frankie":[49.201,0.727,"Frankie"],"first.gabe":[50.228,0.483,"Gabe"],"first.hal":[51.01,0.522,"Hal"],"first.ike":[51.833,0.53,"Ike"],"first.joey":[52.663,0.61,"Joey"],"first.kip":[53.573,0.368,"Kip"],"first.lou":[54.241,0.522,"Lou"],"first.mickey":[55.063,0.682,"Mickey"],"first.nate":[56.045,0.58,"Nate"],"first.ozzie":[56.925,0.585,"Ozzie"],"first.pete":[57.809,0.558,"Pete"],"first.rusty":[58.668,0.707,"Rusty"],"first.sal":[59.675,0.562,"Sal"],"first.tex":[60.537,0.554,"Tex"],"first.vic":[61.391,0.508,"Vic"],"first.woody":[62.199,0.548,"Woody"],"first.zack":[63.048,0.505,"Zack"],"first.buck":[63.852,0.481,"Buck"],"first.dom":[64.633,0.528,"Dom"],"first.marcus":[65.462,0.77,"Marcus"],"first.dante":[66.532,0.743,"Dante"],"first.ray":[67.575,0.524,"Ray"],"first.bo":[68.399,0.514,"Bo"],"first.cole":[69.213,0.463,"Cole"],"first.finn":[69.976,0.601,"Finn"],"first.ollie":[70.877,0.531,"Ollie"],"first.mack":[71.708,0.529,"Mack"],"first.andre":[72.537,0.722,"Andre"],"first.theo":[73.559,0.619,"Theo"],"first.rocco":[74.479,0.687,"Rocco"],"first.jesse":[75.465,0.662,"Jesse"],"first.ada":[76.427,0.552,"Ada"],"first.bea":[77.279,0.506,"Bea"],"first.dot":[78.086,0.575,"Dot"],"first.edie":[78.96,0.54,"Edie"],"first.maggie":[79.801,0.587,"Maggie"],"first.nell":[80.688,0.531,"Nell"],"first.tess":[81.519,0.538,"Tess"],"first.vi":[82.357,0.536,"Vi"],"first.mae":[83.192,0.528,"Mae"],"first.jo":[84.02,0.569,"Jo"],"first.kit":[84.889,0.479,"Kit"],"first.lena":[85.668,0.637,"Lena"],"first.mira":[86.605,0.619,"Mira"],"first.sadie":[87.524,0.628,"Sadie"],"first.june":[88.453,0.631,"June"],"first.hattie":[89.384,0.538,"Hattie"],"first.lola":[90.222,0.633,"Lola"],"first.rafa":[91.155,0.699,"Rafa"],"first.tito":[92.155,0.578,"Tito"],"first.luis":[93.033,0.632,"Luis"],"first.mateo":[93.965,0.788,"Mateo"],"first.diego":[95.053,0.701,"Diego"],"first.javi":[96.054,0.571,"Javi"],"first.carlos":[96.926,0.804,"Carlos"],"first.miguel":[98.029,0.658,"Miguel"],"first.alejandro":[98.988,0.932,"Alejandro"],"first.esteban":[100.22,0.76,"Esteban"],"first.joaquin":[101.279,0.738,"Joaquin"],"first.ruben":[102.317,0.634,"Ruben"],"first.santiago":[103.25,0.93,"Santiago"],"first.hector":[104.481,0.687,"Hector"],"first.ramon":[105.468,0.744,"Ramon"],"first.andres":[106.512,0.8,"Andres"],"first.emilio":[107.612,0.744,"Emilio"],"first.felipe":[108.656,0.74,"Felipe"],"first.julio":[109.696,0.755,"Julio"],"first.marco":[110.75,0.732,"Marco"],"first.pablo":[111.782,0.664,"Pablo"],"first.rogelio":[112.747,0.862,"Rogelio"],"first.teo":[113.908,0.554,"Teo"],"first.vicente":[114.763,0.717,"Vicente"],"first.rosa":[115.78,0.744,"Rosa"],"first.lucia":[116.824,0.679,"Lucia"],"first.marisol":[117.803,0.788,"Marisol"],"first.inez":[118.891,0.672,"Inez"],"first.paloma":[119.864,0.679,"Paloma"],"first.carmen":[120.843,0.673,"Carmen"],"first.elena":[121.816,0.685,"Elena"],"first.sofia":[122.802,0.733,"Sofia"],"first.kenji":[123.835,0.723,"Kenji"],"first.hiro":[124.858,0.661,"Hiro"],"first.takeshi":[125.819,0.697,"Takeshi"],"first.daisuke":[126.816,0.731,"Daisuke"],"first.shohei":[127.847,0.676,"Shohei"],"first.kazuo":[128.823,0.741,"Kazuo"],"first.yuki":[129.863,0.695,"Yuki"],"first.ryo":[130.858,0.611,"Ryo"],"first.masato":[131.769,0.79,"Masato"],"first.haruto":[132.859,0.823,"Haruto"],"last.abbott":[133.982,0.61,"Abbott."],"last.barlow":[134.892,0.701,"Barlow."],"last.calloway":[135.893,0.697,"Calloway."],"last.dempsey":[136.89,0.685,"Dempsey."],"last.ellison":[137.875,0.711,"Ellison."],"last.fontaine":[138.886,0.789,"Fontaine."],"last.holt":[139.975,0.631,"Holt."],"last.ingram":[140.906,0.631,"Ingram."],"last.jessup":[141.837,0.731,"Jessup."],"last.kowalski":[142.868,0.879,"Kowalski."],"last.lindqvist":[144.047,0.862,"Lindqvist."],"last.maddox":[145.209,0.787,"Maddox."],"last.pruitt":[146.296,0.578,"Pruitt."],"last.quinlan":[147.173,0.669,"Quinlan."],"last.rourke":[148.143,0.617,"Rourke."],"last.tolliver":[149.06,0.706,"Tolliver."],"last.underwood":[150.065,0.76,"Underwood."],"last.vance":[151.126,0.632,"Vance."],"last.whitaker":[152.057,0.786,"Whitaker."],"last.yates":[153.144,0.65,"Yates."],"last.booker":[154.093,0.64,"Booker."],"last.delacroix":[155.033,0.828,"Delacroix."],"last.esposito":[156.161,0.922,"Esposito."],"last.fairbanks":[157.383,0.816,"Fairbanks."],"last.gallo":[158.499,0.672,"Gallo."],"last.hargrove":[159.471,0.809,"Hargrove."],"last.keane":[160.58,0.619,"Keane."],"last.lockhart":[161.499,0.849,"Lockhart."],"last.pike":[162.648,0.585,"Pike."],"last.ramsey":[163.533,0.707,"Ramsey."],"last.stroud":[164.541,0.752,"Stroud."],"last.voss":[165.592,0.632,"Voss."],"last.webb":[166.524,0.6,"Webb."],"last.brannigan":[167.424,0.697,"Brannigan."],"last.corbett":[168.422,0.663,"Corbett."],"last.duval":[169.385,0.636,"Duval."],"last.flynn":[170.321,0.615,"Flynn."],"last.hagen":[171.237,0.728,"Hagen."],"last.mccoy":[172.264,0.715,"McCoy."],"last.sutter":[173.279,0.603,"Sutter."],"last.tate":[174.182,0.584,"Tate."],"last.wilder":[175.066,0.685,"Wilder."],"last.garza":[176.051,0.688,"Garza."],"last.navarro":[177.039,0.859,"Navarro."],"last.sandoval":[178.198,0.805,"Sandoval."],"last.zamora":[179.304,0.767,"Zamora."],"last.castillo":[180.371,0.804,"Castillo."],"last.ibarra":[181.475,0.712,"Ibarra."],"last.juarez":[182.487,0.874,"Juarez."],"last.moreno":[183.661,0.672,"Moreno."],"last.mendez":[184.632,0.766,"Mendez."],"last.pardo":[185.699,0.676,"Pardo."],"last.rios":[186.675,0.749,"Rios."],"last.alvarez":[187.724,0.816,"Alvarez."],"last.delgado":[188.84,0.912,"Delgado."],"last.fuentes":[190.052,0.827,"Fuentes."],"last.herrera":[191.178,0.708,"Herrera."],"last.ortega":[192.186,0.745,"Ortega."],"last.quintana":[193.231,0.813,"Quintana."],"last.salazar":[194.344,0.871,"Salazar."],"last.vega":[195.515,0.652,"Vega."],"last.cabrera":[196.467,0.76,"Cabrera."],"last.espinoza":[197.527,0.919,"Espinoza."],"last.guerrero":[198.746,0.786,"Guerrero."],"last.lozano":[199.832,0.805,"Lozano."],"last.medina":[200.937,0.655,"Medina."],"last.ochoa":[201.892,0.795,"Ochoa."],"last.rosales":[202.986,0.849,"Rosales."],"last.valdez":[204.136,0.82,"Valdez."],"last.aguilar":[205.256,0.742,"Aguilar."],"last.benitez":[206.297,0.874,"Benitez."],"last.cordero":[207.471,0.842,"Cordero."],"last.nakamura":[208.613,0.954,"Nakamura."],"last.tanaka":[209.868,0.792,"Tanaka."],"last.kimura":[210.959,0.774,"Kimura."],"last.sato":[212.033,0.708,"Sato."],"last.suzuki":[213.041,0.856,"Suzuki."],"last.takahashi":[214.197,0.949,"Takahashi."],"last.watanabe":[215.446,0.815,"Watanabe."],"last.yamamoto":[216.561,0.94,"Yamamoto."],"last.kobayashi":[217.8,0.98,"Kobayashi."],"last.matsui":[219.081,0.787,"Matsui."]}};
+const VOICE_META={"calls":{"v":"dcf8376a93","dur":612.832},"names":{"v":"eaebca7f77","dur":220.168}};
 
 /* ---------- the recorded announcer: play-by-play calls, big moments and batter introductions ----------
    Lines live in two audio files (audio/voice-calls.mp3, audio/voice-names.mp3) mapped by VOICE_MAP.
@@ -5441,8 +5661,9 @@ function voPlay(desc,prev){
   let key=CALL_TITLE[E.title]||(desc&&CALL_OF[desc.kind])||null;
   if(desc&&desc.kind==='bb'&&ev&&ev.runs>0) key='bbrun';
   if(key==='hr'&&ev&&ev.runs===4) key='gs';
-  if(G.over&&G.walkoff){ if(key==='hr'||key==='gs'){ ids.push(voPick(key)); ids.push(voPick('wohr')); } else { if(key) ids.push(voPick(key)); ids.push(voPick('wo')); } return voSay(ids,{captionText:voCaption(ids)}); }
-  if(key) ids.push(voPick(key));
+  const pk=k=>desc&&desc.call&&String(desc.call).startsWith('c.'+k+'.')?desc.call:voPick(k); // the same line the field animation was built from
+  if(G.over&&G.walkoff){ if(key==='hr'||key==='gs'){ ids.push(pk(key)); ids.push(voPick('wohr')); } else { if(key) ids.push(pk(key)); ids.push(voPick('wo')); } return voSay(ids,{captionText:voCaption(ids)}); }
+  if(key) ids.push(pk(key));
   if(!ids.length||!ids[0]) return;
   const runs=prev?Math.max(0,total(G,0)+total(G,1)-prev.runs):0;
   if(runs>0 && key!=='hr' && key!=='gs' && key!=='bbrun' && key!=='squeeze' && key!=='sacfly' && key!=='stealhome') ids.push(voPick('run'+Math.min(3,runs)));
@@ -5649,19 +5870,19 @@ async function startTutorial(){
   const q=s=>()=>document.querySelector(s);
   const spdBtn=()=>[...document.querySelectorAll('#abar [data-ab]')].find(b=>/steals/.test(b.textContent));
   TUT={step:0, el:{}, steps:[
-    {title:'Welcome to Floodlight Baseball', text:'This guided game takes about three minutes. You manage <b>RED</b> against the computer. The coach shows you the die, the duel at the plate, abilities, action cards, your designated hitter and pitching. After that, the game is yours.', next:"Let's play"},
+    {title:'Welcome to Floodlight Baseball', text:'This guided game takes about three minutes. You manage <b>RED</b> against the computer. The coach shows you the die, abilities, action cards, your designated hitter and how the computer bats. After that, the game is yours.', next:"Let's play"},
     {target:'#park', pad:4, title:'The mini stadium', text:'Your meeples bat and run the bases here, the light towers glow, and the scoreboard keeps the game. RED bats first, in the top of the 1st.'},
     {target:'.call', title:'One roll per at-bat', text:'Every at-bat is one roll of a 12-sided word die: <b>K</b>, <b>Out</b>, <b>Double Play</b>, <b>Walk</b>, <b>Single</b>, <b>Double</b>, plus <b>Roll for Triple</b> and <b>Roll for Home Run</b>, which make you roll again. The result shows up here.'},
-    {target:()=>document.querySelector('#duelbar [data-duel="H"]')||$('duelbar'), title:'The duel', text:`Before each swing, guess the pitch. <b>Guess right</b> and you roll two dice and keep the better one. <b>Guess wrong</b> and the pitcher picks the worse one. Or <b>Just Swing</b> for one normal roll.<br><br>The scouting report says this pitcher throws heat with the bases empty. Tap <b>Sit on Heat</b>.`,
-      before:()=>{ G.duelForce='H'; window.__fdlRig=['OUT','1B']; }, wait:()=>!!G.bases[0], doText:'Tap Sit on Heat', keys:/^[hH]$/, pads:[PADB.LB], act:q('#duelbar [data-duel="H"]')},
-    {target:'#park', pad:4, title:'Base hit!', text:`You guessed right, so you rolled twice and kept the <b>Single</b>. <b>${esc(spd)}</b> is on first. The announcer calls every play, and the play-by-play keeps the record.`},
+    {target:'#roll', title:'Your first swing', text:'Tap <b>Roll</b> to swing. The space bar works too, and so does <b>A</b> on a controller.',
+      before:()=>{ window.__fdlRig=['1B']; }, wait:()=>!!G.bases[0], doText:'Tap Roll', roll:true, act:q('#roll')},
+    {target:'#park', pad:4, title:'Base hit!', text:`A <b>Single</b>! <b>${esc(spd)}</b> is on first. The announcer calls every play, and the play-by-play keeps the record.`},
     {target:()=>spdBtn()||$('abar'), title:'Player abilities', text:`Every player has one ability, once a game. <b>${esc(spd)}</b> has <b>Speed</b>: steal a base without rolling. Tap the glowing Speed button.`, wait:()=>!!G.bases[1]&&!G.bases[0], doText:'Tap the Speed button', act:spdBtn},
     {target:()=>document.querySelector('#hands [data-card="SB"]')||$('hands'), title:'Action cards', text:'Each team draws an action card in the 1st, 4th and 7th innings. You drew <b>Steal</b>. Lit cards can be played now: tap it to send your runner to third. (A Steal fails only on a K.)',
       before:()=>{ G.hands[0]=['SB']; window.__fdlRig=['1B']; renderGame(); }, wait:()=>!!G.bases[2]&&!G.hands[0].includes('SB'), doText:'Tap the Steal card', act:q('#hands [data-card="SB"]')},
     {target:()=>document.querySelector('#hands .dhmini[data-dh="0"]')||$('hands'), title:'Your designated hitter', text:'Once a game, in innings 1 to 8, you can send up a mystery pinch hitter from the DH pile. Most of them reach base, but not all. Tap <b>DH</b>.', wait:()=>G.dhUse[0][0]&&!G.pinch, doText:'Tap DH', keys:/^[dD]$/, act:q('#hands .dhmini[data-dh="0"]')},
-    {target:'#board', title:'A run scores', text:'Your runner came home. The line score and the stadium scoreboard both keep it. Now finish the inning: guess the pitch or <b>Just Swing</b> (the space bar works too) until RED makes three outs.', next:'Got it'},
-    {target:()=>['#duelbar','#roll'].map(s=>document.querySelector(s)).filter(e=>e&&!e.hidden), title:'Finish the half inning', text:'Keep swinging. The coach comes back when you take the field.', wait:()=>G.half===1||G.over, doText:'Play until three outs', roll:true, keys:/^[hHjJ]$/, pads:[PADB.LB,PADB.RB]},
-    {target:()=>['#duelbar','#roll'].map(s=>document.querySelector(s)).filter(e=>e&&!e.hidden), title:"You're pitching", text:'Now BLUE bats. You pick the pitch: <b>Throw Heat</b> or <b>Throw Junk</b>, or <b>Random pitch</b>. Mix it up, because the computer remembers what you throw. Defense cards and your Gold Glove pop up on their own when they can be used.', wait:()=>G.halfPA>0||G.half===0||G.over, doText:'Throw a pitch', roll:true, armMs:1100, keys:/^[hHjJ]$/, pads:[PADB.LB,PADB.RB]},
+    {target:'#board', title:'A run scores', text:'Your runner came home. The line score and the stadium scoreboard both keep it. Now finish the inning: keep tapping <b>Roll</b> (or the space bar) until RED makes three outs.', next:'Got it'},
+    {target:'#roll', title:'Finish the half inning', text:'Keep swinging. The coach comes back when you take the field.', wait:()=>G.half===1||G.over, doText:'Play until three outs', roll:true},
+    {target:'#roll', title:"You're in the field", text:'Now BLUE bats. Tap <b>Roll</b> for the computer\'s at-bats (or turn on <b>Auto</b> in Settings to let it roll on its own). Defense cards and your Gold Glove pop up on their own when they can be used.', wait:()=>G.halfPA>0||G.half===0||G.over, doText:'Roll for BLUE', roll:true, armMs:1100},
     {title:"You're ready", text:'That’s everything. Play this game out, or open the <b>Menu</b> any time for <b>Clutch Challenges</b>, <b>Franchise</b> mode, achievements and settings. Have fun under the lights!', next:'Play ball'}
   ], timer:0};
   TUT.timer=setInterval(tutTick,180);
@@ -5672,6 +5893,7 @@ async function startTutorial(){
 /* after every render of the game screen */
 function addonRender(){
   if(!ADDON_READY) return;
+  try{ parkSync(); }catch(e){}
   renderDuel(); paintHotkeys();
   if(G && !busy){ VO.pre={runs:total(G,0)+total(G,1), outs:G.outs, half:G.half, inning:G.inning}; voBatter(); }
   const ch=!!(G&&G.challenge); document.querySelectorAll('.exh').forEach(el=>el.hidden=frMode||ch);
@@ -5714,6 +5936,10 @@ function autoCpuTry(){
   if(IS_DESKTOP) $('fs').hidden=true; // the desktop app has its own full-screen switch in Settings (and F11)
 })();
 
+/* the tabletop edition: set KICKSTARTER_URL once the campaign page is live; until then the links go to the launch list */
+const KICKSTARTER_URL='';
+const ksHref=()=>KICKSTARTER_URL||'https://eepurl.com/J59uhGXqR0';
+function ksLine(){ return `<p class="kslink"><a href="${ksHref()}" target="_blank" rel="noopener">${KICKSTARTER_URL?'Love the game? Back the tabletop edition on Kickstarter':'Love the game? The tabletop edition is coming to Kickstarter: get launch updates'} ›</a></p>`; }
 /* main menu: Clutch Challenges, Achievements, Settings, the Daily Challenge, and Quit in the desktop app */
 (()=>{
   const nav=document.querySelector('.mlinks'), how=nav.querySelector('[data-m="how"]');
@@ -5722,9 +5948,10 @@ function autoCpuTry(){
   nav.insertBefore(mk('ach','Achievements'), nav.querySelector('[data-m="qsave"]'));
   nav.appendChild(mk('set','Settings'));
   nav.insertBefore(mk('tut','Tutorial'), how);
+  if(!FULL_GAME) nav.insertBefore(mk('full','Get the full game','hot'), nav.firstChild);
   if(IS_DESKTOP && how) how.textContent='How to play';
   nav.addEventListener('click',e=>{ const b=e.target.closest('[data-mx]'); if(!b) return; const k=b.dataset.mx;
-    if(k==='ch') openChallenges(); else if(k==='ach') openAchievements(); else if(k==='set') openSettings(); else if(k==='tut') startTutorial(); });
+    if(k==='ch') openChallenges(); else if(k==='ach') openAchievements(); else if(k==='set') openSettings(); else if(k==='tut') startTutorial(); else if(k==='full') fullAsk('menu'); });
   const tut=document.createElement('button'); tut.type='button'; tut.className='mnew'; tut.id='mTut'; tut.innerHTML='<b>New here?</b> Play the guided first game'; tut.addEventListener('click',startTutorial);
   $('mPlay').insertAdjacentElement('afterend',tut);
   const daily=document.createElement('button'); daily.type='button'; daily.className='mdaily'; daily.id='mDaily';
@@ -5732,7 +5959,10 @@ function autoCpuTry(){
   daily.addEventListener('click',()=>startChallenge(dailyFor(today())));
   const box=document.querySelector('.mcontent').parentNode;
   if(IS_DESKTOP){ const q=document.createElement('button'); q.type='button'; q.className='mquit'; q.textContent='Quit game'; q.addEventListener('click',()=>{ autoSave(); if(NATIVE.quit) NATIVE.quit(); }); box.appendChild(q); }
-  const v=document.createElement('span'); v.className='mver'; v.textContent='v'+GAME_VERSION; box.appendChild(v);
+  const v=document.createElement('span'); v.className='mver'; v.textContent='v'+GAME_VERSION+(FULL_GAME?'':' · Free demo'); box.appendChild(v);
+  const ks=document.createElement('a'); ks.className='mks'; ks.href=ksHref(); ks.target='_blank'; ks.rel='noopener';
+  ks.innerHTML=`<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="8.5" cy="8.5" r="1.6"/><circle cx="15.5" cy="15.5" r="1.6"/><circle cx="12" cy="12" r="1.6"/></svg><span><b>Play it on your table.</b> ${KICKSTARTER_URL?'Back the tabletop edition on Kickstarter':'The tabletop edition is coming to Kickstarter. Get launch updates'}</span>`;
+  nav.insertAdjacentElement('afterend',ks);
 })();
 function paintDaily(){
   if(!ADDON_READY) return;
@@ -5754,15 +5984,11 @@ if(IS_DESKTOP){
 /* the recorded announcer loads after the first tap or key (browsers only play sound after one) */
 const voWarm=()=>{ if(FSET.voice!==false&&ann.on){ voCtx(); voLoad('calls'); voLoad('names'); } };
 document.addEventListener('pointerdown',voWarm,{once:true}); document.addEventListener('keydown',voWarm,{once:true});
-/* the duel gets its own card in How to play */
-(()=>{ const g=document.querySelector('.guidegrid'); if(!g) return; const s=document.createElement('section'); s.className='card wide';
-  s.innerHTML='<h2>The duel</h2><p class="intro">In Simulation mode against the computer, every at-bat starts with a guess. The pitcher picks <b>Heat</b> or <b>Junk</b>; the batter <b>Sits on Heat</b>, <b>Sits on Junk</b> or <b>Just Swings</b>. Guess right and you roll the die twice and keep the result you want. Guess wrong and you roll twice and the pitcher picks. Just Swing is one normal roll. A blind guess changes nothing on average, so the edge comes from reading the pitcher: the scouting line under the buttons tells you their habits. When you pitch, mix it up, because the computer watches what you throw. Turn it off in Settings.</p>';
-  g.insertBefore(s,g.firstChild); })();
 ADDON_READY=true;
 paintDaily(); achProg(); if(F) achFr(); if(G) renderGame();
 /* credits: who made what (needed for the store build too) */
 function openCredits(back){
-  openX(`<div class="xpanel" role="dialog" aria-modal="true" aria-labelledby="crdT">${xHead('<span id="crdT">Credits</span>','Floodlight Baseball Dice Lab '+GAME_VERSION)}
+  openX(`<div class="xpanel" role="dialog" aria-modal="true" aria-labelledby="crdT">${xHead('<span id="crdT">Credits</span>','Floodlight Baseball '+GAME_VERSION)}
 <section class="xsec"><h4>Game</h4><p class="credp"><b>Floodlight Baseball</b> created by <b>John Wood</b>, Seattle, Washington. Inspired by the dice game his family played on nights too dark for baseball.</p></section>
 <section class="xsec"><h4>Sound</h4><p class="credp">Play-by-play voice made with the <b>Kokoro-82M</b> open voice model (Apache License 2.0).<br>Crowd made with the <b>Piper</b> LibriTTS voice model (LibriTTS corpus by Zen et al., CC BY 4.0).<br>Organ: “Take Me Out to the Ball Game” (Albert Von Tilzer, 1908, public domain). Bat, mitt and dice sounds are synthesized live.</p></section>
 <section class="xsec"><h4>Fonts</h4><p class="credp">Barlow and Barlow Condensed (Jeremy Tribby), DM Mono (Colophon Foundry), DotGothic16 (Fontworks), Yellowtail (Astigmatic). All under the SIL Open Font License 1.1.</p></section>
@@ -5770,7 +5996,298 @@ ${IS_DESKTOP?'<section class="xsec"><h4>Software</h4><p class="credp">Built with
 <div class="ovbtns"><button class="btn primary" type="button" data-x data-focus>Close</button></div></div>`,{back});
 }
 
-window.__fdl={addon:{ACHD:()=>ACHD,CHD:()=>CHD,DAYD:()=>DAYD,FSET:()=>FSET,start:id=>startChallenge(id==='daily'?dailyFor(today()):CH_BY[id]),achUnlock,openSettings,openAchievements,openChallenges,litActions,padPress,layerRoot,chFinal,buildChallenge,CHALL,ACHS,dailyFor,badgeSVG,exitChallenge,startTutorial,TUT:()=>TUT,FIELD:()=>FIELD,VO:()=>VO,voSay,voPick,voName,voBatter,fieldCheck,sfx:()=>sfx}, get G(){return G}, get F(){return F}, get busy(){return busy}, setOpp:o=>setOpp(o,true), cpuPick:()=>cpuPick(), showFinal:()=>showFinal(), playWhole, MODES, ACTIONS, ABIL, DHS, P, render:()=>renderGame(),
+/* ---------- franchise: a twelve-club league, and expansion for leagues made with six ---------- */
+const FR_FULL=12;
+function frCountWord(n,cap){ const w=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve'][n]||String(n); return cap?w[0].toUpperCase()+w.slice(1):w; }
+/* expansion happens between seasons, or before the first pitch of one */
+function frCanExpand(){ return !!F && F.ids.length<FR_FULL && !F.live && !(frMode&&G&&!G.over) && (F.phase==='off'||(F.phase==='reg'&&F.day===0)); }
+function frExpandHTML(){
+  if(!F||F.ids.length>=FR_FULL) return '';
+  const add=Math.min(FR_FULL-F.ids.length, FR_CLUBS.filter(c=>!F.ids.some(id=>F.teams[id].name===c.name)).length);
+  if(!add) return '';
+  const names=FR_CLUBS.filter(c=>!F.ids.some(id=>F.teams[id].name===c.name)).slice(0,add).map(c=>c.name);
+  return `<h4 style="margin-top:8px">Expand the league</h4><p>Grow to ${frCountWord(F.ids.length+add)} clubs: the ${names.slice(0,-1).join(', ')} and ${names[names.length-1]} join with their own players. Your team, stats, records and history all stay. The top four still make the playoffs.</p>`
+    +(frCanExpand()?`<div class="hbtns"><button class="btn" type="button" data-act="expand">Expand to ${F.ids.length+add} clubs</button></div>`
+                    :`<p style="color:var(--muted);font-size:13px">You can expand once this season is over, or before the first game of a season.</p>`);
+}
+function frExpand(){
+  if(!frCanExpand()) return;
+  const abbrs=new Set(F.ids.map(id=>F.teams[id].abbr));
+  const pool=FR_CLUBS.filter(c=>!F.ids.some(id=>F.teams[id].name===c.name));
+  const used=new Set([...Object.keys(F.bio||{}),...Object.keys(F.career||{}),...F.ids.flatMap(id=>F.teams[id].lineup),...RED_LINEUP,...BLUE_LINEUP,...DHS.map(d=>d.name),...(F.retired||[]).map(r=>r.name)]);
+  const added=[]; let k=1;
+  for(const c0 of pool){
+    if(F.ids.length>=FR_FULL) break;
+    while(F.teams['t'+k]) k++;
+    const id='t'+k, c=Object.assign({},c0);
+    if(abbrs.has(c.abbr)) c.abbr=abbrOf(c.name.split(' ')[0],abbrs); abbrs.add(c.abbr);
+    const ps=genPlayers(used, 3+(Math.random()<.4?1:0), Math.random()<.3?1:0);
+    F.teams[id]=Object.assign({id},c,{lineup:ps.map(p=>p.name),roster:Object.fromEntries(ps.map(p=>[p.name,Object.assign({ab:p.ab,n:p.n,f:p.f},p.hi?{hi:1}:{},p.jp?{jp:1}:{})]))});
+    F.ids.push(id); added.push(id);
+    for(const n of F.teams[id].lineup) F.bio[n]=Object.assign(nwBioNew(n),{a:19+Math.floor(Math.random()*12)}); // expansion clubs sign players of every age
+  }
+  if(!added.length) return;
+  if(F.phase==='reg'){ F.sched=makeSchedule(F.ids); F.schedV=2; for(const id of added) F.rec[id]={w:0,l:0,rs:0,ra:0}; }
+  const nm=added.map(id=>F.teams[id].name);
+  try{ nwAdd('pre',`The league grows to ${frCountWord(F.ids.length)} clubs`,`Welcome the ${nm.slice(0,-1).join(', ')} and ${nm[nm.length-1]}. ${frCountWord(F.ids.length,true)} clubs now chase the Floodlight Series, and only the top four make the playoffs.`,{w:F.phase==='off'?'Offseason':'Preseason',t:added,pr:3}); }catch(e){}
+  prepCards(added.map(id=>F.teams[id])); frSave();
+  hubMsg=`The league now has ${frCountWord(F.ids.length)} clubs. Meet the newcomers in the Teams tab.`; renderHub(); renderFbar();
+}
+
+/* ---------- franchise: trades with the other clubs' general managers, and a rookie draft every offseason ----------
+   Players are worth their ability, their bat (this season and career, against the league) and the years they have
+   left before they retire. A club that's in the race wants hitters now; a club that's out of it wants youth. */
+const TRADE_DEADLINE=Math.round(SEASON_GAMES*0.625); // trades close after game 20 of 32
+const AB_VAL={SLG:10,CLU:8,GLV:7.5,GAP:7,CON:7,SPD:6.5,EYE:6,BNT:5,HUS:4.5,IRN:4};
+NW_KIND.trade='Trades'; NW_KIND.draft='Draft';
+let TR={with:null, me:[], them:[], msg:''}, DRsel=null;
+
+const plAge=n=>{ const b=F.bio&&F.bio[n]; return b&&b.a!=null?b.a:27; };
+function lgOps(){ let H=0,BB=0,PA=0,AB=0,TB=0; const add=s=>{ H+=s.H; BB+=s.BB; PA+=s.PA; AB+=s.AB; TB+=s.H+s['2B']+2*s['3B']+3*s.HR; };
+  for(const s of Object.values(F.stats||{})) add(s); if(PA<400) for(const s of Object.values(F.career||{})) add(s);
+  return PA>=400&&AB?(H+BB)/PA+TB/AB:.68; }
+/* is this club chasing the playoffs (within two games of fourth) or building for later? */
+function trRace(tid){
+  if(F.phase!=='reg'||F.day<6) return 0; const st=frStandings(), i=st.findIndex(r=>r.id===tid), cut=st[3];
+  return i<4||((cut.w-st[i].w)+(st[i].l-cut.l))/2<=2?1:-1; }
+/* every general manager has his own taste in abilities, and it changes a little from season to season */
+const gmTaste=(tid,ab)=>((nwHash(tid+'|'+F.season+'|'+ab)%25)-12)/10;
+/* what a player is worth to club tid; others = the abilities the club would have alongside him */
+function plValue(n,tid,info,others,lg){
+  const r=info||(F.teams[tid]&&F.teams[tid].roster[n]); if(!r) return 0;
+  lg=lg||lgOps(); const mode=trRace(tid);
+  let v=(AB_VAL[r.ab]||5)+(tid!==F.userId?gmTaste(tid,r.ab):0), perf=0;
+  const s=F.stats&&F.stats[n], c=F.career&&F.career[n];
+  if(s&&s.PA>=12) perf+=(ops(s)-lg)*14*Math.min(1,s.PA/110);
+  if(c&&c.PA>=60) perf+=(ops(c)-lg)*7;
+  v+=Math.max(-5,Math.min(6,perf))*(mode>0?1.3:mode<0?.7:1);
+  const a=r.age!=null?r.age:plAge(n), yrs=Math.max(0,RETIRE_AGE-a);
+  v+=(a<=24?2.5:a<=29?1.5:a<=33?0:-(a-33)*.9)*(mode<0?1.4:mode>0?.6:1)+(yrs<=2?-1.5:0);
+  if(others){ const dup=others.filter(k=>k===r.ab).length; v+=dup?-.6*dup:.5; } // a club wants abilities it doesn't have
+  return Math.round(v*10)/10;
+}
+/* how much better off club tid is after sending out `out` and taking in `inn` (lists of [name,info]) */
+function trGain(tid,out,inn,lg){
+  const T=F.teams[tid], keep=T.lineup.filter(n=>!out.some(o=>o[0]===n)).map(n=>T.roster[n].ab);
+  const got=inn.reduce((p,[n,info],i)=>p+plValue(n,tid,info,keep.concat(inn.filter((x,j)=>j!==i).map(x=>x[1].ab)),lg),0);
+  const lost=out.reduce((p,[n])=>p+plValue(n,tid,null,T.lineup.filter(x=>x!==n).map(x=>T.roster[x].ab),lg),0);
+  return got-lost;
+}
+function trOpen(){ return !!F && !demoFrLocked() && !F.live && !(frMode&&G&&!G.over) && (F.phase==='off'||(F.phase==='reg'&&F.day<TRADE_DEADLINE)); }
+const trPack=(tid,names)=>names.map(n=>[n,Object.assign({},F.teams[tid].roster[n])]);
+const fCount=(tid,names)=>names.filter(n=>F.teams[tid].roster[n]&&F.teams[tid].roster[n].f).length;
+function trValid(){
+  const u=F.userId, o=TR.with; if(!o||!F.teams[o]) return 'Pick a club to trade with.';
+  if(!TR.me.length||!TR.them.length) return 'Pick who you send and who you want.';
+  if(TR.me.length!==TR.them.length) return 'Trades are player for player: send as many as you get.';
+  if(fCount(u,TR.me)!==fCount(o,TR.them)) return 'Each club keeps the same lineup spots: swap a player for a player in the same spot.';
+  const back=(F.trades||[]).find(t=>t.s===F.season&&t.b===o&&t.a===u&&TR.them.some(n=>t.ga.includes(n)));
+  if(back) return `The ${tname(o)} just got ${back.ga.find(n=>TR.them.includes(n))} from you. They won't send him back this season.`;
+  return '';
+}
+/* the other GM's answer: [gain for them, a short line] */
+function trMood(){
+  const o=TR.with, g=trGain(o,trPack(o,TR.them),trPack(F.userId,TR.me));
+  const nm=nickOf(F.teams[o]);
+  return [g, g>=.5?`The ${nm} would take that deal.`:g>=-1.5?`Close. The ${nm} want a little more.`:`The ${nm} aren't interested.`];
+}
+function trDo(a,b,ga,gb,user){
+  const A=F.teams[a], B=F.teams[b], pa=trPack(a,ga), pb=trPack(b,gb);
+  const swap=(T,out,inn)=>{ const nums=new Set(T.lineup.filter(n=>!out.includes(n)).map(n=>T.roster[n].n)), fo=out.filter(n=>T.roster[n].f), mo=out.filter(n=>!T.roster[n].f);
+    for(const [n,info] of inn){ const i=T.lineup.indexOf((info.f?fo:mo).shift()); const x=Object.assign({},info);
+      if(nums.has(x.n)){ let k=1; while(nums.has(k)) k++; x.n=k; } nums.add(x.n); T.roster[n]=x; T.lineup[i]=n; }
+    for(const n of out) delete T.roster[n]; };
+  swap(A,ga,pb); swap(B,gb,pa);
+  for(const st of [F.stats,F.pstats]) if(st){ for(const n of ga) if(st[n]) st[n].team=b; for(const n of gb) if(st[n]) st[n].team=a; }
+  (F.trades||(F.trades=[])).push({s:F.season,d:F.day,a,b,ga:ga.slice(),gb:gb.slice()});
+  const L=l=>l.join(' and ');
+  try{ nwAdd('trade',`Trade: ${L(ga)} to the ${nickOf(B)}`,`The ${A.name} send ${L(ga)} to the ${B.name} for ${L(gb)}.${user?'':' Both clubs filled a need.'}`,{t:[a,b],pr:user?3:2}); }catch(e){}
+  prepCards([A,B]); frSave();
+}
+function trPropose(){
+  const bad=trValid(); if(bad){ TR.msg=bad; renderHub(); return; }
+  const [g,line]=trMood();
+  if(g<.5){ TR.msg=line+' Try a different deal, or ask what they want.'; renderHub(); return; }
+  const got=TR.them.slice(), sent=TR.me.slice(), o=TR.with;
+  askYes(`Send ${sent.join(' and ')} to the ${tname(o)} for ${got.join(' and ')}?`,'Make the trade').then(ok=>{ if(!ok) return;
+    trDo(F.userId,o,sent,got,true); TR.me=[]; TR.them=[];
+    TR.msg=`Done! ${got.join(' and ')} ${got.length>1?'join':'joins'} your club and ${got.length>1?'take':'takes'} the open lineup spot${got.length>1?'s':''}. Set your batting order before your next game.`;
+    renderHub(); renderFbar(); });
+}
+/* "what would it take?": the cheapest of your players the other club would accept for the ones you picked */
+function trAsk(){
+  const o=TR.with, u=F.userId; if(!o||!TR.them.length){ TR.msg='Pick the player you want first.'; renderHub(); return; }
+  const want=trPack(o,TR.them), fNeed=fCount(o,TR.them), mine=me().lineup, lg=lgOps(), opts=[];
+  const combos=TR.them.length===1?mine.map(n=>[n]):mine.flatMap((n,i)=>mine.slice(i+1).map(m=>[n,m]));
+  for(const c of combos){ if(fCount(u,c)!==fCount(o,TR.them)||fCount(u,c)!==fNeed) continue;
+    const g=trGain(o,want,trPack(u,c),lg); if(g>=.5) opts.push([trGain(u,trPack(u,c),want,lg),c]); }
+  opts.sort((x,y)=>y[0]-x[0]);
+  if(!opts.length){ TR.msg=`The ${nickOf(F.teams[o])} won't move ${TR.them.join(' and ')} for anyone on your roster right now.`; renderHub(); return; }
+  TR.me=opts[0][1].slice(); TR.msg=`The ${nickOf(F.teams[o])} would do it for ${TR.me.join(' and ')}.`; renderHub();
+}
+/* computer clubs trade with each other a few times before the deadline */
+function trCpuDay(){
+  if(F.phase!=='reg'||![7,13,19].includes(F.day)||Math.random()<.4) return;
+  const cpu=F.ids.filter(id=>id!==F.userId), lg=lgOps();
+  for(let t=0;t<60;t++){ const a=pick(cpu), b=pick(cpu); if(a===b) continue;
+    const x=pick(F.teams[a].lineup), info=F.teams[a].roster[x];
+    const ys=F.teams[b].lineup.filter(y=>!!F.teams[b].roster[y].f===!!info.f&&F.teams[b].roster[y].ab!==info.ab);
+    for(const y of shuffle(ys)){ const ga=trGain(a,trPack(a,[x]),trPack(b,[y]),lg), gb=trGain(b,trPack(b,[y]),trPack(a,[x]),lg);
+      if(ga>=.2&&gb>=.2){ trDo(a,b,[x],[y],false); return; } } }
+}
+
+/* ---------- the rookie draft: one round, worst record picks first ---------- */
+const DR_NOTE={SLG:'Raw power. The ball jumps off the bat.',CLU:'Ice in the veins with runners on.',GLV:'Vacuum cleaner with a glove.',GAP:'Line drives into both gaps.',CON:'Almost never strikes out.',
+  SPD:'Fastest player in the class.',EYE:'Takes walks like a ten-year vet.',BNT:'Lays down bunts for hits.',HUS:'Never stops running.',IRN:'Never misses a game.'};
+function drMake(){
+  const st=frStandings().map(r=>r.id).reverse(), champ=F.history.length&&F.history[F.history.length-1].champ;
+  const order=st.filter(id=>id!==champ).concat(champ&&F.teams[champ]?[champ]:[]);
+  const used=new Set([...Object.keys(F.bio||{}),...Object.keys(F.career||{}),...F.ids.flatMap(id=>F.teams[id].lineup),...RED_LINEUP,...BLUE_LINEUP,...DHS.map(d=>d.name),...(F.retired||[]).map(r=>r.name),...(F.gone||[])]);
+  const N=F.ids.length+4, pool=[], abs=Object.keys(ABIL);
+  for(let i=0;i<N;i++){ const f=i<3, h=!f&&Math.random()<.3, j=!f&&!h&&Math.random()<.05; let name, fn, g=0;
+    do{ fn=pick(j?FIRST_JP:h?(f?FIRST_HF:FIRST_HM):(f?FIRST_F:FIRST_M)); name=fn+' '+pick(j?LASTS_JP:h?LASTS_H:LASTS); }while(used.has(name)&&g++<500); used.add(name);
+    const age=18+Math.floor(Math.random()*5);
+    pool.push(Object.assign({name,ab:pick(abs),age,n:1+Math.floor(Math.random()*55)},f?{f:1}:{},h?{hi:1}:{},j?{jp:1}:{})); }
+  F.draft={s:F.season,order,pool:shuffle(pool),picks:[],at:0,done:false};
+}
+const drOn=()=>!!F&&F.phase==='off'&&F.history.length>0;
+function drGet(){ if(!drOn()) return null; if(!F.draft||F.draft.s!==F.season) drMake(); return F.draft; }
+const drInfo=p=>Object.assign({ab:p.ab,n:p.n,age:p.age},p.f?{f:1}:{},p.hi?{hi:1}:{},p.jp?{jp:1}:{});
+/* the player a club would let go to make room: its least valuable player in the same lineup spot */
+const DR_KEEP=new Set([...RED_LINEUP,...BLUE_LINEUP,ALLY.name]); // the computer never cuts the game's original players
+function drRoom(tid,p,lg){ const T=F.teams[tid]; let best=null, bv=1e9;
+  for(const n of T.lineup){ if(!!T.roster[n].f!==!!p.f||DR_KEEP.has(n)) continue; const v=plValue(n,tid,null,T.lineup.filter(x=>x!==n).map(x=>T.roster[x].ab),lg); if(v<bv){ bv=v; best=n; } }
+  return [best,bv]; }
+function drTake(tid,p,rel){
+  const D=F.draft, T=F.teams[tid], i=T.lineup.indexOf(rel); if(i<0) return;
+  const nums=new Set(T.lineup.filter(n=>n!==rel).map(n=>T.roster[n].n)); const info=drInfo(p); delete info.age;
+  if(nums.has(info.n)){ let k=1; while(nums.has(k)) k++; info.n=k; }
+  delete T.roster[rel]; T.lineup[i]=p.name; T.roster[p.name]=info;
+  F.bio[p.name]=Object.assign(nwBioNew(p.name),{a:p.age}); (F.gone||(F.gone=[])).push(rel);
+  D.pool=D.pool.filter(x=>x!==p); D.picks.push({tid,name:p.name,ab:p.ab,age:p.age,rel}); prepCards([T]);
+}
+function drCpuPick(tid){ const D=F.draft, lg=lgOps(), T=F.teams[tid]; let best=null;
+  for(const p of D.pool){ const [rel,rv]=drRoom(tid,p,lg); if(!rel) continue;
+    const g=plValue(p.name,tid,drInfo(p),T.lineup.filter(x=>x!==rel).map(x=>T.roster[x].ab),lg)-rv; if(!best||g>best.g) best={p,rel,g}; }
+  if(best&&best.g>=1.2) drTake(tid,best.p,best.rel); else D.picks.push({tid,pass:1});
+  D.at++; }
+/* run the computer clubs' picks until it's your turn (or the draft is over) */
+function drRun(){ const D=drGet(); if(!D||D.done) return;
+  while(D.at<D.order.length&&D.order[D.at]!==F.userId) drCpuPick(D.order[D.at]);
+  if(D.at>=D.order.length) drFinish(); frSave(); }
+function drFinish(){ const D=F.draft; if(D.done) return; D.done=true;
+  const mine=D.picks.find(x=>x.tid===F.userId&&!x.pass), first=D.picks.find(x=>!x.pass);
+  const lines=D.picks.filter(x=>!x.pass).map(x=>`${tname(x.tid)}: ${x.name} (${ABIL[x.ab].name}, ${x.age})${x.rel?`. ${x.rel} is released`:''}`);
+  try{ nwAdd('draft',mine?`Draft day: ${mine.name} joins your club`:first?`Draft day: ${first.name} goes first`:'Draft day: every club passes',
+    `${lines.length?lines.join('.\n')+'.':'Nobody found a rookie they liked better than their own players.'}`,{t:mine?[F.userId]:[],pr:mine?3:2}); }catch(e){}
+  frSave(); }
+/* the season can't wait: clubs still to pick do so, and if it was your turn you pass */
+function drAuto(){ const D=drGet(); if(!D||D.done) return;
+  while(D.at<D.order.length){ if(D.order[D.at]===F.userId){ D.picks.push({tid:F.userId,pass:1}); D.at++; } else drCpuPick(D.order[D.at]); }
+  drFinish(); }
+function drUserPick(name,rel){ const D=drGet(); if(!D||D.done||D.order[D.at]!==F.userId) return;
+  const p=D.pool.find(x=>x.name===name); if(!p) return;
+  if(!rel){ DRsel=name; renderHub(); return; }
+  drTake(F.userId,p,rel); D.at++; DRsel=null; drRun();
+  hubMsg=`${p.name} is on your club. ${rel} has been released. Set your batting order before the first game.`; hubTab='moves'; renderHub(); renderFbar(); }
+function drPass(){ const D=drGet(); if(!D||D.done||D.order[D.at]!==F.userId) return; D.picks.push({tid:F.userId,pass:1}); D.at++; DRsel=null; drRun(); renderHub(); }
+function drHomeLine(){ if(!FULL_GAME) return ''; const D=drGet(); if(!D) return '';
+  if(D.done){ const m=D.picks.find(x=>x.tid===F.userId&&!x.pass); return `<p>Rookie draft: ${m?`you took <b>${esc(m.name)}</b>.`:'you passed.'}</p>`; }
+  const k=D.order.indexOf(F.userId)+1;
+  return `<p><b>The Rookie Draft is open.</b> You pick ${ordinal(k)} of ${D.order.length}. <button class="btn small" type="button" data-act="drgo">Go to the draft</button></p>`; }
+
+/* ---------- the Trades & Draft tab ---------- */
+function plRow(tid,n,side,sel,lg){ const T=F.teams[tid], r=T.roster[n], s=F.stats[n], a=plAge(n);
+  return `<button type="button" class="plrow${sel?' on':''}" data-act="trpick" data-side="${side}" data-n="${esc(n)}" aria-pressed="${sel}"><b>${esc(n)}</b>${abChip(r.ab)}<span class="plm">Age ${a}${s&&s.PA?` · ${f3(avg(s))}, ${s.HR} HR`:''}</span></button>`; }
+function movesHTML(){
+  const u=F.userId, lg=lgOps(); let h='';
+  const D=FULL_GAME?drGet():null;
+  if(!FULL_GAME&&drOn()) h+=`<div class="hcard"><h4>Rookie Draft</h4><p>Every offseason, each club drafts a rookie: worst record picks first. The draft and every season after the first are part of the full game.</p><div class="hbtns"><button class="btn primary" type="button" data-act="full">Get the full game</button></div></div>`;
+  if(D){
+    const turn=!D.done&&D.order[D.at]===u, started=D.at>0||D.done;
+    h+=`<div class="hcard"><h4>Rookie Draft · Season ${F.season+1}</h4>`;
+    if(D.done) h+=`<p>The draft is over.</p>`;
+    else h+=`<p>One round, worst record picks first. Every club may draft one rookie, who takes the place of a player it releases. You can also pass and keep your roster.${started?'':' Clubs that pick before you go when you start.'}</p>`;
+    h+=`<ol class="drorder">${D.order.map((id,i)=>{ const p=D.picks[i]; return `<li class="${id===u?'me':''}${i===D.at&&!D.done?' now':''}">${tdot(id)}<b>${esc(tname(id))}</b><span>${p?(p.pass?'Passed':`${esc(p.name)} · ${ABIL[p.ab].name}${p.rel?` (releases ${esc(p.rel)})`:''}`):i===D.at&&!D.done?(id===u?'Your pick':'On the clock'):''}</span></li>`; }).join('')}</ol>`;
+    if(!D.done&&!started&&!turn) h+=`<div class="hbtns"><button class="btn primary" type="button" data-act="drstart">Start the draft</button></div>`;
+    if(turn&&!DRsel) h+=`<p><b>You're on the clock.</b> Pick a rookie, or pass.</p><div class="drpool">${D.pool.map(p=>`<div class="drp">${abChip(p.ab)}<b>${esc(p.name)}</b><span class="plm">Age ${p.age} · No. ${p.n}</span><p>${DR_NOTE[p.ab]||''}</p><button class="btn small" type="button" data-act="drpick" data-n="${esc(p.name)}">Draft</button></div>`).join('')}</div><div class="hbtns"><button class="btn" type="button" data-act="drpass">Pass</button></div>`;
+    if(turn&&DRsel){ const p=D.pool.find(x=>x.name===DRsel), M=me();
+      h+=`<p><b>${esc(DRsel)}</b> (${ABIL[p.ab].name}, ${p.age}) needs a spot. Who do you release?</p><div class="plist">${M.lineup.filter(n=>!!M.roster[n].f===!!p.f).map(n=>plRow(u,n,'rel',false,lg).replace('data-act="trpick"','data-act="drrel"').replace(`data-n="${esc(n)}"`,`data-n="${esc(n)}" data-p="${esc(DRsel)}"`)).join('')}</div><div class="hbtns"><button class="btn" type="button" data-act="drback">Back to the rookies</button></div>`; }
+    if(!D.done&&!turn&&started) h+=`<div class="hbtns"><button class="btn" type="button" data-act="drstart">Finish the draft</button></div>`;
+    h+='</div>';
+  }
+  const open=trOpen();
+  h+=`<div class="hcard"><h4>Trades</h4>`;
+  if(!open){
+    h+=F.phase==='reg'?`<p>The trade deadline has passed (after Game ${TRADE_DEADLINE}). Trades open again in the offseason.</p>`:F.phase==='post'?`<p>No trades during the playoffs. Trades open again in the offseason.</p>`:`<p>Finish the game in progress first.</p>`;
+    return h+'</div>'+trLogHTML();
+  }
+  const others=F.ids.filter(id=>id!==u); if(!TR.with||!F.teams[TR.with]||TR.with===u) TR.with=others[0];
+  TR.me=TR.me.filter(n=>me().roster[n]); TR.them=TR.them.filter(n=>F.teams[TR.with].roster[n]);
+  const O=F.teams[TR.with];
+  h+=`<p>Swap players with another club, one for one or two for two. Their general manager decides. Clubs in the playoff race want hitters now, clubs out of it want young players, and everyone wants abilities they don't have.${F.phase==='reg'?` Trade deadline: after Game ${TRADE_DEADLINE} (${Math.max(0,TRADE_DEADLINE-F.day)} game${TRADE_DEADLINE-F.day===1?'':'s'} left).`:''}</p>
+<label class="trwith">Trade with <select data-tr="with" class="btn small">${others.map(id=>`<option value="${id}"${id===TR.with?' selected':''}>${esc(tname(id))} (${F.rec[id]?F.rec[id].w+'–'+F.rec[id].l:''})</option>`).join('')}</select></label>
+<div class="trcols"><div><h5>You send</h5><div class="plist">${me().lineup.map(n=>plRow(u,n,'me',TR.me.includes(n),lg)).join('')}</div></div>
+<div><h5 style="color:${ink(O.color)}">You get from the ${esc(nickOf(O))}</h5><div class="plist">${O.lineup.map(n=>plRow(O.id,n,'them',TR.them.includes(n),lg)).join('')}</div></div></div>`;
+  const bad=trValid(), mood=bad?null:trMood();
+  h+=`<p class="trmood${mood?(mood[0]>=.5?' yes':mood[0]>=-1.5?' close':' no'):''}">${esc(TR.msg||(bad||mood[1]))}</p>`;
+  TR.msg='';
+  h+=`<div class="hbtns"><button class="btn primary" type="button" data-act="trgo"${bad?' disabled':''}>Propose trade</button><button class="btn" type="button" data-act="trask"${TR.them.length?'':' disabled'}>What would they want?</button><button class="btn" type="button" data-act="trclear">Clear</button></div></div>`;
+  return h+trLogHTML();
+}
+function trLogHTML(){ const L=(F.trades||[]).filter(t=>t.s===F.season).slice(-8).reverse(); if(!L.length) return '';
+  return `<div class="hcard"><h4>Trades this season</h4><p>${L.map(t=>`${tdot(t.a)}<b>${esc(tname(t.a))}</b> send ${esc(t.ga.join(' and '))} to ${tdot(t.b)}<b>${esc(tname(t.b))}</b> for ${esc(t.gb.join(' and '))}`).join('<br>')}</p></div>`; }
+function movesAct(a,el){
+  if(a==='trpick'){ const L=el.dataset.side==='me'?TR.me:TR.them, n=el.dataset.n, i=L.indexOf(n); if(i>=0) L.splice(i,1); else { L.push(n); if(L.length>2) L.shift(); } renderHub(); }
+  else if(a==='trgo') trPropose();
+  else if(a==='trask') trAsk();
+  else if(a==='trclear'){ TR.me=[]; TR.them=[]; renderHub(); }
+  else if(a==='drgo'){ hubTab='moves'; renderHub(); }
+  else if(a==='drstart'){ const D=drGet(); if(D&&D.order[D.at]!==F.userId) drRun(); renderHub(); }
+  else if(a==='drpick') drUserPick(el.dataset.n);
+  else if(a==='drrel') drUserPick(el.dataset.p,el.dataset.n);
+  else if(a==='drback'){ DRsel=null; renderHub(); }
+  else if(a==='drpass') drPass();
+}
+function movesWire(){ const s=document.querySelector('#hub select[data-tr="with"]'); if(s) s.onchange=()=>{ TR.with=s.value; TR.them=[]; renderHub(); }; }
+TABS.splice(TABS.findIndex(t=>t[0]==='teams')+1,0,['moves','Trades & Draft']);
+
+/* ---------- the free demo (the website) and the full game (Steam) ----------
+   The demo has every quick game, the guided first game, the Daily Challenge and its leaderboard, three Clutch Challenges
+   and the first franchise season through the Floodlight Series. A save code carries the franchise into the full game. */
+const STEAM_URL=''; // the Steam store page: set it once the page is up, and the buttons say "Wishlist on Steam"
+const FULL_PRICE='$7.99', DEMO_CH=3;
+const demoChOk=c=>FULL_GAME||!c||c.id==='daily'||CHALL.findIndex(x=>x.id===c.id)<DEMO_CH;
+const demoFrLocked=()=>!FULL_GAME&&!!F&&F.season>1;
+const FULL_WHY={
+  season:'That’s the end of the free demo season. Keep this franchise going in the full game: as many seasons as you like, a rookie draft every offseason, and players who age, retire and make the Hall of Fame.',
+  locked:'This franchise is past its first season, so it needs the full game. Your save comes with you.',
+  draft:'The Rookie Draft is part of the full game, along with every season after the first.',
+  ch:'The free demo has three Clutch Challenges plus the Daily Challenge. The full game has all twelve.'};
+function fullAsk(why,back){
+  const go=STEAM_URL?`<a class="btn primary" href="${STEAM_URL}" target="_blank" rel="noopener">Wishlist on Steam</a>`:`<a class="btn primary" href="${ksHref()}" target="_blank" rel="noopener">Tell me when it’s out</a>`;
+  openX(`<div class="xpanel" role="dialog" aria-modal="true" aria-labelledby="fgT">${xHead('<span id="fgT">Get the full game</span>',`Floodlight Baseball on Steam · ${FULL_PRICE}`)}
+${FULL_WHY[why]?`<p class="fgwhy">${FULL_WHY[why]}</p>`:''}
+<ul class="fglist"><li><b>Franchise mode with no limits:</b> season after season, trades, the rookie draft, aging, retirements and the Hall of Fame</li><li><b>All twelve Clutch Challenges</b>, plus the Daily Challenge and its leaderboard</li><li><b>Steam achievements</b>, cloud saves and full controller support</li><li><b>Plays offline</b>, full screen on your PC</li></ul>
+<p class="fgnote">Your franchise comes with you: open <b>Save / Load</b> here for your save code, then enter it in the full game.</p>
+<div class="ovbtns">${go}<button class="btn" type="button" data-x>Not now</button></div></div>`,{back});
+}
+/* the franchise hub: the first season is free; the next one (and the draft) is the full game */
+function demoGate(a){
+  if(FULL_GAME||!F) return false;
+  if(a==='next'){ fullAsk('season'); return true; }
+  if(/^dr/.test(a)){ fullAsk('draft'); return true; }
+  if(demoFrLocked()&&['play','sim','simreg','simpo','resume'].includes(a)){ fullAsk('locked'); return true; }
+  return false;
+}
+function demoHomeLine(){
+  if(FULL_GAME||!F) return '';
+  if(F.phase==='off') return `<p class="fgline">That’s the end of the free demo season. <button class="btn small primary" type="button" data-act="full">Keep this franchise going</button></p>`;
+  if(demoFrLocked()) return `<p class="fgline">This franchise is past its first season. <button class="btn small primary" type="button" data-act="full">Play on in the full game</button></p>`;
+  return '';
+}
+
+window.__fdl={addon:{ACHD:()=>ACHD,CHD:()=>CHD,DAYD:()=>DAYD,FSET:()=>FSET,start:id=>startChallenge(id==='daily'?dailyFor(today()):CH_BY[id]),achUnlock,openSettings,openAchievements,openChallenges,litActions,padPress,layerRoot,chFinal,buildChallenge,CHALL,ACHS,dailyFor,badgeSVG,exitChallenge,startTutorial,TUT:()=>TUT,FIELD:()=>FIELD,VO:()=>VO,voSay,voPick,voName,voBatter,fieldCheck,sfx:()=>sfx,parkSync,parkFor,PARK:()=>PARK_CUR,FR_CLUBS:()=>FR_CLUBS,trGain,plValue,drGet,lgOps,TR:()=>TR}, get G(){return G}, get F(){return F}, get busy(){return busy}, setOpp:o=>setOpp(o,true), cpuPick:()=>cpuPick(), showFinal:()=>showFinal(), playWhole, MODES, ACTIONS, ABIL, DHS, P, render:()=>renderGame(),
   setHand:(t,ids)=>{ G.hands[t]=ids.slice(); renderGame(); }, setBases:b=>{ G.bases=b.slice(); renderGame(); }, setOuts:n=>{ G.outs=n; renderGame(); },
   setInning:(i,h)=>{ G.inning=i; G.half=h; G.halfPA=0; while(G.line[0].length<i) G.line[0].push(0); while(G.line[1].length<i-(h?0:1)) G.line[1].push(0); renderGame(); },
   setIdx:(t,i)=>{ G.idx[t]=i; renderGame(); }, activeAbils:t=>activeAbils(t), runAbility:(t,i)=>runAbility(t,activeAbils(t)[i]), newGame, openHub, frCreate:(n,a)=>{ frCreate(n,a); setFrUI(); }, frPregame, frSimToPlayoffs, frSimPlayoffs, frSimUser, frNextSeason, frResume, frExit, genPlayerCard, cardSrc, snapshot, applySnap, toCode, fromCode, openSaves, editQuickNames, frEditNames, quickGame, get tipsOn(){return tipsOn}};
