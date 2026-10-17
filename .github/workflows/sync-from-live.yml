@@ -1,0 +1,26 @@
+name: Sync from the live site
+# Copies the game files from the live Netlify site into this repo, so GitHub matches what players see.
+# Run it from the Actions tab: Sync from the live site -> Run workflow.
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download the live site's files
+        run: |
+          B=https://floodlight-baseball-dice-lab.netlify.app
+          mkdir -p audio netlify/functions
+          for f in index.html share.jpg manifest.webmanifest package.json audio/voice-calls.mp3 netlify/functions/leaderboard.mjs; do
+            curl -fsSL "$B/$f?sync=$GITHUB_RUN_ID" -o "$f"
+          done
+          ls -la . audio netlify/functions
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Sync the game from the live site (v1.4 demo)" || echo "Nothing changed"
+          git push
