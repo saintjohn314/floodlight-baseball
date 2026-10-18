@@ -1125,6 +1125,15 @@ html.rm .mks{opacity:1}
 @media (prefers-reduced-motion:reduce){.stretch image.crowd{animation:none}}
 html.rm .stretch image.crowd{animation:none}
 .stretch .board{box-sizing:border-box} /* the lyrics board fits a phone screen */
+/* conferences and the All-Star Game */
+.confst{display:flex;flex-direction:column;gap:6px}
+.confh{margin:6px 0 2px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--flood,#ffd27e)}
+.asgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.asgrid h5{margin:0 0 6px;font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+.asgrid .troster li small{margin-left:auto}
+@media (max-width:560px){.asgrid{grid-template-columns:1fr}}
+.confst .tbl{table-layout:fixed}
+.confst .tbl th.l,.confst .tbl td.l{width:44%}
 </style>
 </head>
 <body>
@@ -1952,7 +1961,7 @@ const sfx=(()=>{
   }
   const dest=(wet)=>{ const g=ctx.createGain(); g.connect(out); if(wet) g.connect(room); return g; };
   /* the recorded crowd: a looping bed of light chatter */
-  const CROWD=['bed'], AUD=(/^(https?|app):$/.test(location.protocol)?['audio/']:[]).concat(SITE_URL+'/audio/');
+  const CROWD=['bed'], AUD=(/^(https?|app|capacitor):$/.test(location.protocol)?['audio/']:[]).concat(SITE_URL+'/audio/');
   async function getBuf(k){ let err=null;
     for(const base of AUD){ try{ const r=await fetch(base+'crowd-'+k+'.mp3'); if(!r.ok) throw new Error('crowd '+r.status); const ab=await r.arrayBuffer();
       return await new Promise((res,rej)=>ctx.decodeAudioData(ab,res,rej)); }catch(e){ err=e; } }
@@ -2156,18 +2165,18 @@ function frStory(A,H,kind=FR&&FR.kind){
   const u=F.userId, opp=A.id===u?H.id:A.id, out=[];
   if(kind==='po'){
     const all=[...(F.po.series||[]),F.po.final].filter(Boolean), s=all.find(x=>!x.winner&&(x.hi===u||x.lo===u)&&(x.hi===opp||x.lo===opp));
-    if(s){ const nm=s.need===4?'the Floodlight Series':'the semifinals', gn=s.g.length+1, a=s.w[s.hi], b=s.w[s.lo], na=s.need-a, nb=s.need-b;
+    if(s){ const nm=s.need===4?'the Floodlight Series':/ Final$/.test(s.label)?'the '+s.label:'the semifinals', gn=s.g.length+1, a=s.w[s.hi], b=s.w[s.lo], na=s.need-a, nb=s.need-b;
       out.push(gn===1?`Game 1 of ${nm}. First to ${s.need} wins.`:a===b?`Game ${gn} of ${nm}, and the series is tied ${a}–${b}.`:`Game ${gn} of ${nm}. ${Nk(a>b?s.hi:s.lo)} lead the series ${Math.max(a,b)}–${Math.min(a,b)}.`);
       if(na===1&&nb===1) out.push(`It's winner take all${s.need===4?' for the Floodlight Series trophy':''}.`);
       else if(na===1||nb===1){ const c=na===1?s.hi:s.lo; out.push(`${Nk(c)} can ${s.need===4?'win the Floodlight Series':'close out the series'} tonight, and ${nk(c===s.hi?s.lo:s.hi)} are facing elimination.`); }
-      out.push(`${Nk(s.hi)} have home field as the No. ${F.po.seeds.indexOf(s.hi)+1} seed.`);
+      out.push(F.po.conf?(s.need===4&&F.asg&&F.asg.s===F.season?`${Nk(s.hi)} have home field, thanks to the ${CONF_NAME[F.asg.w]}'s win in the All-Star Game.`:`${Nk(s.hi)} have home field.`):`${Nk(s.hi)} have home field as the No. ${F.po.seeds.indexOf(s.hi)+1} seed.`);
     }
   } else {
     const day=F.day, left=SEASON_GAMES-day;
     if(day===0) out.push(F.season===1?`It's Opening Day, the first game in league history.`:`It's Opening Day of Season ${F.season}.`);
     else if(left===1) out.push(`It's the final game of the regular season.`);
     else if(day===SEASON_GAMES/2) out.push(`We've reached the halfway point of the season.`);
-    if(day>=6){ const R=frRace(u), st=R.st, nm=Nk(u);
+    if(day>=6&&ADDON_READY&&confOn()) out.push(confRaceLine(u)); else if(day>=6){ const R=frRace(u), st=R.st, nm=Nk(u);
       if(R.clinched) out.push(`${nm} have already clinched a playoff spot.`);
       else if(R.out) out.push(`${nm} have been eliminated from playoff contention.`);
       else if(R.rank===1){ const g=gDiff(st[0],st[1]); out.push(g>0?`${nm} lead the league by ${gamesWord(g)}.`:`${nm} are tied for first place.`); }
@@ -2196,10 +2205,10 @@ function annPostgame(){
   if(!(G.isFr&&F&&G.frDone)) return s;
   const u=F.userId, nm=Nk(u);
   if(G.frKind==='reg'){ const r=F.rec[u];
-    if(F.phase!=='reg'){ const seed=F.po.seeds.indexOf(u)+1; s+=` That's the end of the regular season. ${nm} finish ${r.w}–${r.l}${seed<=4?`, and they're in the playoffs as the No. ${seed} seed!`:`, and they'll miss the playoffs.`}`; }
+    if(F.phase!=='reg'){ const seed=F.po.seeds.indexOf(u)+1; s+=` That's the end of the regular season. ${nm} finish ${r.w}–${r.l}${seed<=4?(F.po.conf?`, and they're in the playoffs as the ${seedWords(u)}!`:`, and they're in the playoffs as the No. ${seed} seed!`):`, and they'll miss the playoffs.`}`; }
     else { const R=frRace(u); s+=` ${nm} are now ${r.w}–${r.l}.`;
       const ts=F.nx&&F.nx.ts[u]||0; if(ts>=3) s+=` That's ${ts} wins in a row.`; else if(ts<=-3) s+=` That's ${-ts} straight losses.`;
-      if(F.day>=6){ if(R.clinched) s+=` They've clinched a playoff spot!`; else if(R.out) s+=` They've been eliminated from playoff contention.`; else if(R.rank<=4) s+=` They're ${ordinal(R.rank)} and in playoff position.`; else { const g=gDiff(R.st[3],R.me); s+=g>0?` They're ${gamesWord(g)} out of a playoff spot.`:` They're tied for the last playoff spot, on the outside for now.`; } } }
+      if(F.day>=6&&ADDON_READY&&confOn()) s+=' '+confRaceLine(u,true); else if(F.day>=6){ if(R.clinched) s+=` They've clinched a playoff spot!`; else if(R.out) s+=` They've been eliminated from playoff contention.`; else if(R.rank<=4) s+=` They're ${ordinal(R.rank)} and in playoff position.`; else { const g=gDiff(R.st[3],R.me); s+=g>0?` They're ${gamesWord(g)} out of a playoff spot.`:` They're tied for the last playoff spot, on the outside for now.`; } } }
   } else if(F.po){ const opp=G.teams[0].id===u?G.teams[1].id:G.teams[0].id, all=[...(F.po.series||[]),F.po.final].filter(Boolean).filter(x=>(x.hi===u||x.lo===u)&&(x.hi===opp||x.lo===opp)), x=all[all.length-1];
     if(x){ const a2=x.w[x.hi], b2=x.w[x.lo];
       if(x.winner){ if(x.winner===u) s+= x.need===4?` ${nm} are Floodlight Series champions!`:` ${nm} win the series ${Math.max(a2,b2)}–${Math.min(a2,b2)}, and they're headed to the Floodlight Series!`;
@@ -2239,7 +2248,7 @@ function tvSegments(m){
       : m===20?`Welcome to Floodlight Tonight! Twenty games down, twelve to go in Season ${F.season}. The stretch run starts now, so let's check the races.`
       : `Welcome to Floodlight Tonight! Thirty-two games are in the books, and the regular season of Season ${F.season} is over. Let's wrap it all up.`});
   // 2. standings
-  { const lead=st[0], second=st[1], g=gDiff(lead,second), fourth=st[3], fifth=st[4], gap=gDiff(fourth,fifth), ui=st.findIndex(r=>r.id===u), parts=[];
+  if(ADDON_READY&&confOn()) segs.push(confTvStandings(end)); else { const lead=st[0], second=st[1], g=gDiff(lead,second), fourth=st[3], fifth=st[4], gap=gDiff(fourth,fifth), ui=st.findIndex(r=>r.id===u), parts=[];
     if(end){ parts.push(`Here are your final standings. ${TheTeam(nm(lead.id))} finish on top at ${rec(lead.id)}${g>0?`, ${gamesWord(g)} ahead of ${theTeam(nm(second.id))}`:', winning first place on run differential'}.`);
       parts.push(`${TheTeam(nm(fourth.id))} ${gap>0?`grab the last playoff spot by ${gamesWord(gap)}`:`grab the last playoff spot on run differential`} over ${theTeam(nm(fifth.id))}.`);
       parts.push(ui<4?`${me} are in, as the No. ${ui+1} seed.`:`${me} finish ${ordinal(ui+1)} and miss the playoffs.`); }
@@ -2272,9 +2281,9 @@ function tvSegments(m){
     const rd=st.slice().sort((a,b)=>(b.rs-b.ra)-(a.rs-a.ra))[0]; if(rd.rs-rd.ra>0) lines.push(`${TheTeam(nm(rd.id))} have the best run differential in the league, plus ${rd.rs-rd.ra}.`);
     const mine=Object.entries(F.stats).filter(([n,s])=>s.team===u&&s.PA>0).sort((a,b)=>(pscore(b[1])+ops(b[1])*20)-(pscore(a[1])+ops(a[1])*20))[0]; if(mine) lines.push(`For ${theTeam(nm(u))}, ${mine[0]} is leading the way: ${ann.avg(avg(mine[1]))} with ${mine[1].HR} home run${mine[1].HR===1?'':'s'} and ${mine[1].RBI} RBI.`);
     if(lines.length) segs.push({tag:'Storylines',title:'Around the league',html:`<ul class="tvlist">${lines.map(t=>`<li>${esc(t.replace(/\u0001(\d+)\u0001/g,(x,d)=>'.'+String(d).padStart(3,'0')))}</li>`).join('')}</ul>`,say:lines.join(' ')}); }
-  else if(F.po){ const s=F.po.seeds, pr=(a,b)=>`<div class="tvm"><div>${tdot(s[a])}<i>${a+1}</i>${esc(nm(s[a]))}<small>${rec(s[a])}</small></div><div>${tdot(s[b])}<i>${b+1}</i>${esc(nm(s[b]))}<small>${rec(s[b])}</small></div></div>`, ui=s.indexOf(u);
-    segs.push({tag:'Playoffs',title:'The playoff picture',html:`<div class="tvbr">${pr(0,3)}${pr(1,2)}</div><p class="tvnote">Semifinals are best of 3, the Floodlight Series is best of 7. The higher seed has home field.</p>`,
-      say:`On to the playoffs. In the semifinals, the No. 1 seed, ${theTeam(nm(s[0]))}, take on No. 4, ${theTeam(nm(s[3]))}. And No. 2, ${theTeam(nm(s[1]))}, face No. 3, ${theTeam(nm(s[2]))}. Best of three, and the winners meet in the Floodlight Series.${ui>=0&&ui<4?` Good luck to ${theTeam(nm(u))}.`:''}`}); }
+  else if(F.po){ const s=F.po.seeds, pr=(a,b)=>`<div class="tvm"><div>${tdot(s[a])}<i>${ADDON_READY&&F.po.conf?seedTag(s[a]):a+1}</i>${esc(nm(s[a]))}<small>${rec(s[a])}</small></div><div>${tdot(s[b])}<i>${ADDON_READY&&F.po.conf?seedTag(s[b]):b+1}</i>${esc(nm(s[b]))}<small>${rec(s[b])}</small></div></div>`, ui=s.indexOf(u);
+    segs.push({tag:'Playoffs',title:'The playoff picture',html:`<div class="tvbr">${pr(0,3)}${pr(1,2)}</div><p class="tvnote">${F.po.conf?"Conference finals are best of 3, the Floodlight Series is best of 7. The All-Star Game winner's conference has home field in the Series.":"Semifinals are best of 3, the Floodlight Series is best of 7. The higher seed has home field."}</p>`,
+      say:F.po.conf?`On to the playoffs. In the West Final, ${theTeam(nm(s[0]))} take on ${theTeam(nm(s[3]))}. In the East Final, ${theTeam(nm(s[1]))} face ${theTeam(nm(s[2]))}. Best of three, and the conference champions meet in the Floodlight Series.${ui>=0&&ui<4?` Good luck to ${theTeam(nm(u))}.`:''}`:`On to the playoffs. In the semifinals, the No. 1 seed, ${theTeam(nm(s[0]))}, take on No. 4, ${theTeam(nm(s[3]))}. And No. 2, ${theTeam(nm(s[1]))}, face No. 3, ${theTeam(nm(s[2]))}. Best of three, and the winners meet in the Floodlight Series.${ui>=0&&ui<4?` Good luck to ${theTeam(nm(u))}.`:''}`}); }
   // 6. sign-off
   segs.push({tag:'Floodlight Tonight',title:'That’s the show',html:`<div class="tvopen"><b class="tvbig">Floodlight Tonight</b><span class="tvk">${end?'The playoffs are next':`Next report: after game ${m===10?20:SEASON_GAMES}`}</span></div>`,
     say:end?`That's all for Floodlight Tonight. The playoffs are next. We'll see you at the ballpark.`:`That's all for Floodlight Tonight. We'll check back in after game ${m===10?20:SEASON_GAMES}. See you at the ballpark.`});
@@ -2366,7 +2375,7 @@ function caseGet(){ try{ const L=JSON.parse(localStorage.getItem(CASE_KEY)); ret
 function caseAdd(e){ const L=caseGet(); L.push(Object.assign({d:Date.now()},e)); while(L.length>400) L.shift(); try{ localStorage.setItem(CASE_KEY,JSON.stringify(L)); }catch(x){} }
 /* your side: your club in a franchise, the team you manage against the computer, both teams in a two-player game */
 function mySides(){ if(G.isFr&&F) return [0,1].filter(i=>G.teams[i].id===F.userId); const me=G.cpu[0]!==G.cpu[1]?(G.cpu[0]?1:0):-1; return me>=0?[me]:[0,1]; }
-const caseWhere=()=>G.challenge?'Clutch Challenge · '+G.challenge.title:G.isFr&&F?`Franchise ${frSlot} · Season ${F.season}`:'Exhibition';
+const caseWhere=()=>G.challenge?(G.challenge.asg?'All-Star Game':'Clutch Challenge · '+G.challenge.title):G.isFr&&F?`Franchise ${frSlot} · Season ${F.season}`:'Exhibition';
 function caseNote(t,list){ if(list.length) setTimeout(()=>toast(t,`Trophy case: <b>${list.map(e=>CASE_KINDS[e.k][0]+(e.who?` by ${esc(e.who)}`:'')).join(', ')}</b>`,'abil'),1300); }
 function casePlay(){
   if(G.fx!=='HR'||!G.last||G.last.runs!==4) return; const t=G.last.team; if(!mySides().includes(t)) return;
@@ -3166,7 +3175,7 @@ const FR_CLUBS=[{name:'Boston Red Hats',abbr:'BOS',nick:'Red Hats',color:'#d9493
 const LOGOS={crown:`<circle cx="32" cy="32" r="30" fill="#f4eefe" stroke="#9b5de5" stroke-width="3"/><path d="M13 44 L16 21 L25.5 31 L32 14 L38.5 31 L48 21 L51 44 Z" fill="#9b5de5" stroke="#4b2386" stroke-width="2" stroke-linejoin="round"/><rect x="12" y="43" width="40" height="7" rx="2" fill="#7a3fd0" stroke="#4b2386" stroke-width="2"/><g fill="#ffd23f" stroke="#4b2386" stroke-width="1.2"><circle cx="16" cy="21" r="3"/><circle cx="32" cy="14" r="3"/><circle cx="48" cy="21" r="3"/></g><g fill="#fff" opacity=".9"><circle cx="24" cy="46.5" r="1.6"/><circle cx="32" cy="46.5" r="1.6"/><circle cx="40" cy="46.5" r="1.6"/></g>`,cap:`<circle cx="32" cy="32" r="30" fill="#fdf1ef" stroke="#d9493f" stroke-width="3"/><path d="M10 42 C9.5 25 19.5 14 31 14 C43 14 51 23.5 51 37 L51 42 Z" fill="#d9493f" stroke="#7d1d17" stroke-width="2" stroke-linejoin="round"/><path d="M31.5 14.5 Q34 28 34.5 42" stroke="#7d1d17" stroke-width="1.2" fill="none" opacity=".55"/><circle cx="31" cy="14" r="2.4" fill="#b8352c" stroke="#7d1d17" stroke-width="1"/><path d="M30 41 L58 39.5 Q61.5 45.5 54.5 48 L30 47.5 Z" fill="#b8352c" stroke="#7d1d17" stroke-width="2" stroke-linejoin="round"/><text x="21.5" y="37" font-family="Georgia,'Times New Roman',serif" font-weight="700" font-size="18" fill="#fff" text-anchor="middle">B</text>`,needle:`<circle cx="32" cy="32" r="30" fill="#e8f7ee" stroke="#2fa865" stroke-width="3"/><path d="M7.2 46 Q14.5 42 22 46 T37 46 T56.8 46 A28.5 28.5 0 0 1 7.2 46 Z" fill="#3a8fc7"/><path d="M11 51.5 Q17 48.5 23 51.5 T35 51.5 T53 51.5" stroke="#e8f7ee" stroke-width="1.6" fill="none" opacity=".75"/><path d="M32 5 V15" stroke="#1d6b42" stroke-width="2" stroke-linecap="round"/><path d="M28.5 15 H35.5 L34.5 18 H29.5 Z" fill="#1d6b42"/><ellipse cx="32" cy="20.5" rx="15" ry="3.6" fill="#2fa865" stroke="#1d6b42" stroke-width="1.5"/><path d="M19 21 L25.5 25.5 H38.5 L45 21 Z" fill="#1d6b42"/><path d="M28.5 25.5 L30.6 37 L26.5 47 H29.5 L32 40 L34.5 47 H37.5 L33.4 37 L35.5 25.5 Z" fill="#2fa865" stroke="#1d6b42" stroke-width="1.2" stroke-linejoin="round"/><path d="M29.4 33 H34.6" stroke="#1d6b42" stroke-width="1.4"/>`,sun:`<circle cx="32" cy="32" r="30" fill="#103a6b" stroke="#e8c33a" stroke-width="3"/><path d="M32.0 7.5L30.1 18.1L33.9 18.1ZM44.2 10.8L37.2 19.0L40.6 21.0ZM53.2 19.7L43.0 23.4L45.0 26.8ZM56.5 32.0L45.9 30.1L45.9 33.9ZM53.2 44.2L45.0 37.2L43.0 40.6ZM44.2 53.2L40.6 43.0L37.2 45.0ZM32.0 56.5L33.9 45.9L30.1 45.9ZM19.7 53.2L26.8 45.0L23.4 43.0ZM10.8 44.3L21.0 40.6L19.0 37.2ZM7.5 32.0L18.1 33.9L18.1 30.1ZM10.8 19.7L19.0 26.8L21.0 23.4ZM19.7 10.8L23.4 21.0L26.8 19.0Z" fill="#ffd23f"/><circle cx="32" cy="32" r="11.5" fill="#ffd23f" stroke="#f08a1c" stroke-width="2"/><circle cx="28.5" cy="28.5" r="3.5" fill="#fff3b0" opacity=".7"/>`,sword:`<circle cx="32" cy="32" r="30" fill="#17171b" stroke="#c9ced6" stroke-width="3"/><path d="M32 6 L36 13 V40 H28 V13 Z" fill="#dfe3e9" stroke="#8a919c" stroke-width="1.2" stroke-linejoin="round"/><path d="M32 12 V39" stroke="#8a919c" stroke-width="1.4"/><rect x="18.5" y="39.5" width="27" height="5" rx="2.5" fill="#c9ced6" stroke="#8a919c" stroke-width="1"/><rect x="29.5" y="44.5" width="5" height="9" rx="1.5" fill="#3a3a42" stroke="#c9ced6" stroke-width="1"/><circle cx="32" cy="56" r="3.2" fill="#c9ced6" stroke="#8a919c" stroke-width="1"/>`,horns:`<circle cx="32" cy="32" r="30" fill="#f0802a" stroke="#fff" stroke-width="3"/><path d="M24.5 25 C15 26 8.5 19 10 8.5 C13.5 15 18 18.5 25.5 19.5 Z" fill="#fff"/><path d="M39.5 25 C49 26 55.5 19 54 8.5 C50.5 15 46 18.5 38.5 19.5 Z" fill="#fff"/><path d="M21 22.5 Q17 23 15.5 26.5 Q19 27.5 22.5 26 Z M43 22.5 Q47 23 48.5 26.5 Q45 27.5 41.5 26 Z" fill="#fff"/><path d="M22 21 Q32 16.5 42 21 L40.5 31 Q39.5 38 37.5 44 Q35 51 32 51 Q29 51 26.5 44 Q24.5 38 23.5 31 Z" fill="#fff"/><ellipse cx="32" cy="45" rx="6.5" ry="5" fill="#ffd9bd"/><g fill="#f0802a"><circle cx="29.3" cy="45.5" r="1.4"/><circle cx="34.7" cy="45.5" r="1.4"/><ellipse cx="27.2" cy="30" rx="1.8" ry="2.2"/><ellipse cx="36.8" cy="30" rx="1.8" ry="2.2"/></g>`};
 Object.assign(LOGOS,{"bridge":"<circle cx=\"32\" cy=\"32\" r=\"30\" fill=\"#e6f6f8\" stroke=\"#1f9aa8\" stroke-width=\"3\"/><path d=\"M8.5 48 Q32 54 55.5 48 Q50 57 32 59 Q14 57 8.5 48 Z\" fill=\"#3a8fc7\" opacity=\".85\"/><g stroke=\"#0f5560\" stroke-width=\"1.1\" opacity=\".75\"><path d=\"M10 33 V43 M14 37 V43 M28 31 V43 M32 33 V43 M36 31 V43 M50 37 V43 M54 33 V43\"/></g><path d=\"M5 29 Q13 40 21.5 19 Q32 40 42.5 19 Q51 40 59 29\" fill=\"none\" stroke=\"#0f5560\" stroke-width=\"2.2\"/><path d=\"M18 17 h7 v27 h-7 Z M39 17 h7 v27 h-7 Z\" fill=\"#1f9aa8\" stroke=\"#0f5560\" stroke-width=\"2\" stroke-linejoin=\"round\"/><path d=\"M19.8 33 q1.7 -5 3.4 0 v7 h-3.4 Z M40.8 33 q1.7 -5 3.4 0 v7 h-3.4 Z M20.3 22 h2.4 v4 h-2.4 Z M41.3 22 h2.4 v4 h-2.4 Z\" fill=\"#e6f6f8\"/><path d=\"M6 44 H58\" stroke=\"#0f5560\" stroke-width=\"3\" stroke-linecap=\"round\"/>","dice":"<circle cx=\"32\" cy=\"32\" r=\"30\" fill=\"#fdeef5\" stroke=\"#d6408f\" stroke-width=\"3\"/><g transform=\"rotate(-14 22 37)\"><rect x=\"10\" y=\"25\" width=\"24\" height=\"24\" rx=\"5\" fill=\"#fff\" stroke=\"#7a1748\" stroke-width=\"2\"/><g fill=\"#d6408f\"><circle cx=\"16.5\" cy=\"31.5\" r=\"2.6\"/><circle cx=\"22\" cy=\"37\" r=\"2.6\"/><circle cx=\"27.5\" cy=\"42.5\" r=\"2.6\"/></g></g><g transform=\"rotate(12 42 27)\"><rect x=\"30\" y=\"15\" width=\"24\" height=\"24\" rx=\"5\" fill=\"#d6408f\" stroke=\"#7a1748\" stroke-width=\"2\"/><g fill=\"#fff\"><circle cx=\"36.5\" cy=\"21.5\" r=\"2.6\"/><circle cx=\"47.5\" cy=\"21.5\" r=\"2.6\"/><circle cx=\"42\" cy=\"27\" r=\"2.6\"/><circle cx=\"36.5\" cy=\"32.5\" r=\"2.6\"/><circle cx=\"47.5\" cy=\"32.5\" r=\"2.6\"/></g></g>","peaks":"<circle cx=\"32\" cy=\"32\" r=\"30\" fill=\"#eaf5fd\" stroke=\"#45a6e6\" stroke-width=\"3\"/><circle cx=\"46\" cy=\"17\" r=\"5\" fill=\"#ffd23f\" stroke=\"#c99a12\" stroke-width=\"1.2\"/><path d=\"M5 47 L21 20 L30 34 L40 15 L59 47 Z\" fill=\"#2c6fa3\" stroke=\"#173f60\" stroke-width=\"2\" stroke-linejoin=\"round\"/><path d=\"M21 20 L26.6 29.4 L23.6 27.4 L20.6 30.4 L17.8 25.4 Z M40 15 L46.6 27.4 L42.6 25 L39.4 28.6 L36.2 24.6 L34 27.2 Z\" fill=\"#fff\" stroke=\"#173f60\" stroke-width=\"1\" stroke-linejoin=\"round\"/><path d=\"M7 47 H57\" stroke=\"#173f60\" stroke-width=\"2.2\" stroke-linecap=\"round\"/>","pine":"<circle cx=\"32\" cy=\"32\" r=\"30\" fill=\"#f0f6e6\" stroke=\"#6b8e23\" stroke-width=\"3\"/><path d=\"M32 8 L42 22 H37 L46.5 34 H40.5 L51 47 H13 L23.5 34 H17.5 L27 22 H22 Z\" fill=\"#6b8e23\" stroke=\"#2d4210\" stroke-width=\"2\" stroke-linejoin=\"round\"/><path d=\"M32 13 L36.5 20 M32 13 L27.5 20\" stroke=\"#a7c46b\" stroke-width=\"1.4\" stroke-linecap=\"round\" opacity=\".8\"/><rect x=\"28.5\" y=\"47\" width=\"7\" height=\"8\" rx=\"1\" fill=\"#7b4a22\" stroke=\"#2d4210\" stroke-width=\"2\"/>","gear":"<circle cx=\"32\" cy=\"32\" r=\"30\" fill=\"#eef1f5\" stroke=\"#7a8aa0\" stroke-width=\"3\"/><path d=\"M28.2 16.0 L28.8 11.2 L35.2 11.2 L35.8 16.0 L38.3 16.8 L41.6 13.3 L46.8 17.1 L44.5 21.3 L46.1 23.4 L50.8 22.6 L52.7 28.6 L48.4 30.7 L48.4 33.3 L52.7 35.4 L50.8 41.4 L46.1 40.6 L44.5 42.7 L46.8 46.9 L41.6 50.7 L38.3 47.2 L35.8 48.0 L35.2 52.8 L28.8 52.8 L28.2 48.0 L25.7 47.2 L22.4 50.7 L17.2 46.9 L19.5 42.7 L17.9 40.6 L13.2 41.4 L11.3 35.4 L15.6 33.3 L15.6 30.7 L11.3 28.6 L13.2 22.6 L17.9 23.4 L19.5 21.3 L17.2 17.1 L22.4 13.3 L25.7 16.8 Z\" fill=\"#7a8aa0\" stroke=\"#38414f\" stroke-width=\"2\" stroke-linejoin=\"round\"/><circle cx=\"32\" cy=\"32\" r=\"9.5\" fill=\"#eef1f5\" stroke=\"#38414f\" stroke-width=\"2\"/><text x=\"32\" y=\"37\" font-family=\"Georgia,'Times New Roman',serif\" font-weight=\"700\" font-size=\"14\" fill=\"#38414f\" text-anchor=\"middle\">D</text>","twister":"<circle cx=\"32\" cy=\"32\" r=\"30\" fill=\"#f6efe6\" stroke=\"#8b5e3c\" stroke-width=\"3\"/><g fill=\"none\" stroke=\"#5a3a20\" stroke-width=\"7\" stroke-linecap=\"round\" opacity=\".35\"><path d=\"M12 15 Q32 22 52 15\"/><path d=\"M16 23 Q32 29 47 22\"/></g><g fill=\"none\" stroke=\"#8b5e3c\" stroke-width=\"4.6\" stroke-linecap=\"round\"><path d=\"M12 15 Q32 22 52 15\"/><path d=\"M16 23 Q32 29 47 22\"/><path d=\"M20.5 31 Q31 36 42 29.5\"/><path d=\"M24.5 38.5 Q31 42 37.5 37\"/><path d=\"M27.5 45 Q31.5 47.5 34 44\"/><path d=\"M30.5 50.5 Q31.5 53 30 55\"/></g>"}); // the expansion clubs: a bridge, dice, mountain peaks, a pine, a gear and a twister
 const LOGO_OF={'California Kings':'crown','Boston Red Hats':'cap','Seattle Emeralds':'needle','Florida Suns':'sun','Chicago Knights':'sword','Texas Horns':'horns','Brooklyn Bridgers':'bridge','Las Vegas High Rollers':'dice','Denver Summits':'peaks','Portland Pines':'pine','Detroit Motormen':'gear','Kansas City Cyclones':'twister'};
-const logoKey=T=>T?(LOGOS[T.logo]?T.logo:LOGO_OF[T.name]||null):null;
+const logoKey=T=>T?(LOGOS[T.logo]?T.logo:LOGO_OF[T.name]||(ADDON_READY?genLogoKey(T):null)):null;
 /* a team's mark: its logo, or a color dot for a team without one */
 const teamMark=(T,cls='')=>{ const k=logoKey(T); return k?`<svg class="tlogo ${cls}" viewBox="0 0 64 64" role="img" aria-label="${esc(T.name)}"><use href="#lg-${k}"/></svg>`:`<i style="background:${T&&T.color}"></i>`; };
 document.body.insertAdjacentHTML('afterbegin',`<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>${Object.entries(LOGOS).map(([k,v])=>`<symbol id="lg-${k}" viewBox="0 0 64 64">${v}</symbol>`).join('')}</defs></svg>`);
@@ -3293,6 +3302,7 @@ function frStandings(){
 const userGameToday=()=>F.sched[F.day]&&F.sched[F.day].find(g=>g.includes(F.userId));
 function frFinishDay(userG){
   if(F.phase!=='reg') return;
+  try{ if(ADDON_READY&&asgPending()) asgSim(); }catch(e){} // never skip the All-Star Game
   const lines=[], day=[];
   for(const g of F.sched[F.day]){
     const G2 = (userG && g.includes(F.userId)) ? userG : simGame(g[0],g[1]); day.push(G2);
@@ -3320,7 +3330,7 @@ const userSeries=()=>activeSeries().find(s=>s.hi===F.userId||s.lo===F.userId)||n
 function frStartPlayoffs(){
   const st=frStandings(), s=st.map(r=>r.id);
   F.awards=computeAwards(F.stats);
-  F.phase='post'; F.po={seeds:s,series:[mkSeries(s[0],s[3],2,'Semifinal 1 vs 4'),mkSeries(s[1],s[2],2,'Semifinal 2 vs 3')],final:null};
+  F.phase='post'; F.po=ADDON_READY&&confOn()?confPlayoffs(st):{seeds:s,series:[mkSeries(s[0],s[3],2,'Semifinal 1 vs 4'),mkSeries(s[1],s[2],2,'Semifinal 2 vs 3')],final:null};
   nwPlayoffs();
 }
 function frPlayoffDay(userG){
@@ -3337,7 +3347,7 @@ function frPlayoffDay(userG){
   }
   nwPoDay(day);
   if(!F.po.final && F.po.series.every(s=>s.winner)){
-    const [w1,w2]=F.po.series.map(s=>s.winner), seed=id=>F.po.seeds.indexOf(id), hi=seed(w1)<seed(w2)?w1:w2, lo=hi===w1?w2:w1;
+    const [w1,w2]=F.po.series.map(s=>s.winner), seed=id=>F.po.seeds.indexOf(id), hi=ADDON_READY&&F.po.conf?confHome(w1,w2):(seed(w1)<seed(w2)?w1:w2), lo=hi===w1?w2:w1;
     F.po.final=mkSeries(hi,lo,4,'Floodlight Series');
   } else if(F.po.final && F.po.final.winner) frCrown();
   return lines;
@@ -3354,7 +3364,7 @@ function frCrown(){
   F.phase='off';
   const fin=F.po.final, champ=fin.winner, runner=champ===fin.hi?fin.lo:fin.hi, u=F.userId, st=frStandings(), rank=st.findIndex(r=>r.id===u)+1, ur=F.rec[u];
   const semiLost=F.po.series.some(s=>(s.hi===u||s.lo===u)&&s.winner!==u);
-  const result= champ===u?'Won the Floodlight Series': runner===u?'Lost the Floodlight Series': semiLost?'Lost in the semifinals':'Missed the playoffs';
+  const result= champ===u?'Won the Floodlight Series': runner===u?'Lost the Floodlight Series': semiLost?(F.po.conf?'Lost in the conference final':'Lost in the semifinals'):'Missed the playoffs';
   F.history.push({season:F.season,champ,champName:tname(champ),runner,runnerName:tname(runner),score:`${fin.w[champ]}–${fin.w[runner]}`,awards:F.awards,
     user:{name:me().name,w:ur.w,l:ur.l,rank,result},standings:st.map(r=>({id:r.id,name:tname(r.id),w:r.w,l:r.l}))});
   const pre=JSON.parse(JSON.stringify(F.records||{}));
@@ -3373,7 +3383,7 @@ function frRecords(){
 function frNext(){
   const u=F.userId;
   if(F.phase==='reg'){ const g=userGameToday(); if(!g) return null; const opp=g[0]===u?g[1]:g[0]; return {kind:'reg',opp,home:g[1]===u,label:`Season ${F.season} · Game ${F.day+1} of ${F.sched.length}`}; }
-  if(F.phase==='post'){ const s=userSeries(); if(!s) return null; const opp=s.hi===u?s.lo:s.hi; return {kind:'po',opp,home:seriesHome(s)===u,label:`${s.need===4?'Floodlight Series':'Semifinal'} · Game ${s.g.length+1}`,series:s}; }
+  if(F.phase==='post'){ const s=userSeries(); if(!s) return null; const opp=s.hi===u?s.lo:s.hi; return {kind:'po',opp,home:seriesHome(s)===u,label:`${s.need===4?'Floodlight Series':/ Final$/.test(s.label)?s.label:'Semifinal'} · Game ${s.g.length+1}`,series:s}; }
   return null;
 }
 function frPregame(){
@@ -3557,10 +3567,11 @@ function hubAct(a,el){
   else if(a==='reset'){ askYes(`Delete Franchise ${frSlot} and all its seasons, stats and records? Your other franchises are not touched. This cannot be undone.`,'Delete franchise',true).then(ok=>{ if(!ok) return; try{ localStorage.removeItem(frKey(frSlot)); }catch(e){} F=null; frMode=false; FR=null; setFrUI(); startExhibition(); renderHub(); }); }
   else if(a==='exit') frExit();
   else if(ADDON_READY&&/^(tr|dr)/.test(a)) movesAct(a,el);
+  else if(ADDON_READY&&/^asg/.test(a)) asgAct(a);
 }
 function hubBody(){
   switch(hubTab){
-    case 'standings': return `<div class="hcard"><h4>Standings · Season ${F.season}</h4>${standingsHTML(false)}<p class="legend">Top four make the playoffs (dashed line). Semifinals are best of 3, the Floodlight Series is best of 7. Ties broken by run differential.</p></div>`;
+    case 'standings': return `<div class="hcard"><h4>Standings · Season ${F.season}</h4>${standingsHTML(false)}<p class="legend">${ADDON_READY&&confOn()?CONF_LEGEND:"Top four make the playoffs (dashed line). Semifinals are best of 3, the Floodlight Series is best of 7."} Ties broken by run differential.</p></div>`;
     case 'schedule': return scheduleHTML();
     case 'news': return newsHTML();
     case 'stats': return statsHTML();
@@ -3583,6 +3594,7 @@ function homeHTML(){
   let main='';
   if(F.live){
     const L=F.live.G; main=`<div class="hcard nextg"><h4>Game in progress · ${esc(F.live.FR.label)}</h4><p><b>${esc(L.teams[0].name)} ${total(L,0)}</b>, <b>${esc(L.teams[1].name)} ${total(L,1)}</b> · ${L.over?'Final':(L.half?'Bottom ':'Top ')+ordinal(L.inning)}</p><div class="hbtns"><button class="btn primary" type="button" data-act="resume">Resume game</button></div></div>`;
+  } else if(F.phase==='reg'&&ADDON_READY&&asgPending()){ main=asgCardHTML();
   } else if(F.phase==='reg'){
     main=`<div class="hcard nextg"><h4>Next up · Game ${F.day+1} of ${F.sched.length}</h4>${matchupHTML(nx)}<p>Pick home or away and set your batting order on the next screen.</p>
 <div class="hbtns"><button class="btn primary" type="button" data-act="play">Play game</button><button class="btn" type="button" data-act="sim" title="Plays your game out instantly. The computer manages both teams: cards, designated hitters, abilities and steals.">Sim game</button><button class="btn" type="button" data-act="simreg">Sim to playoffs</button></div></div>`;
@@ -3602,13 +3614,14 @@ function homeHTML(){
 <div class="hcard"><h4>Last games</h4>${mine.length?'<p>'+mine.map(g=>resLine(g.a,g.h,g.ra,g.rh,g.inn)).join('<br>')+'</p>':'<p class="empty2">No games yet this season.</p>'}</div></div></div>`;
 }
 function standingsHTML(mini){
+  if(ADDON_READY&&confOn()) return confStandingsHTML(mini);
   const st=frStandings(), u=F.userId;
   return `<div class="tscroll"><table class="tbl"><thead><tr><th class="l">Team</th><th>W</th><th>L</th><th>Pct</th><th>GB</th>${mini?'':'<th>RS</th><th>RA</th>'}<th>Diff</th></tr></thead><tbody>${st.map((r,i)=>`<tr class="${r.id===u?'me':''}${i===3?' cut':''}"><td class="l">${tdot(r.id)}<b>${esc(tname(r.id))}</b>${F.phase!=='reg'&&i<4?`<span class="seed">#${i+1}</span>`:''}</td><td>${r.w}</td><td>${r.l}</td><td>${pct(r.w,r.l)}</td><td>${r.gb?r.gb.toFixed(1).replace('.0',''):'–'}</td>${mini?'':`<td>${r.rs}</td><td>${r.ra}</td>`}<td>${r.rs-r.ra>0?'+':''}${r.rs-r.ra}</td></tr>`).join('')}</tbody></table></div>`;
 }
 const lastWord=s=>{ const w=s.split(' '); return w.length>2?w.slice(-2).join(' '):w.slice(-1)[0]; };
 function bracketHTML(){
   if(!F.po) return '';
-  const row=(s,id)=>`<div class="row ${s.winner?(s.winner===id?'won':'out'):''}">${tdot(id)}<span style="font-family:var(--f-num);font-size:11px;color:var(--muted)">#${F.po.seeds.indexOf(id)+1}</span><b>${esc(tname(id))}</b><span class="w">${s.w[id]}</span></div>`;
+  const row=(s,id)=>`<div class="row ${s.winner?(s.winner===id?'won':'out'):''}">${tdot(id)}<span style="font-family:var(--f-num);font-size:11px;color:var(--muted)">${ADDON_READY?seedTag(id):"#"+(F.po.seeds.indexOf(id)+1)}</span><b>${esc(tname(id))}</b><span class="w">${s.w[id]}</span></div>`;
   const ser=(s,cls)=>`<div class="series ${cls||''}"><span class="sh">${esc(s.label)} · best of ${s.need*2-1}</span>${row(s,s.hi)}${row(s,s.lo)}</div>`;
   return `<div class="hcard"><h4>Playoff bracket</h4><div class="bracket">${F.po.series.map(s=>ser(s)).join('')}${F.po.final?ser(F.po.final,'final'):`<div class="series final"><span class="sh">Floodlight Series · best of 7</span><span class="empty2">Waiting on the semifinals</span></div>`}</div></div>`;
 }
@@ -3692,7 +3705,7 @@ function importSave(file){
   rd.readAsText(file);
 }
 function newFranchiseHTML(){
-  return `<div class="hgrid"><div class="hcard nextg"><h4>Start a franchise</h4><p>You manage <b>RED</b>: Wes Wright, Ezzy Lyons, Hank Hammer and the rest. Eleven computer teams with their own names, logos and abilities fill out the league. Play a <b>32-game season</b>, and the top four make the playoffs: best-of-3 semifinals, then the best-of-7 <b>Floodlight Series</b>. Every stat, record and champion is saved, and the franchise rolls on season after season.</p>
+  return `<div class="hgrid"><div class="hcard nextg"><h4>Start a franchise</h4><p>You manage <b>RED</b>: Wes Wright, Ezzy Lyons, Hank Hammer and the rest. Eleven computer teams with their own names, logos and abilities fill out the league. Play a <b>32-game season</b>, ${ADDON_READY?'split into a <b>West</b> and an <b>East</b>. The top two in each conference make the playoffs: best-of-3 conference finals, then the best-of-7 <b>Floodlight Series</b>, with an <b>All-Star Game</b> at the halfway mark.':'and the top four make the playoffs: best-of-3 semifinals, then the best-of-7 <b>Floodlight Series</b>.'} Every stat, record and champion is saved, and the franchise rolls on season after season.</p>
 <div class="form"><label>Team name<input type="text" id="nfName" maxlength="28" value="California Kings"></label><label>Scoreboard abbreviation<input type="text" id="nfAbbr" maxlength="4" value="CAL"></label>
 <div class="choice"><span style="font-size:13px;color:var(--muted);font-weight:600">League size</span><label><input type="radio" name="nfSize" value="12" checked> 12 clubs</label><label><input type="radio" name="nfSize" value="6"> 6 clubs (the classic league)</label></div>
 <div class="choice"><span style="font-size:13px;color:var(--muted);font-weight:600">Team &amp; player names</span><label><input type="radio" name="nfNames" value="keep" checked> Keep the names as they are</label><label><input type="radio" name="nfNames" value="custom"> Customize team and player names</label></div>
@@ -3921,7 +3934,7 @@ function nwHof(cls){
 }
 function nwPlayoffs(){
   nwInit(); const s=F.po.seeds, u=F.userId, A=F.awards||{}; F.nx.fs={};
-  nwAdd('po',`The field is set`,`Semifinals (best of 3): #1 ${nwT(s[0])} vs #4 ${nwT(s[3])}, and #2 ${nwT(s[1])} vs #3 ${nwT(s[2])}. The winners meet in the best-of-7 Floodlight Series.`,{t:s.slice(0,4),pr:4});
+  nwAdd('po',`The field is set`,F.po.conf?`West Final (best of 3): ${nwT(s[0])} vs ${nwT(s[3])}. East Final (best of 3): ${nwT(s[1])} vs ${nwT(s[2])}. The conference champions meet in the best-of-7 Floodlight Series.`:`Semifinals (best of 3): #1 ${nwT(s[0])} vs #4 ${nwT(s[3])}, and #2 ${nwT(s[1])} vs #3 ${nwT(s[2])}. The winners meet in the best-of-7 Floodlight Series.`,{t:s.slice(0,4),pr:4});
   if(!s.slice(0,4).includes(u)) nwAdd('game',`No October for the ${nwN(u)}`,`${nwT(u)} finished ${F.rec[u].w}–${F.rec[u].l}, ${ordinal(s.indexOf(u)+1)} in the standings. The front office has a long winter ahead.`,{t:[u],pr:3});
   const aw=(k,lbl,pr)=>{ const a=A[k]; if(!a) return; const B=nwBio(a.name); nwAdd('award',`${a.name} wins the ${lbl}`,`${nwT(a.team)} ${a.name}: ${a.line}. ${k==='mvp'?`From ${B.town} to the top of the league. ${B.back}.`:''}`,{t:[a.team],p:{n:a.name,tid:a.team},pr}); };
   aw('bat','batting title',3); aw('hr','home run crown',3); aw('mvp','MVP award',5);
@@ -3931,8 +3944,8 @@ function nwPoDay(list){
   for(const [G2,s] of list){
     const st=nwGame(G2), fin=s.need===4;
     if(fin) for(const [n,b] of Object.entries(G2.box)){ const tid=G2.teams[b.team].id; if(!F.teams[tid].roster[n]) continue; const o=F.nx.fs[n]||(F.nx.fs[n]={tid,H:0,AB:0,HR:0,RBI:0,R:0,'2B':0,'3B':0,SB:0,BB:0}); for(const k of ['H','AB','HR','RBI','R','2B','3B','SB','BB']) o[k]+=b[k]||0; }
-    const lbl=fin?`Floodlight Series Game ${s.g.length}`:`Semifinal Game ${s.g.length}`;
-    if(s.winner&&!fin){ const lo=s.winner===s.hi?s.lo:s.hi; nwAdd('po',`${nwN(s.winner)} advance to the Floodlight Series`,`${nwT(s.winner)} took the semifinal from ${nwT(lo)}, ${s.w[s.winner]} games to ${s.w[lo]}. In the clincher: ${st.b}`,{t:[s.winner,lo],p:st.p,pr:s.winner===F.userId?6:4}); continue; }
+    const lbl=fin?`Floodlight Series Game ${s.g.length}`:`${/ Final$/.test(s.label)?s.label:'Semifinal'} Game ${s.g.length}`;
+    if(s.winner&&!fin){ const lo=s.winner===s.hi?s.lo:s.hi; nwAdd('po',`${nwN(s.winner)} advance to the Floodlight Series`,`${nwT(s.winner)} took the ${/ Final$/.test(s.label)?s.label:'semifinal'} from ${nwT(lo)}, ${s.w[s.winner]} games to ${s.w[lo]}. In the clincher: ${st.b}`,{t:[s.winner,lo],p:st.p,pr:s.winner===F.userId?6:4}); continue; }
     if(fin&&s.winner) continue; // the title story covers it
     const ser=s.w[s.hi]===s.w[s.lo]?`Series tied ${s.w[s.hi]}–${s.w[s.lo]}.`:`${nwN(s.w[s.hi]>s.w[s.lo]?s.hi:s.lo)} lead the series ${Math.max(s.w[s.hi],s.w[s.lo])}–${Math.min(s.w[s.hi],s.w[s.lo])}.`;
     nwAdd(st.W===F.userId||st.L===F.userId?'game':'po',`${lbl}: ${st.h}`,`${st.b} ${ser}`,{t:[st.W,st.L],p:st.p,pr:Math.max(st.pr,fin?3:2)});
@@ -4466,7 +4479,7 @@ if(/(^|[#&])play\b/.test(location.hash)) closeMenu(); else openMenu();
 var ADDON_READY = false; // the game's own start-up runs before this code; hooks wait for it
 const NATIVE = (typeof window!=='undefined' && window.fdlNative) || null; // set by the desktop app's preload script
 const IS_DESKTOP = !!(NATIVE && NATIVE.isDesktop);
-const GAME_VERSION = '1.4.0';
+const GAME_VERSION = '1.5.0';
 const FULL_GAME = true; /*@edition*/ // the website is the free demo; build.py turns this on for the Steam game
 
 /* ---------- a shared add-on dialog layer (sits above the menu, never touches the game's own pop-ups) ---------- */
@@ -4981,6 +4994,7 @@ function parkSeries(A,H){ return {key:'series:'+A.name+'|'+H.name, wi:['#26375f'
   back:['hallofgood','curveball','pizza','strikezone','ghostrunner'], sideR:['hotdogs','umpire','badhops'], sideL:['popcorn','giftshop','warningtrack'], bunting:true}; }
 /* which park this game is in: quick games keep the classic stadium */
 function parkFor(G){
+  if(G&&G.challenge&&G.challenge.asg) return parkAsg(); // the All-Star Game: the grand stadium
   if(!G||!G.isFr) return parkClassic();
   const A=G.teams[0], H=G.teams[1];
   if(/Floodlight Series/.test(G.frLabel||'')) return parkSeries(A,H);
@@ -5175,6 +5189,7 @@ function chEval(){
 /* the final out of a challenge: stars, records, then Retry / Next */
 function chFinal(){
   const c=G.challenge; if(!c) return false;
+  if(c.asg) return asgFinal();
   const sim=!!G.fin, ok=sim?c.goals.map(()=>false):chEval(), won=ok[0], stars=won?ok.filter(Boolean).length:0, daily=c.id==='daily';
   const rec=daily?(DAYD[c.date]=DAYD[c.date]||{}):(CHD[c.id]=CHD[c.id]||{});
   const best=Math.max(rec.stars||0,stars), newBest=stars>(rec.stars||0); rec.stars=best; if(won){ rec.wins=(rec.wins||0)+1; rec.won=true; }
@@ -5216,6 +5231,8 @@ function exitChallenge(){
 }
 function chBar(el){
   const c=G.challenge; el.hidden=false; el.classList.add('chbar');
+  if(c.asg){ el.innerHTML=`<span class="tagx">Franchise · Season ${F?F.season:''}</span><b>All-Star Game</b><span style="color:var(--muted)">${esc(G.teams[0].name)} at ${esc(G.teams[1].name)} · the winning conference gets home field in the Floodlight Series</span><span class="sp"><button class="btn small" type="button" id="cbExit">Back to franchise</button></span>`;
+    $('cbExit').onclick=()=>{ if(busy) return; askYes('Leave the All-Star Game? It will be simmed when the season moves on.','Leave').then(ok=>{ if(ok) exitChallenge(); }); }; return; }
   el.innerHTML=`<span class="tagx">Clutch Challenge</span><b>${esc(c.title)}</b><span style="color:var(--muted)">${c.goals.map(g=>esc(goalText(g))).join(' · ')}</span><span class="sp"><button class="btn small" type="button" id="cbRetry">Restart</button><button class="btn small" type="button" id="cbAll">Challenges</button><button class="btn small" type="button" id="cbExit">Exit</button></span>`;
   $('cbRetry').onclick=()=>{ if(busy) return; startChallenge(c.id==='daily'?dailyFor(c.date):CH_BY[c.id]); };
   $('cbAll').onclick=()=>{ if(busy) return; openChallenges(); };
@@ -6028,7 +6045,7 @@ function frExpandHTML(){
   const add=Math.min(FR_FULL-F.ids.length, FR_CLUBS.filter(c=>!F.ids.some(id=>F.teams[id].name===c.name)).length);
   if(!add) return '';
   const names=FR_CLUBS.filter(c=>!F.ids.some(id=>F.teams[id].name===c.name)).slice(0,add).map(c=>c.name);
-  return `<h4 style="margin-top:8px">Expand the league</h4><p>Grow to ${frCountWord(F.ids.length+add)} clubs: the ${names.slice(0,-1).join(', ')} and ${names[names.length-1]} join with their own players. Your team, stats, records and history all stay. The top four still make the playoffs.</p>`
+  return `<h4 style="margin-top:8px">Expand the league</h4><p>Grow to ${frCountWord(F.ids.length+add)} clubs: the ${names.slice(0,-1).join(', ')} and ${names[names.length-1]} join with their own players. Your team, stats, records and history all stay. The clubs split evenly into the West and East conferences.</p>`
     +(frCanExpand()?`<div class="hbtns"><button class="btn" type="button" data-act="expand">Expand to ${F.ids.length+add} clubs</button></div>`
                     :`<p style="color:var(--muted);font-size:13px">You can expand once this season is over, or before the first game of a season.</p>`);
 }
@@ -6049,9 +6066,10 @@ function frExpand(){
     for(const n of F.teams[id].lineup) F.bio[n]=Object.assign(nwBioNew(n),{a:19+Math.floor(Math.random()*12)}); // expansion clubs sign players of every age
   }
   if(!added.length) return;
+  if(F.conf) confInit();
   if(F.phase==='reg'){ F.sched=makeSchedule(F.ids); F.schedV=2; for(const id of added) F.rec[id]={w:0,l:0,rs:0,ra:0}; }
   const nm=added.map(id=>F.teams[id].name);
-  try{ nwAdd('pre',`The league grows to ${frCountWord(F.ids.length)} clubs`,`Welcome the ${nm.slice(0,-1).join(', ')} and ${nm[nm.length-1]}. ${frCountWord(F.ids.length,true)} clubs now chase the Floodlight Series, and only the top four make the playoffs.`,{w:F.phase==='off'?'Offseason':'Preseason',t:added,pr:3}); }catch(e){}
+  try{ nwAdd('pre',`The league grows to ${frCountWord(F.ids.length)} clubs`,`Welcome the ${nm.slice(0,-1).join(', ')} and ${nm[nm.length-1]}. ${frCountWord(F.ids.length,true)} clubs now chase the Floodlight Series, six in the West and six in the East.`,{w:F.phase==='off'?'Offseason':'Preseason',t:added,pr:3}); }catch(e){}
   prepCards(added.map(id=>F.teams[id])); frSave();
   hubMsg=`The league now has ${frCountWord(F.ids.length)} clubs. Meet the newcomers in the Teams tab.`; renderHub(); renderFbar();
 }
@@ -6070,7 +6088,9 @@ function lgOps(){ let H=0,BB=0,PA=0,AB=0,TB=0; const add=s=>{ H+=s.H; BB+=s.BB; 
   return PA>=400&&AB?(H+BB)/PA+TB/AB:.68; }
 /* is this club chasing the playoffs (within two games of fourth) or building for later? */
 function trRace(tid){
-  if(F.phase!=='reg'||F.day<6) return 0; const st=frStandings(), i=st.findIndex(r=>r.id===tid), cut=st[3];
+  if(F.phase!=='reg'||F.day<6) return 0;
+  if(confOn()){ const R=confRace(tid); return R.rank<=2||gDiff(R.st[1],R.me)<=2?1:-1; } // within two games of a playoff spot in its conference
+  const st=frStandings(), i=st.findIndex(r=>r.id===tid), cut=st[3];
   return i<4||((cut.w-st[i].w)+(st[i].l-cut.l))/2<=2?1:-1; }
 /* every general manager has his own taste in abilities, and it changes a little from season to season */
 const gmTaste=(tid,ab)=>((nwHash(tid+'|'+F.season+'|'+ab)%25)-12)/10;
@@ -6162,7 +6182,7 @@ function trCpuDay(){
 const DR_NOTE={SLG:'Raw power. The ball jumps off the bat.',CLU:'Ice in the veins with runners on.',GLV:'Vacuum cleaner with a glove.',GAP:'Line drives into both gaps.',CON:'Almost never strikes out.',
   SPD:'Fastest player in the class.',EYE:'Takes walks like a ten-year vet.',BNT:'Lays down bunts for hits.',HUS:'Never stops running.',IRN:'Never misses a game.'};
 function drMake(){
-  const order=frStandings().map(r=>r.id).reverse(); // last season's worst record picks first, the best record picks last (ties: worse run differential first)
+  const order=drOrder();
   const used=new Set([...Object.keys(F.bio||{}),...Object.keys(F.career||{}),...F.ids.flatMap(id=>F.teams[id].lineup),...RED_LINEUP,...BLUE_LINEUP,...DHS.map(d=>d.name),...(F.retired||[]).map(r=>r.name),...(F.gone||[])]);
   const N=F.ids.length+4, pool=[], abs=Object.keys(ABIL);
   for(let i=0;i<N;i++){ const f=i<3, h=!f&&Math.random()<.3, j=!f&&!h&&Math.random()<.05; let name, fn, g=0;
@@ -6170,6 +6190,16 @@ function drMake(){
     const age=18+Math.floor(Math.random()*5);
     pool.push(Object.assign({name,ab:pick(abs),age,n:1+Math.floor(Math.random()*55)},f?{f:1}:{},h?{hi:1}:{},j?{jp:1}:{})); }
   F.draft={s:F.season,order,pool:shuffle(pool),picks:[],at:0,done:false};
+}
+/* the draft order: clubs that missed the playoffs pick first, worst record first; then the playoff clubs in the order
+   they went out (the conference-final or semifinal losers, worse record first), then the Floodlight Series loser, and
+   the champion picks last */
+function drOrder(){
+  const st=frStandings(), worst=ids=>ids.slice().sort((a,b)=>st.findIndex(r=>r.id===b)-st.findIndex(r=>r.id===a));
+  const po=F.po, fin=po&&po.final, champ=fin&&fin.winner, runner=champ?(champ===fin.hi?fin.lo:fin.hi):null;
+  if(!po||!champ) return st.map(r=>r.id).reverse();
+  const inPO=new Set(po.seeds.slice(0,4)), semis=po.series.map(s=>s.winner===s.hi?s.lo:s.hi).filter(Boolean);
+  return [...worst(st.map(r=>r.id).filter(id=>!inPO.has(id))), ...worst(semis), runner, champ].filter((id,i,a)=>id&&a.indexOf(id)===i&&F.teams[id]);
 }
 const drOn=()=>!!F&&F.phase==='off'&&F.history.length>0;
 function drGet(){ if(!drOn()) return null; if(!F.draft||F.draft.s!==F.season) drMake(); return F.draft; }
@@ -6308,6 +6338,165 @@ function demoHomeLine(){
   return '';
 }
 
+/* ---------- franchise: West and East conferences, the All-Star Game, and conference playoffs ----------
+   The league splits in two (six and six in a twelve-club league). The top two in each conference make the playoffs and
+   meet in a best-of-3 conference final; the West and East champions play the best-of-7 Floodlight Series. At the
+   All-Star break (halfway through the season) each conference's best players meet in one game, and the winning
+   conference gets home field in the Floodlight Series. */
+const CONF_WEST=new Set(['California Kings','Seattle Emeralds','Las Vegas High Rollers','Denver Summits','Portland Pines','Texas Horns']);
+const CONF_EAST=new Set(['Boston Red Hats','Florida Suns','Chicago Knights','Brooklyn Bridgers','Detroit Motormen','Kansas City Cyclones']);
+const CONF_NAME={W:'West',E:'East'};
+const ASG_DAY=Math.floor(SEASON_GAMES/2); // the break comes after game 16
+const confOn=()=>!!F&&F.ids.length>=4&&F.ids.length%2===0;
+/* every club gets a conference once; new clubs (expansion, renamed or generated ones) fill whichever side is short */
+function confInit(){
+  if(!confOn()) return;
+  F.conf=F.conf||{};
+  for(const id of F.ids) if(!F.conf[id]&&CONF_WEST.has(F.teams[id].name)) F.conf[id]='W';
+  for(const id of F.ids) if(!F.conf[id]&&CONF_EAST.has(F.teams[id].name)) F.conf[id]='E';
+  // anyone else (your renamed club, generated clubs) fills the side that's short
+  for(const id of F.ids) if(!F.conf[id]){ const w=F.ids.filter(x=>F.conf[x]==='W').length, e=F.ids.filter(x=>F.conf[x]==='E').length; F.conf[id]=w<=e?'W':'E'; }
+  for(const k of Object.keys(F.conf)) if(!F.teams[k]) delete F.conf[k];
+  const side=c=>F.ids.filter(x=>F.conf[x]===c), half=F.ids.length/2;
+  while(side('W').length>half){ const m=side('W').filter(x=>x!==F.userId).pop(); F.conf[m]='E'; }
+  while(side('E').length>half){ const m=side('E').filter(x=>x!==F.userId).pop(); F.conf[m]='W'; }
+}
+const confOf=id=>{ confInit(); return F.conf&&F.conf[id]||null; };
+const confTeams=c=>{ confInit(); return F.ids.filter(id=>F.conf[id]===c); };
+/* the playoff field: the top two in each conference, as seeds [W1, E1, E2, W2, ...everyone else by record] so the
+   existing 1-vs-4 and 2-vs-3 pairings are the two conference finals */
+function confPlayoffs(st){
+  confInit();
+  const W=st.filter(r=>F.conf[r.id]==='W').map(r=>r.id), E=st.filter(r=>F.conf[r.id]==='E').map(r=>r.id);
+  const top=[W[0],E[0],E[1],W[1]], rest=st.map(r=>r.id).filter(id=>!top.includes(id));
+  return {seeds:[...top,...rest], conf:true, series:[mkSeries(W[0],W[1],2,'West Final'),mkSeries(E[0],E[1],2,'East Final')], final:null};
+}
+function seedTag(id){ if(!F.po) return ''; const i=F.po.seeds.indexOf(id); if(!F.po.conf) return '#'+(i+1); if(i<0||i>3) return ''; return (F.conf[id]==='W'?'W':'E')+(i<2?'1':'2'); }
+/* home field in the Floodlight Series: the conference that won this season's All-Star Game, otherwise the better record */
+function confHome(a,b){
+  const g=F.asg&&F.asg.s===F.season?F.asg.w:null;
+  if(g&&F.conf&&F.conf[a]!==F.conf[b]) return F.conf[a]===g?a:b;
+  const ra=F.rec[a], rb=F.rec[b], d=(ra.w-ra.l)-(rb.w-rb.l);
+  return d>0||(d===0&&(ra.rs-ra.ra)>=(rb.rs-rb.ra))?a:b;
+}
+/* the standings, one table per conference */
+function confStandingsHTML(mini){
+  confInit(); const st=frStandings(), u=F.userId;
+  const tbl=c=>{ const rows=st.filter(r=>F.conf[r.id]===c), top=rows[0];
+    return `<h5 class="confh">${CONF_NAME[c]}</h5><div class="tscroll"><table class="tbl"><thead><tr><th class="l">Team</th><th>W</th><th>L</th><th>Pct</th><th>GB</th>${mini?'':'<th>RS</th><th>RA</th>'}<th>Diff</th></tr></thead><tbody>${rows.map((r,i)=>{ const gb=((top.w-r.w)+(r.l-top.l))/2;
+      return `<tr class="${r.id===u?'me':''}${i===1?' cut':''}"><td class="l">${tdot(r.id)}<b>${esc(tname(r.id))}</b>${F.phase!=='reg'&&F.po&&F.po.conf&&i<2?`<span class="seed">${c}${i+1}</span>`:''}</td><td>${r.w}</td><td>${r.l}</td><td>${pct(r.w,r.l)}</td><td>${gb?gb.toFixed(1).replace('.0',''):'–'}</td>${mini?'':`<td>${r.rs}</td><td>${r.ra}</td>`}<td>${r.rs-r.ra>0?'+':''}${r.rs-r.ra}</td></tr>`; }).join('')}</tbody></table></div>`; };
+  return `<div class="confst">${tbl('W')}${tbl('E')}</div>`;
+}
+const CONF_LEGEND='The top two in each conference make the playoffs (dashed line). The conference finals are best of 3; the West and East champions meet in the best-of-7 Floodlight Series, with home field going to the conference that won the All-Star Game.';
+
+/* ---------- the All-Star Game ---------- */
+const asgPending=()=>confOn()&&F.phase==='reg'&&F.day>=ASG_DAY&&!(F.asg&&F.asg.s===F.season);
+const asgScore=(n,s)=>s&&s.PA?ops(s)*10+s.HR*.6+s.RBI*.15+s.SB*.1+Math.min(s.PA,80)/80:0;
+/* nine All-Stars a side: every club's best player, then the best of the rest */
+function asgRoster(c){
+  const ids=confTeams(c), pool=[];
+  for(const id of ids) for(const n of F.teams[id].lineup) pool.push({n,tid:id,v:asgScore(n,F.stats[n])+Math.random()*.01});
+  pool.sort((a,b)=>b.v-a.v);
+  const pick=[]; for(const id of ids){ const p=pool.find(x=>x.tid===id&&!pick.includes(x)); if(p) pick.push(p); }
+  for(const p of pool){ if(pick.length>=9) break; if(!pick.includes(p)) pick.push(p); }
+  pick.sort((a,b)=>b.v-a.v);
+  const order=[pick[2],pick[1],pick[0],pick[3],pick[4],pick[5],pick[6],pick[7],pick[8]].filter(Boolean); // best hitter bats third
+  const roster={}; for(const p of order) roster[p.n]=Object.assign({},F.teams[p.tid].roster[p.n],{from:p.tid});
+  return {id:'as'+c, name:CONF_NAME[c]+' All-Stars', abbr:c==='W'?'WEST':'EAST', nick:'All-Stars', color:c==='W'?'#c8423a':'#2b5fb4', lineup:order.map(p=>p.n), roster};
+}
+function asgTeams(){
+  const s=F.season, wHome=s%2===1; // the host conference alternates every year
+  // the rosters are picked once, at the break, so the hub, the game and a sim all use the same nine
+  if(!F.asgR||F.asgR.s!==s){ F.asgR={s,W:asgRoster('W'),E:asgRoster('E')};
+    try{ const nm=T=>T.lineup.slice(0,4).map(n=>`${n} (${F.teams[T.roster[n].from]?F.teams[T.roster[n].from].abbr:''})`).join(', ');
+      nwAdd('league','All-Star rosters announced',`West: ${nm(F.asgR.W)} and more. East: ${nm(F.asgR.E)} and more. The winning conference gets home field in the Floodlight Series.`,{t:[],pr:3}); }catch(e){}
+    frSave(); }
+  const Wt=F.asgR.W, Et=F.asgR.E;
+  return wHome?[Et,Wt]:[Wt,Et];
+}
+function asgRecord(G2,sim){
+  const a=G2.teams[0], h=G2.teams[1], ra=total(G2,0), rh=total(G2,1), wt=ra>rh?a:h, lt=wt===a?h:a, w=wt.id==='asW'?'W':'E';
+  // the game's MVP: the winners' best line in the box score
+  let mvp=null, best=-1; for(const [n,b] of Object.entries(G2.box||{})){ if(G2.teams[b.team]!==wt) continue; const v=(b.H||0)*2+(b.HR||0)*4+(b.RBI||0)*2+(b.R||0); if(v>best){ best=v; mvp=n; } }
+  const from=mvp&&((wt.info||wt.roster||{})[mvp]||{}).from;
+  F.asg={s:F.season,w,score:`${Math.max(ra,rh)}–${Math.min(ra,rh)}`,inn:G2.inning,mvp,mvpTeam:from||null,sim:!!sim};
+  try{ nwAdd('league',`The ${CONF_NAME[w]} wins the All-Star Game ${F.asg.score}`,`${wt.name} beat the ${lt.name} ${F.asg.score}${G2.inning>9?` in ${G2.inning} innings`:''}.${mvp?` ${mvp}${from?` of the ${tname(from)}`:''} is the All-Star Game MVP.`:''} The ${CONF_NAME[w]} will have home field in the Floodlight Series.`,{t:from?[from]:[],pr:4}); }catch(e){}
+  frSave();
+}
+function asgSim(){ if(!asgPending()) return; const [A,H]=asgTeams(); const G2=smartRun(newState('sim',[gameTeam(A),gameTeam(H)],[true,true])); asgRecord(G2,true); }
+/* play it: the user manages their own conference's All-Stars; nothing in it counts toward season stats */
+function asgStart(){
+  if(!asgPending()||busy) return;
+  const [A,H]=asgTeams(), u=confOf(F.userId)==='W'?(A.id==='asW'?0:1):(A.id==='asE'?0:1);
+  prepCards([A,H]);
+  autoSave(); frMode=false; FR=null; setFrUI(); closeHub(); closeMenu(); pendingToast='';
+  const ov=$('ov'); ov.hidden=true; ov.innerHTML=''; ov.onclick=null;
+  mode='sim'; paintModeTabs(); renderFaces();
+  G=newState('sim',[gameTeam(A),gameTeam(H)],u?[true,false]:[false,true]);
+  G.challenge={id:'asg',title:'All-Star Game',asg:true,goals:[['win']],start:[0,0],inn0:1,inn:9,hr0:0,cards:0,u,from:'fr'};
+  busy=false; $('pcard').dataset.nm=''; annStart(); renderGame(); fitTop();
+  openX(`<div class="xpanel" role="dialog" aria-modal="true" aria-labelledby="asT">${xHead('<span id="asT">All-Star Game</span>',`Season ${F.season} · ${esc(A.name)} at ${esc(H.name)}`)}
+<p>You manage the <b>${esc(G.teams[u].name)}</b>: the best players from every ${CONF_NAME[confOf(F.userId)]} club, yours included. The winning conference gets <b>home field in the Floodlight Series</b>. It doesn't count in the standings or the stat sheets.</p>
+<div class="asgrid">${[A,H].map(T=>`<div><h5 style="color:${T.color}">${esc(T.name)}</h5><ol class="troster">${T.lineup.map((n,i)=>`<li><span>${i+1}</span><span>${esc(n)} <small style="color:var(--muted)">${esc(F.teams[T.roster[n].from]?F.teams[T.roster[n].from].abbr:'')}</small></span>${abChip(T.roster[n].ab)}</li>`).join('')}</ol></div>`).join('')}</div>
+<div class="ovbtns"><button class="btn primary" type="button" data-x data-focus>Play ball</button></div></div>`,{onClose:()=>{ sfx.organ&&sfx.organ(); autoCpuKick(); }});
+}
+/* the final out of the All-Star Game */
+function asgFinal(){
+  const sim=!!G.fin; asgRecord(G,sim);
+  const a=total(G,0), h=total(G,1), u=G.challenge.u, won=(u===0?a>h:h>a), A=F.asg;
+  openX(`<div class="xpanel chres" role="dialog" aria-modal="true" aria-labelledby="afT"><span class="aside" style="color:var(--flood)">All-Star Game · Season ${F.season}</span>
+<h3 id="afT">${won?'Your All-Stars win!':'The '+CONF_NAME[A.w]+' wins it'}</h3>
+<p class="fin">Final: ${esc(G.teams[0].abbr)} ${a}, ${esc(G.teams[1].abbr)} ${h}${G.inning>9?` in ${G.inning}`:''}</p>
+<p class="fin">${A.mvp?`MVP: <b>${esc(A.mvp)}</b>. `:''}The ${CONF_NAME[A.w]} will have home field in the Floodlight Series.</p>
+<div class="ovbtns"><button class="btn primary" type="button" id="afBack" data-focus>Back to the franchise</button><button class="btn small" type="button" id="afBox">See the box score</button></div></div>`);
+  if(won) setTimeout(()=>sfx.organ&&sfx.organ(),400);
+  $('afBack').onclick=()=>{ closeX(true); exitChallenge(); };
+  $('afBox').onclick=()=>{ closeX(true); G.challengeShown=true; showFinal(); };
+  return true;
+}
+/* the hub's All-Star break card */
+function asgCardHTML(){
+  const [A,H]=asgTeams(), mine=confOf(F.userId);
+  const col=T=>`<div><h5 style="color:${T.color}">${esc(T.name)}</h5><ol class="troster">${T.lineup.map((n,i)=>`<li><span>${i+1}</span><span>${esc(n)}</span><small style="color:var(--muted)">${esc(F.teams[T.roster[n].from]?F.teams[T.roster[n].from].abbr:'')}</small></li>`).join('')}</ol></div>`;
+  return `<div class="hcard nextg"><h4>All-Star break · Season ${F.season}</h4><p>Halfway home. The ${esc(A.name)} visit the ${esc(H.name)}, and the winning conference gets <b>home field in the Floodlight Series</b>. You manage the ${CONF_NAME[mine]}.</p><div class="asgrid">${col(A)}${col(H)}</div>
+<div class="hbtns"><button class="btn primary" type="button" data-act="asgplay">Play the All-Star Game</button><button class="btn" type="button" data-act="asgsim">Sim it</button></div></div>`;
+}
+function asgAct(a){
+  if(a==='asgplay') asgStart();
+  else if(a==='asgsim'){ asgSim(); hubMsg=F.asg?`The ${CONF_NAME[F.asg.w]} won the All-Star Game ${F.asg.score}${F.asg.mvp?`; ${esc(F.asg.mvp)} is the MVP`:''}. The ${CONF_NAME[F.asg.w]} has home field in the Floodlight Series.`:''; renderHub(); }
+}
+/* the All-Star Game is played at the grand neutral stadium too, with its own banner */
+function parkAsg(){ const P=parkSeries(G.teams[0],G.teams[1]); return Object.assign(P,{key:'asg',text:'All-Star Game',logos:[]}); }
+
+/* ---------- conference-aware words for the TV show and the newspaper ---------- */
+function confRace(id){
+  confInit(); const c=F.conf[id], st=frStandings().filter(r=>F.conf[r.id]===c), left=x=>SEASON_GAMES-(x.w+x.l), me=st.find(x=>x.id===id), others=st.filter(x=>x.id!==id), maxMe=me.w+left(me);
+  return {st,c,me,rank:st.indexOf(me)+1,left:left(me),clinched:others.filter(x=>x.w+left(x)>=me.w).length<=1,out:others.filter(x=>x.w>maxMe).length>=2};
+}
+function confRaceLine(u,post){
+  const R=confRace(u), st=R.st, C=CONF_NAME[R.c], nm=Nk(u);
+  if(R.clinched) return post?`They've clinched a playoff spot in the ${C}!`:`${nm} have already clinched a playoff spot in the ${C}.`;
+  if(R.out) return post?`They've been eliminated from playoff contention.`:`${nm} have been eliminated from playoff contention.`;
+  if(R.rank===1){ const g=gDiff(st[0],st[1]); return g>0?`${post?'They':nm} lead the ${C} by ${gamesWord(g)}.`:`${post?'They':nm} are tied for first in the ${C}.`; }
+  if(R.rank===2){ const g=gDiff(R.me,st[2]); return g>0?`${post?"They're":nm+' are'} second in the ${C}, ${gamesWord(g)} clear of third and in playoff position.`:`${post?'They':nm} hold the ${C}'s last playoff spot on run differential.`; }
+  const g=gDiff(st[1],R.me); return g>0?`${post?"They're":nm+' are'} ${gamesWord(g)} out of a playoff spot in the ${C}.`:`${post?"They're":nm+' are'} tied for the ${C}'s last playoff spot, but on the outside on run differential.`;
+}
+const seedWords=id=>{ const t=seedTag(id); return t?`No. ${t[1]} seed in the ${CONF_NAME[t[0]]}`:''; };
+/* the TV show's standings segment, one table per conference */
+function confTvStandings(end){
+  confInit(); const u=F.userId, all=frStandings(), rec=id=>`${F.rec[id].w}–${F.rec[id].l}`, nm=id=>tname(id), parts=[];
+  const conf=c=>all.filter(r=>F.conf[r.id]===c);
+  for(const c of ['W','E']){ const st=conf(c), [a,b,d]=st, g=gDiff(a,b), gap=gDiff(b,d), C=CONF_NAME[c];
+    if(end) parts.push(`In the ${C}, ${theTeam(nm(a.id))} finish first at ${rec(a.id)}${g>0?`, ${gamesWord(g)} ahead`:' on run differential'}, and ${theTeam(nm(b.id))} ${gap>0?`take the other playoff spot by ${gamesWord(gap)}`:'take the other playoff spot on run differential'}.`);
+    else parts.push(g>0?`${TheTeam(nm(a.id))} lead the ${C} at ${rec(a.id)}, ${gamesWord(g)} up on ${theTeam(nm(b.id))}.`:`${TheTeam(nm(a.id))} and ${theTeam(nm(b.id))} share first in the ${C} at ${rec(a.id)}.`); }
+  const me=TheTeam(nm(u));
+  if(end){ const t=F.po&&F.po.conf?seedTag(u):''; parts.push(t?`${me} are in, as the ${seedWords(u)}.`:`${me} miss the playoffs.`); }
+  else parts.push(confRaceLine(u));
+  const tbl=c=>`<h5 class="confh">${CONF_NAME[c]}</h5><table class="tvtbl"><thead><tr><th></th><th class="l">Team</th><th>W</th><th>L</th><th>GB</th><th>Diff</th></tr></thead><tbody>${conf(c).map((r,i,arr)=>{ const gb=gDiff(arr[0],r);
+    return `<tr class="${r.id===u?'me':''}${i===1?' line':''}"><td>${i+1}</td><td class="l">${tdot(r.id)}${esc(nm(r.id))}${end&&i<2?' <em>In</em>':''}</td><td>${r.w}</td><td>${r.l}</td><td>${gb?gb.toFixed(1).replace('.0',''):'–'}</td><td>${r.rs-r.ra>0?'+':''}${r.rs-r.ra}</td></tr>`; }).join('')}</tbody></table>`;
+  return {tag:'Standings',title:end?'Final standings':'Standings',html:`<div class="confst">${tbl('W')}${tbl('E')}</div><p class="tvnote">The top two in each conference make the playoffs.</p>`,say:parts.join(' ')};
+}
+
 /* ---------- a full house for the seventh-inning stretch ----------
    The stands in the stretch scene fill with fans drawn in the player cards' style: outlined cartoon people, caps with
    brims, jerseys in the home and visiting teams' colors, everyone on their feet and plenty of arms up for the song.
@@ -6386,7 +6575,81 @@ function crowdImage(){
   }catch(e){ return ''; }
 }
 
-window.__fdl={addon:{ACHD:()=>ACHD,CHD:()=>CHD,DAYD:()=>DAYD,FSET:()=>FSET,start:id=>startChallenge(id==='daily'?dailyFor(today()):CH_BY[id]),achUnlock,openSettings,openAchievements,openChallenges,litActions,padPress,layerRoot,chFinal,buildChallenge,CHALL,ACHS,dailyFor,badgeSVG,exitChallenge,startTutorial,TUT:()=>TUT,FIELD:()=>FIELD,VO:()=>VO,voSay,voPick,voName,voBatter,fieldCheck,sfx:()=>sfx,parkSync,parkFor,PARK:()=>PARK_CUR,FR_CLUBS:()=>FR_CLUBS,trGain,plValue,drGet,lgOps,TR:()=>TR,stretchScene:()=>stretchScene(),crowdCanvas}, get G(){return G}, get F(){return F}, get busy(){return busy}, setOpp:o=>setOpp(o,true), cpuPick:()=>cpuPick(), showFinal:()=>showFinal(), playWhole, MODES, ACTIONS, ABIL, DHS, P, render:()=>renderGame(),
+/* ---------- a logo for every club: one is drawn from the team's name ----------
+   The game's own clubs have hand-drawn logos. Any other club (your renamed franchise team, generated clubs, the
+   All-Star teams) gets one made from its name: "Monterey Lightning" gets a lightning bolt, "Tacoma Tigers" a paw,
+   "Bay Sharks" a fin. Names with no match get the standard crest: crossed bats and a ball with the team's initial.
+   Logos are drawn in the same badge style as the rest, in the team's colour, and never saved: they're redrawn from
+   the name, so renaming a club changes its logo too. */
+const GEN_LOGO={};
+const LG_ICONS=[
+  [/lightning|thunder|bolt|storm|electric|volt|flash|spark|charge|energy/i,'bolt'],
+  [/fire|flame|blaze|heat|inferno|burn|phoenix|dragon|ember|scorch|lava|volcano/i,'flame'],
+  [/all-?stars?|stars?\b|comet|galaxy|nova|meteor|cosmo/i,'star'],
+  [/wave|surf|tide|ocean|seas?\b|marine|bay\b|river|splash|current|tsunami|lake/i,'wave'],
+  [/eagle|hawk|falcon|bird|jay|raven|crow|owl|cardinal|oriole|osprey|condor|wing|robin|pelican|seagull|gull|kestrel|thrasher/i,'wing'],
+  [/tiger|lion|cat|panther|cougar|lynx|jaguar|puma|leopard|bear|cub|wolf|wolves|dog|hound|husk|fox|grizzl|badger|coyote/i,'paw'],
+  [/shark|fish|marlin|barracuda|dolphin|orca|whale|ray\b|rays\b|trout|bass|piranha/i,'fin'],
+  [/anchor|sailor|mariner|pirate|captain|navy|port|harbor|harbour|admiral|buccaneer|clipper/i,'anchor'],
+  [/rocket|astro|space|launch|jet|orbit|pilot|aviator|flyer/i,'rocket'],
+  [/mountain|peak|summit|rock|ridge|cliff|alpine|canyon|highland|rockies|everest/i,'mountain'],
+  [/pine|oak|tree|forest|timber|wood|maple|cedar|redwood|sequoia|birch|grove|lumber|evergreen|green/i,'tree'],
+  [/snow|ice\b|icy|frost|blizzard|polar|glacier|freeze|winter|yeti|chill/i,'snow'],
+  [/moon|night|lunar|midnight|eclipse|dusk|shadow/i,'moon'],
+  [/sun\b|suns\b|solar|sunshine|dawn|sunset|sunrise|daybreak|heatwave/i,'sun'],
+  [/king|royal|queen|prince|crown|monarch|empire|emperor|regal|majest/i,'crown'],
+  [/horse|mustang|colt|bronco|stallion|cowboy|ranger|rodeo|wrangler|outlaw|bandit/i,'shoe'],
+  [/hammer|smith|steel|iron|miner|forge|worker|builder|crusher|anvil|bomber/i,'hammer'],
+  [/diamond|gem|jewel|emerald|ruby|sapphire|crystal|gold|silver|nugget/i,'gem'],
+  [/knight|warrior|spartan|titan|gladiator|legion|guardian|viking|trojan|crusader|sentinel|defender/i,'shield'],
+];
+const lgHex=h=>{ const n=parseInt(String(h||'#c8423a').replace('#','').slice(0,6),16); return isNaN(n)?[200,66,58]:[n>>16&255,n>>8&255,n&255]; };
+const lgMix=(c,t,w)=>{ const a=lgHex(c); return '#'+a.map(v=>Math.round(v+(t-v)*w).toString(16).padStart(2,'0')).join(''); };
+/* the icon, drawn in a 64 x 64 badge: m = team colour, d = its dark outline colour */
+function lgIcon(k,m,d,init){
+  const S=`stroke="${d}" stroke-width="2" stroke-linejoin="round"`;
+  switch(k){
+    case 'bolt': return `<path d="M36 8 L16 35 L29 35 L24 56 L48 26 L35 26 L41 8 Z" fill="${m}" ${S}/><path d="M35 13 L23 31" stroke="#fff" stroke-width="2" opacity=".55" stroke-linecap="round"/>`;
+    case 'flame': return `<path d="M32 8 C35 18 46 22 46 36 C46 47 39 54 32 54 C25 54 18 47 18 37 C18 29 23 25 25 19 C27 25 29 27 31 27 C30 20 30 14 32 8 Z" fill="${m}" ${S}/><path d="M32 30 C35 36 39 38 39 44 C39 49 36 52 32 52 C28 52 25 49 25 45 C25 41 28 39 29 35 C30 38 31 38 32 38 Z" fill="#ffd23f" stroke="${d}" stroke-width="1.4"/>`;
+    case 'star': return `<path d="M32 9 L38.5 24 L54.5 25 L42 35.5 L46 51.5 L32 42.5 L18 51.5 L22 35.5 L9.5 25 L25.5 24 Z" fill="${m}" ${S}/><path d="M32 17 L35.5 26 L44 26.5" fill="none" stroke="#fff" stroke-width="2" opacity=".5" stroke-linecap="round"/>`;
+    case 'wave': return `<path d="M8 40 C14 28 26 20 36 22 C46 24 50 32 46 38 C43 42 37 40 38 35 C39 31 44 31 44 31 C40 26 30 26 24 33 C20 38 18 44 20 48 L8 48 Z" fill="${m}" ${S}/><path d="M8 50 Q16 46 24 50 T40 50 T56 50 L56 54 Q48 58 40 54 T24 54 T8 54 Z" fill="${lgMix(m,255,.35)}" ${S}/>`;
+    case 'wing': return `<path d="M10 40 C18 22 34 14 54 14 C50 20 46 22 40 24 C47 24 50 26 52 28 C45 30 41 31 36 32 C42 33 45 35 46 38 C38 40 30 40 24 42 C20 46 16 48 10 48 Z" fill="${m}" ${S}/><path d="M18 40 C24 30 34 24 46 20" fill="none" stroke="#fff" stroke-width="1.6" opacity=".55"/>`;
+    case 'paw': return `<g fill="${m}" ${S}><ellipse cx="32" cy="41" rx="12" ry="10.5"/><ellipse cx="19" cy="27" rx="5" ry="6.5" transform="rotate(-18 19 27)"/><ellipse cx="27.5" cy="19.5" rx="5" ry="6.8"/><ellipse cx="36.5" cy="19.5" rx="5" ry="6.8"/><ellipse cx="45" cy="27" rx="5" ry="6.5" transform="rotate(18 45 27)"/></g>`;
+    case 'fin': return `<path d="M14 44 C24 40 30 26 30 12 C38 20 46 32 50 44 Z" fill="${m}" ${S}/><path d="M8 46 Q16 42 24 46 T40 46 T56 46 L56 52 Q48 56 40 52 T24 52 T8 52 Z" fill="#3a8fc7" ${S}/>`;
+    case 'anchor': return `<g fill="none" stroke="${d}" stroke-width="7" stroke-linecap="round"><path d="M32 18 V50"/><path d="M14 38 Q16 52 32 52 Q48 52 50 38"/><path d="M23 26 H41"/></g><g fill="none" stroke="${m}" stroke-width="4" stroke-linecap="round"><path d="M32 18 V50"/><path d="M14 38 Q16 52 32 52 Q48 52 50 38"/><path d="M23 26 H41"/></g><circle cx="32" cy="13" r="5" fill="${m}" ${S}/>`;
+    case 'rocket': return `<path d="M32 8 C42 16 44 30 41 44 L23 44 C20 30 22 16 32 8 Z" fill="${m}" ${S}/><circle cx="32" cy="25" r="5" fill="#e6f2fb" ${S}/><path d="M23 36 L15 46 L23 46 Z M41 36 L49 46 L41 46 Z" fill="${lgMix(m,0,.25)}" ${S}/><path d="M27 46 Q32 58 37 46 Z" fill="#ffd23f" ${S}/>`;
+    case 'mountain': return `<path d="M6 50 L24 20 L32 32 L40 18 L58 50 Z" fill="${m}" ${S}/><path d="M24 20 L19 28 L24 26 L28 30 Z M40 18 L35 26 L40 24 L45 28 Z" fill="#fff" stroke="${d}" stroke-width="1.2"/>`;
+    case 'tree': return `<path d="M32 8 L44 24 L38 24 L48 37 L41 37 L52 50 L12 50 L23 37 L16 37 L26 24 L20 24 Z" fill="${m}" ${S}/><rect x="28.5" y="50" width="7" height="7" fill="#7a4e33" ${S}/>`;
+    case 'snow': return `<g stroke="${d}" stroke-width="6" stroke-linecap="round"><path d="M32 10 V54 M13 21 L51 43 M13 43 L51 21"/></g><g stroke="${m}" stroke-width="3.2" stroke-linecap="round" fill="none"><path d="M32 10 V54 M13 21 L51 43 M13 43 L51 21"/><path d="M26 13 L32 18 L38 13 M26 51 L32 46 L38 51"/></g>`;
+    case 'moon': return `<path d="M40 10 C28 12 20 22 20 33 C20 45 30 54 42 54 C46 54 49 53 52 51 C40 50 32 42 32 31 C32 22 36 14 40 10 Z" fill="${m}" ${S}/><g fill="#ffd23f" stroke="${d}" stroke-width="1"><path d="M47 22 l1.5 3.5 3.5 .3 -2.7 2.3 .9 3.6 -3.2 -2 -3.2 2 .9 -3.6 -2.7 -2.3 3.5 -.3 Z"/></g>`;
+    case 'sun': return `<g stroke="${d}" stroke-width="2.2" stroke-linecap="round">${[0,45,90,135,180,225,270,315].map(a=>`<path d="M32 9 L32 16" transform="rotate(${a} 32 32)"/>`).join('')}</g><circle cx="32" cy="32" r="13" fill="${m}" ${S}/>`;
+    case 'crown': return `<path d="M13 44 L16 21 L25.5 31 L32 14 L38.5 31 L48 21 L51 44 Z" fill="${m}" ${S}/><rect x="12" y="43" width="40" height="7" rx="2" fill="${lgMix(m,0,.2)}" ${S}/><g fill="#ffd23f" stroke="${d}" stroke-width="1.2"><circle cx="16" cy="21" r="3"/><circle cx="32" cy="14" r="3"/><circle cx="48" cy="21" r="3"/></g>`;
+    case 'shoe': return `<path d="M20 50 L16 30 C15 18 23 11 32 11 C41 11 49 18 48 30 L44 50 L36 50 L39 31 C40 24 37 20 32 20 C27 20 24 24 25 31 L28 50 Z" fill="${m}" ${S}/><g fill="#fff" opacity=".85">${[[19,27],[19,38],[45,27],[45,38],[25,15],[39,15]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="1.8"/>`).join('')}</g>`;
+    case 'hammer': return `<path d="M30 26 L36 26 L38 56 L28 56 Z" fill="#b98a5a" ${S}/><path d="M14 14 L50 14 L50 20 Q44 20 42 28 L22 28 Q20 20 14 20 Z" fill="${m}" ${S}/>`;
+    case 'gem': return `<path d="M18 14 L46 14 L56 26 L32 54 L8 26 Z" fill="${m}" ${S}/><path d="M8 26 H56 M18 14 L24 26 L32 54 L40 26 L46 14 M24 26 L32 14 L40 26" fill="none" stroke="${d}" stroke-width="1.3" opacity=".7"/><path d="M20 17 L16 24" stroke="#fff" stroke-width="2" opacity=".6" stroke-linecap="round"/>`;
+    case 'shield': return `<path d="M32 8 L50 14 L48 34 C46 44 40 50 32 56 C24 50 18 44 16 34 L14 14 Z" fill="${m}" ${S}/><path d="M17 31 L47 21 L47.5 27 L18 37 Z" fill="#fff" opacity=".85"/><path d="M32 38 L34.4 43 L39.8 43.4 L35.7 46.8 L37 52 L32 49.2 L27 52 L28.3 46.8 L24.2 43.4 L29.6 43 Z" fill="#ffd23f" stroke="${d}" stroke-width="1"/>`;
+    default: // the standard crest: crossed bats, a ball, and the team's initial
+      return `<g stroke="${d}" stroke-width="2" stroke-linejoin="round"><path d="M14 50 L44 16 Q48 12 51 15 Q54 18 50 22 L18 54 Z" fill="#c48a45"/><path d="M50 50 L20 16 Q16 12 13 15 Q10 18 14 22 L46 54 Z" fill="#c48a45"/></g><circle cx="32" cy="34" r="12" fill="#fff" ${S}/><path d="M24 26 Q28 34 24 42 M40 26 Q36 34 40 42" fill="none" stroke="#d9493f" stroke-width="1.3"/><text x="32" y="39.5" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-weight="700" font-size="15" fill="${m}">${esc(init)}</text>`;
+  }
+}
+/* the logo key for a club that has none of its own */
+function genLogoKey(T){
+  if(!T||!T.name||/^(RED|BLUE)$/i.test(T.name)) return null;
+  const name=String(T.name), color=T.color||'#c8423a', words=name.split(/\s+/), nick=words.length>1?words.slice(1).join(' '):name;
+  let icon=null; for(const [re,k] of LG_ICONS) if(re.test(nick)){ icon=k; break; }
+  if(!icon) for(const [re,k] of LG_ICONS) if(re.test(name)){ icon=k; break; }
+  const init=(nick.replace(/[^A-Za-z]/g,'')[0]||name[0]||'F').toUpperCase(), key='gen'+hashStr(name+'|'+color+'|'+(icon||init)).toString(36);
+  if(!GEN_LOGO[key]){
+    const dark=lgMix(color,0,.5), tint=lgMix(color,255,.9);
+    const svg=`<circle cx="32" cy="32" r="30" fill="${tint}" stroke="${color}" stroke-width="3"/>${lgIcon(icon,color,dark,init)}`;
+    LOGOS[key]=svg; GEN_LOGO[key]=1;
+    const defs=document.querySelector('symbol[id^="lg-"]'); // the page's logo sheet (made at start-up); before that, LOGOS feeds it
+    if(defs&&!document.getElementById('lg-'+key)){ const sym=document.createElementNS('http://www.w3.org/2000/svg','symbol'); sym.id='lg-'+key; sym.setAttribute('viewBox','0 0 64 64'); sym.innerHTML=svg; defs.parentNode.appendChild(sym); }
+  }
+  return key;
+}
+
+window.__fdl={addon:{ACHD:()=>ACHD,CHD:()=>CHD,DAYD:()=>DAYD,FSET:()=>FSET,start:id=>startChallenge(id==='daily'?dailyFor(today()):CH_BY[id]),achUnlock,openSettings,openAchievements,openChallenges,litActions,padPress,layerRoot,chFinal,buildChallenge,CHALL,ACHS,dailyFor,badgeSVG,exitChallenge,startTutorial,TUT:()=>TUT,FIELD:()=>FIELD,VO:()=>VO,voSay,voPick,voName,voBatter,fieldCheck,sfx:()=>sfx,parkSync,parkFor,PARK:()=>PARK_CUR,FR_CLUBS:()=>FR_CLUBS,trGain,plValue,drGet,lgOps,TR:()=>TR,stretchScene:()=>stretchScene(),crowdCanvas,asgSim,asgPending,asgStart,confOf,drOrder,genLogoKey}, get G(){return G}, get F(){return F}, get busy(){return busy}, setOpp:o=>setOpp(o,true), cpuPick:()=>cpuPick(), showFinal:()=>showFinal(), playWhole, MODES, ACTIONS, ABIL, DHS, P, render:()=>renderGame(),
   setHand:(t,ids)=>{ G.hands[t]=ids.slice(); renderGame(); }, setBases:b=>{ G.bases=b.slice(); renderGame(); }, setOuts:n=>{ G.outs=n; renderGame(); },
   setInning:(i,h)=>{ G.inning=i; G.half=h; G.halfPA=0; while(G.line[0].length<i) G.line[0].push(0); while(G.line[1].length<i-(h?0:1)) G.line[1].push(0); renderGame(); },
   setIdx:(t,i)=>{ G.idx[t]=i; renderGame(); }, activeAbils:t=>activeAbils(t), runAbility:(t,i)=>runAbility(t,activeAbils(t)[i]), newGame, openHub, frCreate:(n,a)=>{ frCreate(n,a); setFrUI(); }, frPregame, frSimToPlayoffs, frSimPlayoffs, frSimUser, frNextSeason, frResume, frExit, genPlayerCard, cardSrc, snapshot, applySnap, toCode, fromCode, openSaves, editQuickNames, frEditNames, quickGame, get tipsOn(){return tipsOn}};
