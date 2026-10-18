@@ -4460,7 +4460,7 @@ var ADDON_READY = false; // the game's own start-up runs before this code; hooks
 const NATIVE = (typeof window!=='undefined' && window.fdlNative) || null; // set by the desktop app's preload script
 const IS_DESKTOP = !!(NATIVE && NATIVE.isDesktop);
 const GAME_VERSION = '1.4.0';
-const FULL_GAME = false; /*@edition*/ // the website is the free demo; build.py turns this on for the Steam game
+const FULL_GAME = true; /*@edition*/ // the website is the free demo; build.py turns this on for the Steam game
 
 /* ---------- a shared add-on dialog layer (sits above the menu, never touches the game's own pop-ups) ---------- */
 const ov2 = (()=>{ const d=document.createElement('div'); d.className='ov2'; d.id='ov2'; d.hidden=true; document.body.appendChild(d); return d; })();
