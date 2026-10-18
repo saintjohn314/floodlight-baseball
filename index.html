@@ -1149,6 +1149,38 @@ html.app .mver{left:calc(16px + var(--sa-l))}
 @media (max-width:560px){html.app .park{width:calc(100% + 32px + var(--sa-l) + var(--sa-r));margin-left:calc(-16px - var(--sa-l))!important;margin-right:calc(-16px - var(--sa-r))!important}}
 /* short screens (a phone on its side, a small laptop window): the title menu scrolls instead of losing its top */
 @media (max-height:560px){.menu{overflow-y:auto;align-items:flex-start}.mcontent{margin:auto 0;padding-block:14px;gap:6px}.mlogo{font-size:clamp(40px,9vh + 16px,90px)}.mplay{margin-top:6px;padding:8px 40px}}
+/* ---------- the playoff bracket (src/js/60-post.js) ---------- */
+.pbr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:start}
+.pbr.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:760px){.pbr,.pbr.two{grid-template-columns:minmax(0,1fr)}.pmid{order:3}}
+.pcol{display:flex;flex-direction:column;gap:10px;min-width:0}
+.pcol h5{margin:0;font-family:var(--f-head);font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.pmid h5{color:var(--flood);text-align:center}
+.pbox{border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;background:rgba(6,11,22,.35);position:relative}
+.pbox.wcbox{border-style:dashed}
+.pbox.mine{border-color:rgba(255,200,97,.65);box-shadow:0 0 0 1px rgba(255,200,97,.2) inset}
+.pbox.fsbox{border-color:rgba(255,200,97,.5);background:radial-gradient(circle at 50% 0%,rgba(255,200,97,.16),transparent 70%),rgba(6,11,22,.4)}
+.pbox .pbh{font-family:var(--f-head);font-weight:700;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.pbox.fsbox .pbh{color:var(--flood)}
+.pbrow{display:flex;align-items:center;gap:8px;font-size:15px;min-width:0}
+.pbrow i{font-style:normal;font-family:var(--f-num);font-size:11px;color:var(--muted);min-width:20px}
+.pbrow b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.pbrow .w{margin-left:auto;font-family:var(--f-led);font-size:18px;color:#ffd77e;text-shadow:0 0 4px rgba(255,190,80,.5)}
+.pbrow .prc{margin-left:auto;font-family:var(--f-num);font-size:13px;color:var(--muted);white-space:nowrap}
+.pbrow.out{opacity:.45}
+.pbrow.won b{color:var(--flood)}
+.pbrow.me b{text-decoration:underline;text-decoration-color:rgba(255,200,97,.6);text-underline-offset:3px}
+.pbrow.tbd b{color:var(--muted);font-weight:500;font-style:italic}
+.pbrow .tlogo,.pbrow .dot{flex:none}
+.pbst{font-size:12px;color:#c4ccdb}
+.pbg{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:4px 10px;font-family:var(--f-num);font-size:11px;color:var(--muted)}
+.pbox .btn.small{align-self:flex-start;margin-top:2px}
+.pchamp{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;padding:12px;border-radius:12px;border:1px solid rgba(255,200,97,.5);background:radial-gradient(circle at 50% 0%,rgba(255,200,97,.3),transparent 70%)}
+.pchamp svg{width:34px;height:34px;fill:#ffd23f;filter:drop-shadow(0 0 8px rgba(255,200,97,.6))}
+.pchamp span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--flood)}
+.pchamp b{font-family:var(--f-logo);font-weight:400;font-size:30px;line-height:1.1;color:var(--cream);text-shadow:2px 2px 0 #9e2f28}
+.awards.potw{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:620px){.awards.potw{grid-template-columns:minmax(0,1fr)}}
 </style>
 </head>
 <body>
@@ -2180,8 +2212,8 @@ function frStory(A,H,kind=FR&&FR.kind){
   const u=F.userId, opp=A.id===u?H.id:A.id, out=[];
   if(kind==='po'){
     const all=[...(F.po.series||[]),F.po.final].filter(Boolean), s=all.find(x=>!x.winner&&(x.hi===u||x.lo===u)&&(x.hi===opp||x.lo===opp));
-    if(s){ const nm=s.need===4?'the Floodlight Series':/ Final$/.test(s.label)?'the '+s.label:'the semifinals', gn=s.g.length+1, a=s.w[s.hi], b=s.w[s.lo], na=s.need-a, nb=s.need-b;
-      out.push(gn===1?`Game 1 of ${nm}. First to ${s.need} wins.`:a===b?`Game ${gn} of ${nm}, and the series is tied ${a}–${b}.`:`Game ${gn} of ${nm}. ${Nk(a>b?s.hi:s.lo)} lead the series ${Math.max(a,b)}–${Math.min(a,b)}.`);
+    if(s){ const nm=s.need===4?'the Floodlight Series':/ (Final|Wild Card)$/.test(s.label)?'the '+s.label:'the semifinals', gn=s.g.length+1, a=s.w[s.hi], b=s.w[s.lo], na=s.need-a, nb=s.need-b;
+      out.push(ADDON_READY&&s.need===1?poWcStory(s):gn===1?`Game 1 of ${nm}. First to ${s.need} wins.`:a===b?`Game ${gn} of ${nm}, and the series is tied ${a}–${b}.`:`Game ${gn} of ${nm}. ${Nk(a>b?s.hi:s.lo)} lead the series ${Math.max(a,b)}–${Math.min(a,b)}.`);
       if(na===1&&nb===1) out.push(`It's winner take all${s.need===4?' for the Floodlight Series trophy':''}.`);
       else if(na===1||nb===1){ const c=na===1?s.hi:s.lo; out.push(`${Nk(c)} can ${s.need===4?'win the Floodlight Series':'close out the series'} tonight, and ${nk(c===s.hi?s.lo:s.hi)} are facing elimination.`); }
       out.push(F.po.conf?(s.need===4&&F.asg&&F.asg.s===F.season?`${Nk(s.hi)} have home field, thanks to the ${CONF_NAME[F.asg.w]}'s win in the All-Star Game.`:`${Nk(s.hi)} have home field.`):`${Nk(s.hi)} have home field as the No. ${F.po.seeds.indexOf(s.hi)+1} seed.`);
@@ -2220,7 +2252,7 @@ function annPostgame(){
   if(!(G.isFr&&F&&G.frDone)) return s;
   const u=F.userId, nm=Nk(u);
   if(G.frKind==='reg'){ const r=F.rec[u];
-    if(F.phase!=='reg'){ const seed=F.po.seeds.indexOf(u)+1; s+=` That's the end of the regular season. ${nm} finish ${r.w}–${r.l}${seed<=4?(F.po.conf?`, and they're in the playoffs as the ${seedWords(u)}!`:`, and they're in the playoffs as the No. ${seed} seed!`):`, and they'll miss the playoffs.`}`; }
+    if(F.phase!=='reg'){ const seed=F.po.seeds.indexOf(u)+1; s+=` That's the end of the regular season. ${nm} finish ${r.w}–${r.l}${(ADDON_READY?poIn(u):seed<=4)?(F.po.conf?`, and they're in the playoffs as the ${seedWords(u)}!`:`, and they're in the playoffs as the No. ${seed} seed!`):`, and they'll miss the playoffs.`}`; }
     else { const R=frRace(u); s+=` ${nm} are now ${r.w}–${r.l}.`;
       const ts=F.nx&&F.nx.ts[u]||0; if(ts>=3) s+=` That's ${ts} wins in a row.`; else if(ts<=-3) s+=` That's ${-ts} straight losses.`;
       if(F.day>=6&&ADDON_READY&&confOn()) s+=' '+confRaceLine(u,true); else if(F.day>=6){ if(R.clinched) s+=` They've clinched a playoff spot!`; else if(R.out) s+=` They've been eliminated from playoff contention.`; else if(R.rank<=4) s+=` They're ${ordinal(R.rank)} and in playoff position.`; else { const g=gDiff(R.st[3],R.me); s+=g>0?` They're ${gamesWord(g)} out of a playoff spot.`:` They're tied for the last playoff spot, on the outside for now.`; } } }
@@ -2279,6 +2311,7 @@ function tvSegments(m){
     if(D.avg[0]) parts.push(`${D.avg[0].n} ${end?'wins the batting race':'leads the batting race'} at ${ann.avg(D.avg[0].v)}.`);
     if(D.rbi[0]&&D.rbi[0].v>0) parts.push(`And ${D.rbi[0].n} has driven in ${D.rbi[0].v}, the most in the league.`);
     segs.push({tag:'Leaders',title:'League leaders',html:`<div class="tvlead"><div><h5>Home runs</h5><ol>${leaderRows(D.hr,v=>v)}</ol></div><div><h5>Average</h5><ol>${leaderRows(D.avg,f3)}</ol></div><div><h5>RBI</h5><ol>${leaderRows(D.rbi,v=>v)}</ol></div><div><h5>Stolen bases</h5><ol>${leaderRows(D.sb,v=>v)}</ol></div></div><p class="tvnote">Average leaders need ${D.minpa} plate appearances.</p>`,say:parts.join(' ')}); }
+  if(ADDON_READY){ const P=potwSeg(m); if(P) segs.push(P); } // the Players of the Week
   // 4. MVP race, or the awards at the end
   if(!end){ const M=D.mvp, line=x=>`${f3(avg(x.s))}, ${x.s.HR} HR, ${x.s.RBI} RBI`;
     if(M.length) segs.push({tag:'MVP race',title:'The MVP race',html:`<div class="tvcards">${M.map((x,i)=>`<div class="tvc${i?'':' one'}"><i>${i+1}</i><b>${tdot(x.s.team)}${esc(x.n)}</b><span>${esc(nm(x.s.team))}</span><small>${esc(line(x))} · ${f3(ops(x.s))} OPS</small></div>`).join('')}</div>`,
@@ -2287,8 +2320,10 @@ function tvSegments(m){
     const said=n=>{ const x=F.stats[n]; return x?`${ann.avg(avg(x))}, with ${x.HR} home run${x.HR===1?'':'s'} and ${x.RBI} RBI`:''; }, parts=[];
     if(A.hr){ const x=F.stats[A.hr.name]; parts.push(`The home run crown goes to ${A.hr.name}, with ${x?x.HR:''} home runs.`); }
     if(A.bat){ const x=F.stats[A.bat.name]; parts.push(`The batting title: ${A.bat.name}, at ${x?ann.avg(avg(x)):''}.`); }
+    if(ADDON_READY&&A.roy) parts.push(`Rookie of the Year: ${A.roy.name} of ${theTeam(nm(A.roy.team))}.`);
+    if(ADDON_READY&&A.slug) parts.push(`Slugger of the Year: ${A.slug.name}, slugging ${ann.avg(slg(F.stats[A.slug.name]||{}))} with ${(F.stats[A.slug.name]||{}).HR} home runs.`);
     if(A.mvp) parts.push(`And your league MVP: ${A.mvp.name} of ${theTeam(nm(A.mvp.team))}, hitting ${said(A.mvp.name)}.`);
-    if(parts.length) segs.push({tag:'Awards',title:'Season awards',html:`<div class="tvcards">${card('mvp','MVP')}${card('hr','HR king')}${card('bat','Batting')}</div>`,say:parts.join(' ')}); }
+    if(parts.length) segs.push({tag:'Awards',title:'Season awards',html:`<div class="tvcards">${card('mvp','MVP')}${card('hr','HR king')}${card('bat','Batting')}${ADDON_READY?card('roy','Rookie')+card('slug','Slugger'):''}</div>`,say:parts.join(' ')}); }
   // 5. storylines, or the playoff bracket
   if(!end){ const lines=[], L=new Set(F.ids.flatMap(id=>F.teams[id].lineup));
     const hot=Object.entries(F.nx&&F.nx.hs||{}).filter(([n,v])=>v>=5&&L.has(n)).sort((a,b)=>b[1]-a[1])[0]; if(hot) lines.push(`${hot[0]} has hit safely in ${hot[1]} straight games.`);
@@ -2296,6 +2331,7 @@ function tvSegments(m){
     const rd=st.slice().sort((a,b)=>(b.rs-b.ra)-(a.rs-a.ra))[0]; if(rd.rs-rd.ra>0) lines.push(`${TheTeam(nm(rd.id))} have the best run differential in the league, plus ${rd.rs-rd.ra}.`);
     const mine=Object.entries(F.stats).filter(([n,s])=>s.team===u&&s.PA>0).sort((a,b)=>(pscore(b[1])+ops(b[1])*20)-(pscore(a[1])+ops(a[1])*20))[0]; if(mine) lines.push(`For ${theTeam(nm(u))}, ${mine[0]} is leading the way: ${ann.avg(avg(mine[1]))} with ${mine[1].HR} home run${mine[1].HR===1?'':'s'} and ${mine[1].RBI} RBI.`);
     if(lines.length) segs.push({tag:'Storylines',title:'Around the league',html:`<ul class="tvlist">${lines.map(t=>`<li>${esc(t.replace(/\u0001(\d+)\u0001/g,(x,d)=>'.'+String(d).padStart(3,'0')))}</li>`).join('')}</ul>`,say:lines.join(' ')}); }
+  else if(F.po&&ADDON_READY&&F.po.wc) segs.push(poTvSeg(u));
   else if(F.po){ const s=F.po.seeds, pr=(a,b)=>`<div class="tvm"><div>${tdot(s[a])}<i>${ADDON_READY&&F.po.conf?seedTag(s[a]):a+1}</i>${esc(nm(s[a]))}<small>${rec(s[a])}</small></div><div>${tdot(s[b])}<i>${ADDON_READY&&F.po.conf?seedTag(s[b]):b+1}</i>${esc(nm(s[b]))}<small>${rec(s[b])}</small></div></div>`, ui=s.indexOf(u);
     segs.push({tag:'Playoffs',title:'The playoff picture',html:`<div class="tvbr">${pr(0,3)}${pr(1,2)}</div><p class="tvnote">${F.po.conf?"Conference finals are best of 3, the Floodlight Series is best of 7. The All-Star Game winner's conference has home field in the Series.":"Semifinals are best of 3, the Floodlight Series is best of 7. The higher seed has home field."}</p>`,
       say:F.po.conf?`On to the playoffs. In the West Final, ${theTeam(nm(s[0]))} take on ${theTeam(nm(s[3]))}. In the East Final, ${theTeam(nm(s[1]))} face ${theTeam(nm(s[2]))}. Best of three, and the conference champions meet in the Floodlight Series.${ui>=0&&ui<4?` Good luck to ${theTeam(nm(u))}.`:''}`:`On to the playoffs. In the semifinals, the No. 1 seed, ${theTeam(nm(s[0]))}, take on No. 4, ${theTeam(nm(s[3]))}. And No. 2, ${theTeam(nm(s[1]))}, face No. 3, ${theTeam(nm(s[2]))}. Best of three, and the winners meet in the Floodlight Series.${ui>=0&&ui<4?` Good luck to ${theTeam(nm(u))}.`:''}`}); }
@@ -2393,10 +2429,12 @@ function mySides(){ if(G.isFr&&F) return [0,1].filter(i=>G.teams[i].id===F.userI
 const caseWhere=()=>G.challenge?(G.challenge.asg?'All-Star Game':'Clutch Challenge · '+G.challenge.title):G.isFr&&F?`Franchise ${frSlot} · Season ${F.season}`:'Exhibition';
 function caseNote(t,list){ if(list.length) setTimeout(()=>toast(t,`Trophy case: <b>${list.map(e=>CASE_KINDS[e.k][0]+(e.who?` by ${esc(e.who)}`:'')).join(', ')}</b>`,'abil'),1300); }
 function casePlay(){
+  if(ADDON_READY&&G&&G.challenge&&G.challenge.watch) return; // nothing from a game you only watched goes in your trophy case
   if(G.fx!=='HR'||!G.last||G.last.runs!==4) return; const t=G.last.team; if(!mySides().includes(t)) return;
   const e={k:'gs',who:G.last.batter,team:G.teams[t].name,color:G.teams[t].color,vs:G.teams[1-t].name,inn:inningText(G),where:caseWhere()}; caseAdd(e); caseNote(t,[e]);
 }
 function caseFinal(){
+  if(ADDON_READY&&G&&G.challenge&&G.challenge.watch) return;
   for(const t of mySides()){ const o=1-t, got=[], base={team:G.teams[t].name,color:G.teams[t].color,vs:G.teams[o].name,score:`${total(G,t)}–${total(G,o)}`,where:caseWhere()};
     if(total(G,t)>total(G,o)&&G.inning>=9&&G.hits[o]===0) got.push(Object.assign({k:G.bb[o]===0?'pg':'nh'},base));
     for(const [n,b] of Object.entries(G.box)) if(b.team===t&&b.H-b['2B']-b['3B']-b.HR>0&&b['2B']>0&&b['3B']>0&&b.HR>0) got.push(Object.assign({k:'cy',who:n},base));
@@ -2494,6 +2532,7 @@ function renderHands(){
 /* ---------- tips: one plain-language hint about what you can do right now ---------- */
 let tipsOn=true; try{ tipsOn=localStorage.getItem('fdl-tips')!=='off'; }catch(e){}
 function tipText(){
+  if(ADDON_READY&&G&&G.challenge&&G.challenge.watch) return '';
   if(!G||G.over) return G&&G.over?'Game over. Hit <b>New game</b> (or <b>Franchise hub</b>) to play again.':'';
   const t=G.half, f=1-t, human=!cpu(t), fieldHuman=!cpu(f), bat=curBatter(G), k=cardsOn()&&abOf(G,t,bat), T=G.teams[t];
   if(G.event==null && freshGame()) return `Each roll of the die is one at-bat. Press <b>Roll the dice</b> (or the space bar). Before the first pitch you can still <b>set the batting order</b>.`;
@@ -3332,6 +3371,7 @@ function frFinishDay(userG){
   nwDay(day);
   F.day++;
   try{ if(ADDON_READY) trCpuDay(); }catch(e){}
+  if(ADDON_READY) potwCheck(); // Player of the Week after games 10, 20 and 32
   if(F.day>=F.sched.length) frStartPlayoffs();
   return lines;
 }
@@ -3354,7 +3394,7 @@ function frPlayoffDay(userG){
   const lines=[], day=[];
   for(const s of activeSeries()){
     const isU=s.hi===F.userId||s.lo===F.userId; let G2;
-    if(isU && userG) G2=userG; else { const h=seriesHome(s); G2=simGame(h===s.hi?s.lo:s.hi,h); }
+    if(isU && userG) G2=userG; else { const h=seriesHome(s); G2=(ADDON_READY&&poTakeWatched(s))||simGame(h===s.hi?s.lo:s.hi,h); } // a game you watched counts
     const a=G2.teams[0].id, h=G2.teams[1].id, ra=total(G2,0), rh=total(G2,1), wid=ra>rh?a:h;
     s.w[wid]++; s.g.push({a,h,ra,rh,inn:G2.inning}); addBox(F.pstats,G2);
     if(s.w[wid]>=s.need) s.winner=wid;
@@ -3362,6 +3402,7 @@ function frPlayoffDay(userG){
     if(isU) lines.push(resLine(a,h,ra,rh,G2.inning)+` · ${esc(s.label.split(' ')[0]==='Semifinal'?'Semifinal':s.label)} ${seriesText(s)}`);
   }
   nwPoDay(day);
+  if(ADDON_READY) poAdvance(); // the wild card round becomes the conference finals
   if(!F.po.final && F.po.series.every(s=>s.winner)){
     const [w1,w2]=F.po.series.map(s=>s.winner), seed=id=>F.po.seeds.indexOf(id), hi=ADDON_READY&&F.po.conf?confHome(w1,w2):(seed(w1)<seed(w2)?w1:w2), lo=hi===w1?w2:w1;
     F.po.final=mkSeries(hi,lo,4,'Floodlight Series');
@@ -3374,13 +3415,14 @@ function computeAwards(stats){
   const best=(fn,ok)=>rows.filter(r=>!ok||ok(r.s)).sort((x,y)=>fn(y.s)-fn(x.s))[0]||null;
   const line=s=>`${f3(avg(s))}, ${s.HR} HR, ${s.RBI} RBI`;
   const pack=(r,extra)=>r&&{name:r.name,team:r.s.team,line:extra?extra(r.s):line(r.s)};
-  return {mvp:pack(best(s=>pscore(s)+ops(s)*20)), hr:pack(best(s=>s.HR*1000+s.RBI),s=>`${s.HR} home runs`), bat:pack(best(avg,s=>s.PA>=MIN_PA),s=>`${f3(avg(s))} average`)};
+  return (o=>ADDON_READY?Object.assign(o,moreAwards(stats,o)):o)({mvp:pack(best(s=>pscore(s)+ops(s)*20)), hr:pack(best(s=>s.HR*1000+s.RBI),s=>`${s.HR} home runs`), bat:pack(best(avg,s=>s.PA>=MIN_PA),s=>`${f3(avg(s))} average`)});
 }
 function frCrown(){
   F.phase='off';
   const fin=F.po.final, champ=fin.winner, runner=champ===fin.hi?fin.lo:fin.hi, u=F.userId, st=frStandings(), rank=st.findIndex(r=>r.id===u)+1, ur=F.rec[u];
   const semiLost=F.po.series.some(s=>(s.hi===u||s.lo===u)&&s.winner!==u);
-  const result= champ===u?'Won the Floodlight Series': runner===u?'Lost the Floodlight Series': semiLost?(F.po.conf?'Lost in the conference final':'Lost in the semifinals'):'Missed the playoffs';
+  const wcLost=ADDON_READY&&!!F.po.wcs&&F.po.wcs.some(s=>(s.hi===u||s.lo===u)&&s.winner!==u);
+  const result= champ===u?'Won the Floodlight Series': runner===u?'Lost the Floodlight Series': wcLost?'Lost in the wild card game': semiLost?(F.po.conf?'Lost in the conference final':'Lost in the semifinals'):'Missed the playoffs';
   F.history.push({season:F.season,champ,champName:tname(champ),runner,runnerName:tname(runner),score:`${fin.w[champ]}–${fin.w[runner]}`,awards:F.awards,
     user:{name:me().name,w:ur.w,l:ur.l,rank,result},standings:st.map(r=>({id:r.id,name:tname(r.id),w:r.w,l:r.l}))});
   const pre=JSON.parse(JSON.stringify(F.records||{}));
@@ -3399,7 +3441,7 @@ function frRecords(){
 function frNext(){
   const u=F.userId;
   if(F.phase==='reg'){ const g=userGameToday(); if(!g) return null; const opp=g[0]===u?g[1]:g[0]; return {kind:'reg',opp,home:g[1]===u,label:`Season ${F.season} · Game ${F.day+1} of ${F.sched.length}`}; }
-  if(F.phase==='post'){ const s=userSeries(); if(!s) return null; const opp=s.hi===u?s.lo:s.hi; return {kind:'po',opp,home:seriesHome(s)===u,label:`${s.need===4?'Floodlight Series':/ Final$/.test(s.label)?s.label:'Semifinal'} · Game ${s.g.length+1}`,series:s}; }
+  if(F.phase==='post'){ const s=userSeries(); if(!s) return null; const opp=s.hi===u?s.lo:s.hi; return {kind:'po',opp,home:seriesHome(s)===u,label:`${s.need===4?'Floodlight Series':/ (Final|Wild Card)$/.test(s.label)?s.label:'Semifinal'} · Game ${s.g.length+1}`,series:s}; }
   return null;
 }
 function frPregame(){
@@ -3434,7 +3476,7 @@ function frGameOver(){
   const M=me(), r=F.rec[M.id];
   let note=`<b>${esc(M.name)}</b> ${F.phase==='post'||F.phase==='off'?'finished':'are'} ${r.w}–${r.l}.`;
   if(lines&&lines[0]&&F.phase!=='reg') note=lines[0]+'.';
-  if(F.phase==='post' && !F.po.final && F.day>=SEASON_GAMES && F.po.series.every(s=>!s.g.length)) note+=` Regular season over: ${F.po.seeds.slice(0,4).includes(M.id)?'you made the playoffs!':'you missed the playoffs.'}`;
+  if(F.phase==='post' && !F.po.final && F.day>=SEASON_GAMES && F.po.series.every(s=>!s.g.length)&&!F.po.wcs) note+=` Regular season over: ${(ADDON_READY?poIn(M.id):F.po.seeds.slice(0,4).includes(M.id))?'you made the playoffs!':'you missed the playoffs.'}`;
   if(F.phase==='off'){ const h=F.history[F.history.length-1]; note=`<b>${esc(h.champName)}</b> win the Floodlight Series ${h.score}! ${h.champ===M.id?'That’s you. Champions!':''}`; if(h.champ===M.id) G.trophy=true; }
   const hl=F.news&&F.news.find(x=>x.t.includes(M.id)); if(hl) note+=`<br><span class="gzline">Gazette: ${nwText(hl.h)}</span>`;
   G.frNote=note; frSave(); renderFbar();
@@ -3584,16 +3626,19 @@ function hubAct(a,el){
   else if(a==='exit') frExit();
   else if(ADDON_READY&&/^(tr|dr)/.test(a)) movesAct(a,el);
   else if(ADDON_READY&&/^asg/.test(a)) asgAct(a);
+  else if(ADDON_READY&&a==='pwatch') poAct(a,el);
 }
 function hubBody(){
   switch(hubTab){
-    case 'standings': return `<div class="hcard"><h4>Standings · Season ${F.season}</h4>${standingsHTML(false)}<p class="legend">${ADDON_READY&&confOn()?CONF_LEGEND:"Top four make the playoffs (dashed line). Semifinals are best of 3, the Floodlight Series is best of 7."} Ties broken by run differential.</p></div>`;
+    case 'standings': return `<div class="hcard"><h4>Standings · Season ${F.season}</h4>${standingsHTML(false)}<p class="legend">${ADDON_READY&&confOn()?confLegend():"Top four make the playoffs (dashed line). Semifinals are best of 3, the Floodlight Series is best of 7."} Ties broken by run differential.</p></div>`;
     case 'schedule': return scheduleHTML();
     case 'news': return newsHTML();
     case 'stats': return statsHTML();
     case 'records': return recordsHTML();
     case 'hof': return hofHTML();
     case 'champs': return champsHTML();
+    case 'playoffs': return ADDON_READY?poTabHTML():'';
+    case 'awards': return ADDON_READY?awardsTabHTML():'';
     case 'teams': return teamsHTML();
     case 'moves': return ADDON_READY?movesHTML():'';
     case 'settings': return settingsHTML();
@@ -3616,12 +3661,13 @@ function homeHTML(){
 <div class="hbtns"><button class="btn primary" type="button" data-act="play">Play game</button><button class="btn" type="button" data-act="sim" title="Plays your game out instantly. The computer manages both teams: cards, designated hitters, abilities and steals.">Sim game</button><button class="btn" type="button" data-act="simreg">Sim to playoffs</button></div></div>`;
   } else if(F.phase==='post'){
     main=`<div class="hcard nextg"><h4>Playoffs</h4>${nx?`<p><b>${esc(nx.label)}</b> · ${esc(seriesText(nx.series))}</p>${matchupHTML(nx)}<div class="hbtns"><button class="btn primary" type="button" data-act="play">Play game</button><button class="btn" type="button" data-act="sim">Sim game</button></div>`
-      :`<p>${F.po.seeds.slice(0,4).includes(M.id)?'Your season is over. ':'You missed the playoffs this year. '}Watch the rest play out.</p><div class="hbtns"><button class="btn primary" type="button" data-act="sim">Sim next game</button><button class="btn" type="button" data-act="simpo">Sim rest of playoffs</button></div>`}</div>${bracketHTML()}`;
+      :ADDON_READY?poIdleHTML():`<p>${F.po.seeds.slice(0,4).includes(M.id)?'Your season is over. ':'You missed the playoffs this year. '}Watch the rest play out.</p><div class="hbtns"><button class="btn primary" type="button" data-act="sim">Sim next game</button><button class="btn" type="button" data-act="simpo">Sim rest of playoffs</button></div>`}</div>${bracketHTML()}`;
   } else {
     const h=F.history[F.history.length-1];
     main=`<div class="champ"><span class="aside">Season ${h.season} · Floodlight Series champions</span><b>${esc(h.champName)}</b><span>Beat ${esc(h.runnerName)} ${h.score}</span></div>
 <div class="hcard"><h4>Your season</h4><p><b>${esc(M.name)}</b> went <b>${h.user.w}–${h.user.l}</b>, finished ${ordinal(h.user.rank)} and <b>${h.user.result.toLowerCase()}</b>.</p>${ADDON_READY?drHomeLine()+demoHomeLine():""}<div class="hbtns"><button class="btn primary" type="button" data-act="next">Start Season ${F.season+1}${ADDON_READY&&!FULL_GAME?" · full game":""}</button></div></div>${awardsHTML(h.awards)}${bracketHTML()}`;
   }
+  if(ADDON_READY&&F.phase==='reg'&&!F.live) main+=potwCardHTML();
   if(ADDON_READY&&demoFrLocked()&&F.phase!=='off') main=`<div class="hcard">${demoHomeLine()}</div>`+main;
   main+=newsCardHTML();
   const mine=F.games.filter(g=>g.a===M.id||g.h===M.id).slice(-5).reverse();
@@ -3637,6 +3683,7 @@ function standingsHTML(mini){
 const lastWord=s=>{ const w=s.split(' '); return w.length>2?w.slice(-2).join(' '):w.slice(-1)[0]; };
 function bracketHTML(){
   if(!F.po) return '';
+  if(ADDON_READY&&F.po.conf) return poBracketHTML();
   const row=(s,id)=>`<div class="row ${s.winner?(s.winner===id?'won':'out'):''}">${tdot(id)}<span style="font-family:var(--f-num);font-size:11px;color:var(--muted)">${ADDON_READY?seedTag(id):"#"+(F.po.seeds.indexOf(id)+1)}</span><b>${esc(tname(id))}</b><span class="w">${s.w[id]}</span></div>`;
   const ser=(s,cls)=>`<div class="series ${cls||''}"><span class="sh">${esc(s.label)} · best of ${s.need*2-1}</span>${row(s,s.hi)}${row(s,s.lo)}</div>`;
   return `<div class="hcard"><h4>Playoff bracket</h4><div class="bracket">${F.po.series.map(s=>ser(s)).join('')}${F.po.final?ser(F.po.final,'final'):`<div class="series final"><span class="sh">Floodlight Series · best of 7</span><span class="empty2">Waiting on the semifinals</span></div>`}</div></div>`;
@@ -3644,7 +3691,7 @@ function bracketHTML(){
 function awardsHTML(A){
   if(!A) return '';
   const one=(lbl,a)=>a?`<div class="award"><img src="${cardSrc(a.name,F.teams[a.team])}" alt=""><div><span class="aside">${lbl}</span><b>${esc(a.name)}</b><span>${esc(tname(a.team))} · ${esc(a.line)}</span></div></div>`:'';
-  return `<div class="hcard"><h4>Season awards</h4><div class="awards">${one('MVP',A.mvp)}${one('Home run king',A.hr)}${one('Batting title',A.bat)}</div></div>`;
+  return `<div class="hcard"><h4>Season awards</h4><div class="awards">${one('MVP',A.mvp)}${one('Home run king',A.hr)}${one('Batting title',A.bat)}${ADDON_READY?one('Rookie of the Year',A.roy)+one('Slugger of the Year',A.slug):''}</div></div>`;
 }
 function leadersHTML(){
   const rows=Object.entries(F.stats), top=(fn,fmt,ok)=>rows.filter(([,s])=>!ok||ok(s)).sort((a,b)=>fn(b[1])-fn(a[1])).slice(0,3).map(([n,s])=>`${tdot(s.team)}${esc(n)} <b>${fmt(fn(s))}</b>`).join('<br>');
@@ -3722,7 +3769,7 @@ function importSave(file){
   rd.readAsText(file);
 }
 function newFranchiseHTML(){
-  return `<div class="hgrid"><div class="hcard nextg"><h4>Start a franchise</h4><p>You manage <b>RED</b>: Wes Wright, Ezzy Lyons, Hank Hammer and the rest. Eleven computer teams with their own names, logos and abilities fill out the league. Play a <b>32-game season</b>, ${ADDON_READY?'split into a <b>West</b> and an <b>East</b>. The top two in each conference make the playoffs: best-of-3 conference finals, then the best-of-7 <b>Floodlight Series</b>, with an <b>All-Star Game</b> at the halfway mark.':'and the top four make the playoffs: best-of-3 semifinals, then the best-of-7 <b>Floodlight Series</b>.'} Every stat, record and champion is saved, and the franchise rolls on season after season.</p>
+  return `<div class="hgrid"><div class="hcard nextg"><h4>Start a franchise</h4><p>You manage <b>RED</b>: Wes Wright, Ezzy Lyons, Hank Hammer and the rest. Eleven computer teams with their own names, logos and abilities fill out the league. Play a <b>32-game season</b>, ${ADDON_READY?'split into a <b>West</b> and an <b>East</b>. The top three in each conference make the playoffs: a one-game wild card, best-of-3 conference finals, then the best-of-7 <b>Floodlight Series</b>. Along the way: an <b>All-Star Game</b> at the halfway mark, a <b>Player of the Week</b> after games 10, 20 and 32, and Rookie of the Year and Slugger of the Year when the season ends.':'and the top four make the playoffs: best-of-3 semifinals, then the best-of-7 <b>Floodlight Series</b>.'} Every stat, record and champion is saved, and the franchise rolls on season after season.</p>
 <div class="form"><label>Team name<input type="text" id="nfName" maxlength="28" value="California Kings"></label><label>Scoreboard abbreviation<input type="text" id="nfAbbr" maxlength="4" value="CAL"></label>
 <div class="choice"><span style="font-size:13px;color:var(--muted);font-weight:600">League size</span><label><input type="radio" name="nfSize" value="12" checked> 12 clubs</label><label><input type="radio" name="nfSize" value="6"> 6 clubs (the classic league)</label></div>
 <div class="choice"><span style="font-size:13px;color:var(--muted);font-weight:600">Team &amp; player names</span><label><input type="radio" name="nfNames" value="keep" checked> Keep the names as they are</label><label><input type="radio" name="nfNames" value="custom"> Customize team and player names</label></div>
@@ -3951,15 +3998,16 @@ function nwHof(cls){
 }
 function nwPlayoffs(){
   nwInit(); const s=F.po.seeds, u=F.userId, A=F.awards||{}; F.nx.fs={};
-  nwAdd('po',`The field is set`,F.po.conf?`West Final (best of 3): ${nwT(s[0])} vs ${nwT(s[3])}. East Final (best of 3): ${nwT(s[1])} vs ${nwT(s[2])}. The conference champions meet in the best-of-7 Floodlight Series.`:`Semifinals (best of 3): #1 ${nwT(s[0])} vs #4 ${nwT(s[3])}, and #2 ${nwT(s[1])} vs #3 ${nwT(s[2])}. The winners meet in the best-of-7 Floodlight Series.`,{t:s.slice(0,4),pr:4});
-  if(!s.slice(0,4).includes(u)) nwAdd('game',`No October for the ${nwN(u)}`,`${nwT(u)} finished ${F.rec[u].w}–${F.rec[u].l}, ${ordinal(s.indexOf(u)+1)} in the standings. The front office has a long winter ahead.`,{t:[u],pr:3});
+  if(ADDON_READY&&F.po.wc) poFieldNews(); else nwAdd('po',`The field is set`,F.po.conf?`West Final (best of 3): ${nwT(s[0])} vs ${nwT(s[3])}. East Final (best of 3): ${nwT(s[1])} vs ${nwT(s[2])}. The conference champions meet in the best-of-7 Floodlight Series.`:`Semifinals (best of 3): #1 ${nwT(s[0])} vs #4 ${nwT(s[3])}, and #2 ${nwT(s[1])} vs #3 ${nwT(s[2])}. The winners meet in the best-of-7 Floodlight Series.`,{t:s.slice(0,4),pr:4});
+  if(!(ADDON_READY?poIn(u):s.slice(0,4).includes(u))) nwAdd('game',`No October for the ${nwN(u)}`,`${nwT(u)} finished ${F.rec[u].w}–${F.rec[u].l}, ${ordinal(s.indexOf(u)+1)} in the standings. The front office has a long winter ahead.`,{t:[u],pr:3});
   const aw=(k,lbl,pr)=>{ const a=A[k]; if(!a) return; const B=nwBio(a.name); nwAdd('award',`${a.name} wins the ${lbl}`,`${nwT(a.team)} ${a.name}: ${a.line}. ${k==='mvp'?`From ${B.town} to the top of the league. ${B.back}.`:''}`,{t:[a.team],p:{n:a.name,tid:a.team},pr}); };
-  aw('bat','batting title',3); aw('hr','home run crown',3); aw('mvp','MVP award',5);
+  aw('bat','batting title',3); aw('hr','home run crown',3); if(ADDON_READY){ aw('slug','Slugger of the Year award',3); aw('roy','Rookie of the Year award',4); } aw('mvp','MVP award',5);
 }
 function nwPoDay(list){
   nwInit();
   for(const [G2,s] of list){
     const st=nwGame(G2), fin=s.need===4;
+    if(ADDON_READY&&s.need===1){ if(s.winner) poWcNews(st,s); continue; } // the one-game wild card
     if(fin) for(const [n,b] of Object.entries(G2.box)){ const tid=G2.teams[b.team].id; if(!F.teams[tid].roster[n]) continue; const o=F.nx.fs[n]||(F.nx.fs[n]={tid,H:0,AB:0,HR:0,RBI:0,R:0,'2B':0,'3B':0,SB:0,BB:0}); for(const k of ['H','AB','HR','RBI','R','2B','3B','SB','BB']) o[k]+=b[k]||0; }
     const lbl=fin?`Floodlight Series Game ${s.g.length}`:`${/ Final$/.test(s.label)?s.label:'Semifinal'} Game ${s.g.length}`;
     if(s.winner&&!fin){ const lo=s.winner===s.hi?s.lo:s.hi; nwAdd('po',`${nwN(s.winner)} advance to the Floodlight Series`,`${nwT(s.winner)} took the ${/ Final$/.test(s.label)?s.label:'semifinal'} from ${nwT(lo)}, ${s.w[s.winner]} games to ${s.w[lo]}. In the clincher: ${st.b}`,{t:[s.winner,lo],p:st.p,pr:s.winner===F.userId?6:4}); continue; }
@@ -4501,7 +4549,7 @@ const IS_DESKTOP = !!(NATIVE && NATIVE.isDesktop);
 const CAP = (typeof window!=='undefined' && window.Capacitor && typeof window.Capacitor.isNativePlatform==='function' && window.Capacitor.isNativePlatform()) ? window.Capacitor : null;
 const IS_APP = !!CAP;
 const APP_OS = CAP ? String(CAP.getPlatform()) : '';
-const GAME_VERSION = '1.5.0';
+const GAME_VERSION = '1.6.0';
 const FULL_GAME = true; /*@edition*/ // the website is the free demo; build.py turns this on for the Steam game
 
 /* ---------- a shared add-on dialog layer (sits above the menu, never touches the game's own pop-ups) ---------- */
@@ -4724,7 +4772,7 @@ function achSyncNative(){ try{ if(NATIVE && NATIVE.achievement) for(const id of 
 /* per play: called after every live play (not for games simulated in one click) */
 let achLastEv=null;
 function achPA(){
-  if(!G||G.event===achLastEv) return; achLastEv=G.event;
+  if(!G||G.event===achLastEv||watchOn()) return; // a computer game you're watching earns nothing achLastEv=G.event;
   const mine=mySides(), ev=G.last, E=G.event||{};
   if(cpuLvl!=='allstar') G.lvlAll=false;
   lbTrack();
@@ -4743,7 +4791,7 @@ function achPA(){
 }
 /* at the final out */
 function achGame(){
-  if(!G||!G.over||G.achDone) return; G.achDone=true;
+  if(!G||!G.over||G.achDone||watchOn()) return; G.achDone=true;
   const ch=!!G.challenge, a=total(G,0), h=total(G,1), w=a>h?0:1, u=userSide(), two=!G.isFr&&!G.cpu[0]&&!G.cpu[1];
   if(!ch){ achUnlock('play_ball'); achAdd('games'); if(two) achUnlock('two_player'); }
   if(two||G.fin) return; // two-player games don't count as wins against the computer; neither do games finished by the computer
@@ -4764,7 +4812,7 @@ function achCard(t){ if(ADDON_READY && G && !cpu(t)){ achAdd('cards'); if(G.chal
 function achFr(){
   if(!ADDON_READY||!F) return;
   if(F.phase!=='reg' && (F.day||0)>=SEASON_GAMES) achUnlock('fr_season');
-  if(F.po && F.po.seeds && F.po.seeds.slice(0,4).includes(F.userId)) achUnlock('fr_playoffs');
+  if(F.po && F.po.seeds && F.po.seeds.slice(0,F.po.n||4).includes(F.userId)) achUnlock('fr_playoffs');
   const titles=(F.history||[]).filter(h=>h.champ===F.userId).length;
   if(titles){ achUnlock('fr_title'); if(titles>(ACHD.s.titles||0)) achSet('titles',titles); }
 }
@@ -5017,6 +5065,7 @@ function parkSeries(A,H){ return {key:'series:'+A.name+'|'+H.name, wi:['#26375f'
 /* which park this game is in: quick games keep the classic stadium */
 function parkFor(G){
   if(G&&G.challenge&&G.challenge.asg) return parkAsg(); // the All-Star Game: the grand stadium
+  if(G&&G.challenge&&G.challenge.watch) return G.challenge.fs?parkSeries(G.teams[0],G.teams[1]):parkForTeam(G.teams[1]); // a playoff game you're watching
   if(!G||!G.isFr) return parkClassic();
   const A=G.teams[0], H=G.teams[1];
   if(/Floodlight Series/.test(G.frLabel||'')) return parkSeries(A,H);
@@ -5212,6 +5261,7 @@ function chEval(){
 function chFinal(){
   const c=G.challenge; if(!c) return false;
   if(c.asg) return asgFinal();
+  if(c.watch) return poWatchFinal();
   const sim=!!G.fin, ok=sim?c.goals.map(()=>false):chEval(), won=ok[0], stars=won?ok.filter(Boolean).length:0, daily=c.id==='daily';
   const rec=daily?(DAYD[c.date]=DAYD[c.date]||{}):(CHD[c.id]=CHD[c.id]||{});
   const best=Math.max(rec.stars||0,stars), newBest=stars>(rec.stars||0); rec.stars=best; if(won){ rec.wins=(rec.wins||0)+1; rec.won=true; }
@@ -5253,6 +5303,9 @@ function exitChallenge(){
 }
 function chBar(el){
   const c=G.challenge; el.hidden=false; el.classList.add('chbar');
+  if(c.watch){ el.innerHTML=`<span class="tagx">Playoffs · Season ${F?F.season:''}</span><b>${esc(c.title)}</b><span style="color:var(--muted)">Watching: ${esc(G.teams[0].name)} at ${esc(G.teams[1].name)}</span><span class="sp"><button class="btn small" type="button" id="cbFin">Finish game</button><button class="btn small" type="button" id="cbExit">Back to playoffs</button></span>`;
+    $('cbFin').onclick=()=>{ if(!G||G.over) return; askYes('Skip to the end? The rest of the game plays out in one go.','Finish game').then(ok=>{ if(!ok) return; const go=()=>{ if(!G||G.over||!watchOn()) return; if(busy||layerRoot()){ setTimeout(go,150); return; } $('finish').click(); }; go(); }); };
+    $('cbExit').onclick=()=>{ if(busy) return; askYes('Stop watching? This game will be simmed with the rest of the day.','Stop watching').then(ok=>{ if(ok){ hubTab='playoffs'; exitChallenge(); } }); }; return; }
   if(c.asg){ el.innerHTML=`<span class="tagx">Franchise · Season ${F?F.season:''}</span><b>All-Star Game</b><span style="color:var(--muted)">${esc(G.teams[0].name)} at ${esc(G.teams[1].name)} · the winning conference gets home field in the Floodlight Series</span><span class="sp"><button class="btn small" type="button" id="cbExit">Back to franchise</button></span>`;
     $('cbExit').onclick=()=>{ if(busy) return; askYes('Leave the All-Star Game? It will be simmed when the season moves on.','Leave').then(ok=>{ if(ok) exitChallenge(); }); }; return; }
   el.innerHTML=`<span class="tagx">Clutch Challenge</span><b>${esc(c.title)}</b><span style="color:var(--muted)">${c.goals.map(g=>esc(goalText(g))).join(' · ')}</span><span class="sp"><button class="btn small" type="button" id="cbRetry">Restart</button><button class="btn small" type="button" id="cbAll">Challenges</button><button class="btn small" type="button" id="cbExit">Exit</button></span>`;
@@ -5958,7 +6011,7 @@ function addonRender(){
   renderDuel(); paintHotkeys();
   if(G && !busy){ VO.pre={runs:total(G,0)+total(G,1), outs:G.outs, half:G.half, inning:G.inning}; voBatter(); }
   const ch=!!(G&&G.challenge); document.querySelectorAll('.exh').forEach(el=>el.hidden=frMode||ch);
-  if(FSET.autoCpu && G && !G.over && !busy && cpu(G.half) && !G.tutorial) autoCpuKick(); // in the guided game you press for the computer, so the coach can explain
+  if((FSET.autoCpu||watchOn()) && G && !G.over && !busy && cpu(G.half) && !G.tutorial) autoCpuKick(); // in the guided game you press for the computer, so the coach can explain
   if(TUT) setTimeout(tutTick,0); // the coach moves on the moment the play is done
 }
 /* after every live play */
@@ -5977,9 +6030,9 @@ function addonGameOver(){ if(!ADDON_READY) return; try{ achGame(); achFr(); }cat
 
 /* the computer rolls its own at-bats when Settings says so (it waits while you have a defense card you could play) */
 let autoT=null;
-function autoCpuKick(){ clearTimeout(autoT); if(!FSET.autoCpu) return; autoT=setTimeout(autoCpuTry, Math.round(1100*spd())); }
+function autoCpuKick(){ clearTimeout(autoT); if(!FSET.autoCpu&&!watchOn()) return; autoT=setTimeout(autoCpuTry, Math.round(1100*spd())); }
 function autoCpuTry(){
-  if(!FSET.autoCpu||!G||G.over||busy||!cpu(G.half)) return;
+  if((!FSET.autoCpu&&!watchOn())||!G||G.over||busy||!cpu(G.half)) return;
   const f=1-G.half;
   const key=G.half+':'+G.idx[G.half]+':'+G.outs+':'+G.bases.map(Boolean).join('');
   if(!cpu(f) && cardsOn() && G.hands[f].some(id=>id==='PK'&&legal(f,id)) && G.autoWait!==key){ G.autoWait=key; autoT=setTimeout(autoCpuTry, Math.round(3500*spd())); return; } // a moment to play Pickoff
@@ -6111,7 +6164,7 @@ function lgOps(){ let H=0,BB=0,PA=0,AB=0,TB=0; const add=s=>{ H+=s.H; BB+=s.BB; 
 /* is this club chasing the playoffs (within two games of fourth) or building for later? */
 function trRace(tid){
   if(F.phase!=='reg'||F.day<6) return 0;
-  if(confOn()){ const R=confRace(tid); return R.rank<=2||gDiff(R.st[1],R.me)<=2?1:-1; } // within two games of a playoff spot in its conference
+  if(confOn()){ const R=confRace(tid); return R.rank<=R.S||gDiff(R.st[R.S-1],R.me)<=2?1:-1; } // within two games of a playoff spot in its conference
   const st=frStandings(), i=st.findIndex(r=>r.id===tid), cut=st[3];
   return i<4||((cut.w-st[i].w)+(st[i].l-cut.l))/2<=2?1:-1; }
 /* every general manager has his own taste in abilities, and it changes a little from season to season */
@@ -6214,14 +6267,15 @@ function drMake(){
   F.draft={s:F.season,order,pool:shuffle(pool),picks:[],at:0,done:false};
 }
 /* the draft order: clubs that missed the playoffs pick first, worst record first; then the playoff clubs in the order
-   they went out (the conference-final or semifinal losers, worse record first), then the Floodlight Series loser, and
+   they went out (the wild card losers, then the conference-final or semifinal losers, worse record first each time),
+   then the Floodlight Series loser, and
    the champion picks last */
 function drOrder(){
   const st=frStandings(), worst=ids=>ids.slice().sort((a,b)=>st.findIndex(r=>r.id===b)-st.findIndex(r=>r.id===a));
   const po=F.po, fin=po&&po.final, champ=fin&&fin.winner, runner=champ?(champ===fin.hi?fin.lo:fin.hi):null;
   if(!po||!champ) return st.map(r=>r.id).reverse();
-  const inPO=new Set(po.seeds.slice(0,4)), semis=po.series.map(s=>s.winner===s.hi?s.lo:s.hi).filter(Boolean);
-  return [...worst(st.map(r=>r.id).filter(id=>!inPO.has(id))), ...worst(semis), runner, champ].filter((id,i,a)=>id&&a.indexOf(id)===i&&F.teams[id]);
+  const inPO=new Set(po.seeds.slice(0,po.n||4)), semis=po.series.map(s=>s.winner===s.hi?s.lo:s.hi).filter(Boolean), wcl=(po.wcs||[]).map(s=>s.winner===s.hi?s.lo:s.hi).filter(Boolean);
+  return [...worst(st.map(r=>r.id).filter(id=>!inPO.has(id))), ...worst(wcl), ...worst(semis), runner, champ].filter((id,i,a)=>id&&a.indexOf(id)===i&&F.teams[id]);
 }
 const drOn=()=>!!F&&F.phase==='off'&&F.history.length>0;
 function drGet(){ if(!drOn()) return null; if(!F.draft||F.draft.s!==F.season) drMake(); return F.draft; }
@@ -6390,10 +6444,16 @@ const confTeams=c=>{ confInit(); return F.ids.filter(id=>F.conf[id]===c); };
 function confPlayoffs(st){
   confInit();
   const W=st.filter(r=>F.conf[r.id]==='W').map(r=>r.id), E=st.filter(r=>F.conf[r.id]==='E').map(r=>r.id);
+  if(poWcOn()){ // the top three in each conference: 2 vs 3 in a one-game wild card, the 1 seed waits
+    const cs={}; W.slice(0,3).forEach((id,i)=>cs[id]='W'+(i+1)); E.slice(0,3).forEach((id,i)=>cs[id]='E'+(i+1));
+    const top6=[W[0],E[0],W[1],E[1],W[2],E[2]], rest6=st.map(r=>r.id).filter(id=>!top6.includes(id));
+    return {seeds:[...top6,...rest6], n:6, conf:true, wc:true, cs, top:{W:W[0],E:E[0]}, round:'wc', wcs:null,
+      series:[mkSeries(W[1],W[2],1,'West Wild Card'),mkSeries(E[1],E[2],1,'East Wild Card')], final:null};
+  }
   const top=[W[0],E[0],E[1],W[1]], rest=st.map(r=>r.id).filter(id=>!top.includes(id));
   return {seeds:[...top,...rest], conf:true, series:[mkSeries(W[0],W[1],2,'West Final'),mkSeries(E[0],E[1],2,'East Final')], final:null};
 }
-function seedTag(id){ if(!F.po) return ''; const i=F.po.seeds.indexOf(id); if(!F.po.conf) return '#'+(i+1); if(i<0||i>3) return ''; return (F.conf[id]==='W'?'W':'E')+(i<2?'1':'2'); }
+function seedTag(id){ if(!F.po) return ''; if(F.po.cs) return F.po.cs[id]||''; const i=F.po.seeds.indexOf(id); if(!F.po.conf) return '#'+(i+1); if(i<0||i>3) return ''; return (F.conf[id]==='W'?'W':'E')+(i<2?'1':'2'); }
 /* home field in the Floodlight Series: the conference that won this season's All-Star Game, otherwise the better record */
 function confHome(a,b){
   const g=F.asg&&F.asg.s===F.season?F.asg.w:null;
@@ -6403,13 +6463,12 @@ function confHome(a,b){
 }
 /* the standings, one table per conference */
 function confStandingsHTML(mini){
-  confInit(); const st=frStandings(), u=F.userId;
+  confInit(); const st=frStandings(), u=F.userId, S=F.phase!=='reg'&&F.po&&F.po.conf?(F.po.n===6?3:2):poSpots();
   const tbl=c=>{ const rows=st.filter(r=>F.conf[r.id]===c), top=rows[0];
     return `<h5 class="confh">${CONF_NAME[c]}</h5><div class="tscroll"><table class="tbl"><thead><tr><th class="l">Team</th><th>W</th><th>L</th><th>Pct</th><th>GB</th>${mini?'':'<th>RS</th><th>RA</th>'}<th>Diff</th></tr></thead><tbody>${rows.map((r,i)=>{ const gb=((top.w-r.w)+(r.l-top.l))/2;
-      return `<tr class="${r.id===u?'me':''}${i===1?' cut':''}"><td class="l">${tdot(r.id)}<b>${esc(tname(r.id))}</b>${F.phase!=='reg'&&F.po&&F.po.conf&&i<2?`<span class="seed">${c}${i+1}</span>`:''}</td><td>${r.w}</td><td>${r.l}</td><td>${pct(r.w,r.l)}</td><td>${gb?gb.toFixed(1).replace('.0',''):'–'}</td>${mini?'':`<td>${r.rs}</td><td>${r.ra}</td>`}<td>${r.rs-r.ra>0?'+':''}${r.rs-r.ra}</td></tr>`; }).join('')}</tbody></table></div>`; };
+      return `<tr class="${r.id===u?'me':''}${i===S-1?' cut':''}"><td class="l">${tdot(r.id)}<b>${esc(tname(r.id))}</b>${F.phase!=='reg'&&F.po&&F.po.conf&&i<(F.po.n===6?3:2)?`<span class="seed">${c}${i+1}</span>`:''}</td><td>${r.w}</td><td>${r.l}</td><td>${pct(r.w,r.l)}</td><td>${gb?gb.toFixed(1).replace('.0',''):'–'}</td>${mini?'':`<td>${r.rs}</td><td>${r.ra}</td>`}<td>${r.rs-r.ra>0?'+':''}${r.rs-r.ra}</td></tr>`; }).join('')}</tbody></table></div>`; };
   return `<div class="confst">${tbl('W')}${tbl('E')}</div>`;
 }
-const CONF_LEGEND='The top two in each conference make the playoffs (dashed line). The conference finals are best of 3; the West and East champions meet in the best-of-7 Floodlight Series, with home field going to the conference that won the All-Star Game.';
 
 /* ---------- the All-Star Game ---------- */
 const asgPending=()=>confOn()&&F.phase==='reg'&&F.day>=ASG_DAY&&!(F.asg&&F.asg.s===F.season);
@@ -6492,31 +6551,33 @@ function parkAsg(){ const P=parkSeries(G.teams[0],G.teams[1]); return Object.ass
 
 /* ---------- conference-aware words for the TV show and the newspaper ---------- */
 function confRace(id){
-  confInit(); const c=F.conf[id], st=frStandings().filter(r=>F.conf[r.id]===c), left=x=>SEASON_GAMES-(x.w+x.l), me=st.find(x=>x.id===id), others=st.filter(x=>x.id!==id), maxMe=me.w+left(me);
-  return {st,c,me,rank:st.indexOf(me)+1,left:left(me),clinched:others.filter(x=>x.w+left(x)>=me.w).length<=1,out:others.filter(x=>x.w>maxMe).length>=2};
+  confInit(); const S=poSpots(), c=F.conf[id], st=frStandings().filter(r=>F.conf[r.id]===c), left=x=>SEASON_GAMES-(x.w+x.l), me=st.find(x=>x.id===id), others=st.filter(x=>x.id!==id), maxMe=me.w+left(me);
+  return {st,c,me,S,rank:st.indexOf(me)+1,left:left(me),clinched:others.filter(x=>x.w+left(x)>=me.w).length<=S-1,out:others.filter(x=>x.w>maxMe).length>=S};
 }
 function confRaceLine(u,post){
   const R=confRace(u), st=R.st, C=CONF_NAME[R.c], nm=Nk(u);
   if(R.clinched) return post?`They've clinched a playoff spot in the ${C}!`:`${nm} have already clinched a playoff spot in the ${C}.`;
   if(R.out) return post?`They've been eliminated from playoff contention.`:`${nm} have been eliminated from playoff contention.`;
   if(R.rank===1){ const g=gDiff(st[0],st[1]); return g>0?`${post?'They':nm} lead the ${C} by ${gamesWord(g)}.`:`${post?'They':nm} are tied for first in the ${C}.`; }
+  if(R.S===3&&R.rank<=3){ const g=gDiff(R.me,st[3]||R.me); return g>0?`${post?"They're":nm+' are'} ${ordinal(R.rank)} in the ${C}, ${gamesWord(g)} clear of fourth and in ${R.rank===2?'line to host the wild card game':'the last playoff spot'}.`:`${post?'They':nm} hold the ${C}'s last playoff spot on run differential.`; }
   if(R.rank===2){ const g=gDiff(R.me,st[2]); return g>0?`${post?"They're":nm+' are'} second in the ${C}, ${gamesWord(g)} clear of third and in playoff position.`:`${post?'They':nm} hold the ${C}'s last playoff spot on run differential.`; }
-  const g=gDiff(st[1],R.me); return g>0?`${post?"They're":nm+' are'} ${gamesWord(g)} out of a playoff spot in the ${C}.`:`${post?"They're":nm+' are'} tied for the ${C}'s last playoff spot, but on the outside on run differential.`;
+  const g=gDiff(st[R.S-1],R.me); return g>0?`${post?"They're":nm+' are'} ${gamesWord(g)} out of a playoff spot in the ${C}.`:`${post?"They're":nm+' are'} tied for the ${C}'s last playoff spot, but on the outside on run differential.`;
 }
 const seedWords=id=>{ const t=seedTag(id); return t?`No. ${t[1]} seed in the ${CONF_NAME[t[0]]}`:''; };
 /* the TV show's standings segment, one table per conference */
 function confTvStandings(end){
-  confInit(); const u=F.userId, all=frStandings(), rec=id=>`${F.rec[id].w}–${F.rec[id].l}`, nm=id=>tname(id), parts=[];
+  confInit(); const u=F.userId, all=frStandings(), rec=id=>`${F.rec[id].w}–${F.rec[id].l}`, nm=id=>tname(id), parts=[], S=end&&F.po&&F.po.conf?(F.po.n===6?3:2):poSpots();
   const conf=c=>all.filter(r=>F.conf[r.id]===c);
   for(const c of ['W','E']){ const st=conf(c), [a,b,d]=st, g=gDiff(a,b), gap=gDiff(b,d), C=CONF_NAME[c];
-    if(end) parts.push(`In the ${C}, ${theTeam(nm(a.id))} finish first at ${rec(a.id)}${g>0?`, ${gamesWord(g)} ahead`:' on run differential'}, and ${theTeam(nm(b.id))} ${gap>0?`take the other playoff spot by ${gamesWord(gap)}`:'take the other playoff spot on run differential'}.`);
+    if(end&&S===3) parts.push(`In the ${C}, ${theTeam(nm(a.id))} finish first at ${rec(a.id)} and earn the bye. ${TheTeam(nm(b.id))} host ${theTeam(nm(d.id))} in the wild card game.`);
+    else if(end) parts.push(`In the ${C}, ${theTeam(nm(a.id))} finish first at ${rec(a.id)}${g>0?`, ${gamesWord(g)} ahead`:' on run differential'}, and ${theTeam(nm(b.id))} ${gap>0?`take the other playoff spot by ${gamesWord(gap)}`:'take the other playoff spot on run differential'}.`);
     else parts.push(g>0?`${TheTeam(nm(a.id))} lead the ${C} at ${rec(a.id)}, ${gamesWord(g)} up on ${theTeam(nm(b.id))}.`:`${TheTeam(nm(a.id))} and ${theTeam(nm(b.id))} share first in the ${C} at ${rec(a.id)}.`); }
   const me=TheTeam(nm(u));
   if(end){ const t=F.po&&F.po.conf?seedTag(u):''; parts.push(t?`${me} are in, as the ${seedWords(u)}.`:`${me} miss the playoffs.`); }
   else parts.push(confRaceLine(u));
   const tbl=c=>`<h5 class="confh">${CONF_NAME[c]}</h5><table class="tvtbl"><thead><tr><th></th><th class="l">Team</th><th>W</th><th>L</th><th>GB</th><th>Diff</th></tr></thead><tbody>${conf(c).map((r,i,arr)=>{ const gb=gDiff(arr[0],r);
-    return `<tr class="${r.id===u?'me':''}${i===1?' line':''}"><td>${i+1}</td><td class="l">${tdot(r.id)}${esc(nm(r.id))}${end&&i<2?' <em>In</em>':''}</td><td>${r.w}</td><td>${r.l}</td><td>${gb?gb.toFixed(1).replace('.0',''):'–'}</td><td>${r.rs-r.ra>0?'+':''}${r.rs-r.ra}</td></tr>`; }).join('')}</tbody></table>`;
-  return {tag:'Standings',title:end?'Final standings':'Standings',html:`<div class="confst">${tbl('W')}${tbl('E')}</div><p class="tvnote">The top two in each conference make the playoffs.</p>`,say:parts.join(' ')};
+    return `<tr class="${r.id===u?'me':''}${i===S-1?' line':''}"><td>${i+1}</td><td class="l">${tdot(r.id)}${esc(nm(r.id))}${end&&i<S?' <em>In</em>':''}</td><td>${r.w}</td><td>${r.l}</td><td>${gb?gb.toFixed(1).replace('.0',''):'–'}</td><td>${r.rs-r.ra>0?'+':''}${r.rs-r.ra}</td></tr>`; }).join('')}</tbody></table>`;
+  return {tag:'Standings',title:end?'Final standings':'Standings',html:`<div class="confst">${tbl('W')}${tbl('E')}</div><p class="tvnote">The top ${S===3?'three':'two'} in each conference make the playoffs.${S===3?' The 2 and 3 seeds meet in a one-game wild card.':''}</p>`,say:parts.join(' ')};
 }
 
 /* ---------- a full house for the seventh-inning stretch ----------
@@ -6797,7 +6858,191 @@ function frRenameClubs(o){
   return n;
 }
 
-window.__fdl={addon:{ACHD:()=>ACHD,CHD:()=>CHD,DAYD:()=>DAYD,FSET:()=>FSET,start:id=>startChallenge(id==='daily'?dailyFor(today()):CH_BY[id]),achUnlock,openSettings,openAchievements,openChallenges,litActions,padPress,layerRoot,chFinal,buildChallenge,CHALL,ACHS,dailyFor,badgeSVG,exitChallenge,startTutorial,TUT:()=>TUT,FIELD:()=>FIELD,VO:()=>VO,voSay,voPick,voName,voBatter,fieldCheck,sfx:()=>sfx,parkSync,parkFor,PARK:()=>PARK_CUR,FR_CLUBS:()=>FR_CLUBS,trGain,plValue,drGet,lgOps,TR:()=>TR,stretchScene:()=>stretchScene(),crowdCanvas,asgSim,asgPending,asgStart,confOf,drOrder,genLogoKey}, get G(){return G}, get F(){return F}, get busy(){return busy}, setOpp:o=>setOpp(o,true), cpuPick:()=>cpuPick(), showFinal:()=>showFinal(), playWhole, MODES, ACTIONS, ABIL, DHS, P, render:()=>renderGame(),
+/* ---------- the postseason and the awards ----------
+   In a league of ten or more clubs, the top three in each conference make the playoffs (six teams). The 2 and 3 seeds
+   play a one-game wild card at the 2 seed's park; the winner meets the 1 seed in the best-of-3 conference final, and
+   the West and East champions play the best-of-7 Floodlight Series. The bracket lives in the hub (Playoffs tab, and on
+   Home in October), every computer playoff game can be watched live, and the league hands out a Player of the Week in
+   each conference after games 10, 20 and 32, plus Rookie of the Year and Slugger of the Year at season's end. */
+function poWcOn(){ return confOn()&&F.ids.length>=10; }
+function poSpots(){ return poWcOn()?3:2; }            // playoff spots per conference
+function poN(){ return F&&F.po?(F.po.n||4):4; }        // clubs in the field
+function poIn(id){ return !!(F&&F.po&&F.po.seeds&&F.po.seeds.slice(0,poN()).includes(id)); }
+HOMEPAT[1]=[0]; // a one-game wild card: the higher seed is at home
+const poLoser=s=>s&&s.winner?(s.winner===s.hi?s.lo:s.hi):null;
+const poKey=s=>`${F.season}|${s.label}|${s.g.length}`;
+function watchOn(){ return !!(G&&G.challenge&&G.challenge.watch); } // (a function, so the start-up render can ask too)
+
+/* the wild card round becomes the conference finals once both wild card games are in */
+function poAdvance(){
+  const P=F.po; if(!P||!P.wc||P.round!=='wc'||!P.series.every(s=>s.winner)) return;
+  P.wcs=P.series; const w=c=>(P.wcs.find(s=>s.label.indexOf(CONF_NAME[c])===0)||{}).winner;
+  P.series=[mkSeries(P.top.W,w('W'),2,'West Final'),mkSeries(P.top.E,w('E'),2,'East Final')]; P.round='cf';
+  try{ nwAdd('po','The conference finals are set',`West Final (best of 3): ${nwT(P.top.W)} vs ${nwT(w('W'))}. East Final (best of 3): ${nwT(P.top.E)} vs ${nwT(w('E'))}. The conference champions meet in the best-of-7 Floodlight Series.`,{t:[P.top.W,w('W'),P.top.E,w('E')],pr:4}); }catch(e){}
+}
+function poFieldNews(){
+  const P=F.po, c=P.cs, by=k=>Object.keys(c).find(id=>c[id]===k);
+  nwAdd('po','The field is set',`West: ${nwT(by('W1'))} earn the bye and wait in the West Final. ${nwT(by('W2'))} host ${nwT(by('W3'))} in the wild card game. East: ${nwT(by('E1'))} earn the bye, and ${nwT(by('E2'))} host ${nwT(by('E3'))} in the wild card game. One game, winner moves on.`,{t:P.seeds.slice(0,6),pr:4});
+}
+function poWcNews(st,s){
+  const lo=poLoser(s), up=F.po.top&&F.po.top[s.label.indexOf('West')===0?'W':'E'];
+  nwAdd(s.winner===F.userId||lo===F.userId?'game':'po',`${nwN(s.winner)} win the ${s.label} game`,`${st.b} ${nwT(s.winner)} move on to face ${up?nwT(up):'the top seed'} in the ${s.label.replace('Wild Card','Final')}. The season is over for ${nwT(lo)}.`,{t:[s.winner,lo],p:st.p,pr:s.winner===F.userId||lo===F.userId?6:4});
+}
+function poWcStory(s){
+  const up=F.po.top&&F.po.top[s.label.indexOf('West')===0?'W':'E'];
+  return `It's the ${s.label} game. One game, and the winner moves on to face ${up?theTeam(tname(up)):'the top seed'} in the ${s.label.replace('Wild Card','Final')}.`;
+}
+/* the hub line when you're not playing today */
+function poIdleHTML(){
+  const u=F.userId, alive=poIn(u)&&!([...(F.po.wcs||[]),...F.po.series,F.po.final].filter(Boolean).some(s=>poLoser(s)===u));
+  const txt=alive?'You’re through! Waiting on the other series to finish.':poIn(u)?'Your season is over.':'You missed the playoffs this year.';
+  const W=activeSeries().filter(s=>s.hi!==u&&s.lo!==u);
+  return `<p>${txt} Watch the computer’s games live, or sim ahead.</p><div class="hbtns">${W.map(s=>`<button class="btn primary" type="button" data-act="pwatch" data-s="${esc(s.label)}">Watch ${esc(poGameName(s))}</button>`).join('')}<button class="btn" type="button" data-act="sim">Sim next game</button><button class="btn" type="button" data-act="simpo">Sim rest of playoffs</button></div>`;
+}
+const poGameName=s=>s.need===1?`the ${s.label} game`:`${s.label} Game ${s.g.length+1}`;
+
+/* ---------- the bracket ---------- */
+function poBracketHTML(tab){
+  const P=F.po, u=F.userId; if(!P) return '';
+  const seedOf=id=>id?seedTag(id):'';
+  const row=(s,id,tbd)=>id?`<div class="pbrow ${s&&s.winner?(s.winner===id?'won':'out'):''}${id===u?' me':''}">${tdot(id)}<i>${seedOf(id)}</i><b>${esc(tname(id))}</b><span class="w">${s?s.w[id]:''}</span></div>`:`<div class="pbrow tbd"><span class="dot" style="background:#33415c"></span><i></i><b>${esc(tbd||'To be decided')}</b><span class="w"></span></div>`;
+  const games=s=>s&&s.g.length?`<ol class="pbg">${s.g.map((g,i)=>`<li>${s.need===1?'':'G'+(i+1)+' '}${esc(F.teams[g.a].abbr)} ${g.ra}, ${esc(F.teams[g.h].abbr)} ${g.rh}${g.inn>9?` (${g.inn})`:''}</li>`).join('')}</ol>`:'';
+  const watchBtn=s=>s&&!s.winner&&F.phase==='post'&&!F.live&&s.hi!==u&&s.lo!==u&&activeSeries().includes(s)?`<button class="btn small" type="button" data-act="pwatch" data-s="${esc(s.label)}">Watch ${s.need===1?'it':'Game '+(s.g.length+1)} live</button>`:'';
+  const box=(s,label,need,cls,hi,lo,tbd)=>`<div class="pbox ${cls||''}${s&&(s.hi===u||s.lo===u)?' mine':''}"><span class="pbh">${esc(label)} · ${need===1?'one game':'best of '+(need*2-1)}</span>${row(s,s?s.hi:hi,tbd&&tbd[0])}${row(s,s?s.lo:lo,tbd&&tbd[1])}${s?`<span class="pbst">${esc(s.winner?(need===1?`${tname(s.winner)} win`:seriesText(s)):s.g.length?seriesText(s):need===1?`At ${tname(seriesHome(s))}`:`Game 1 at ${tname(seriesHome(s))}`)}</span>`:''}${games(s)}${watchBtn(s)}</div>`;
+  const conf=c=>{ const C=CONF_NAME[c];
+    if(P.wc){ const wcS=(P.wcs||P.series).find(s=>s.label===C+' Wild Card'), cf=P.round==='cf'?P.series.find(s=>s.label===C+' Final'):null;
+      return `<div class="pcol"><h5>${C}</h5>${box(wcS,C+' Wild Card',1,'wcbox')}${box(cf,C+' Final',2,'',P.top[c],null,[null,'Wild card winner'])}</div>`; }
+    const cf=P.series.find(s=>s.label===C+' Final');
+    return `<div class="pcol"><h5>${C}</h5>${box(cf,C+' Final',2)}</div>`; };
+  const fin=P.final, champ=fin&&fin.winner, cw=c=>{ const x=P.series.find(q=>q.label===CONF_NAME[c]+' Final'); return x&&x.winner||null; };
+  const mid=`<div class="pcol pmid"><h5>Floodlight Series</h5>${box(fin,'Floodlight Series',4,'fsbox',cw('W'),cw('E'),['West champion','East champion'])}${champ?`<div class="pchamp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10v3a5 5 0 0 1-3.5 4.8V14h2.5v2H8v-2h2.5v-3.2A5 5 0 0 1 7 6V3Zm-4 1h3v2.5A3.5 3.5 0 0 1 3 4Zm18 0a3.5 3.5 0 0 1-3 2.5V4h3ZM6 18h12v3H6v-3Z"/></svg><span>Season ${F.season} champions</span><b>${esc(tname(champ))}</b></div>`:''}</div>`;
+  const legend=P.wc?'The 1 seeds wait for the winner of their conference’s one-game wild card. Home field in the Floodlight Series goes to the conference that won the All-Star Game.':'Home field in the Floodlight Series goes to the conference that won the All-Star Game.';
+  return `<div class="hcard pbcard"><h4>${tab?`Season ${F.season} playoffs`:'Playoff bracket'}</h4><div class="pbr">${conf('W')}${mid}${conf('E')}</div><p class="legend">${legend}</p></div>`;
+}
+/* during the season: who's in if it ended today */
+function poProjectedHTML(){
+  if(!confOn()) return `<div class="hcard"><h4>Playoffs</h4><p class="empty2">The playoffs start after game ${SEASON_GAMES}.</p></div>`;
+  confInit(); const st=frStandings(), S=poSpots(), u=F.userId;
+  const side=c=>{ const L=st.filter(r=>F.conf[r.id]===c);
+    return `<div class="pcol"><h5>${CONF_NAME[c]}</h5>${L.slice(0,S).map((r,i)=>`<div class="pbrow${r.id===u?' me':''}">${tdot(r.id)}<i>${c}${i+1}</i><b>${esc(tname(r.id))}</b><span class="prc">${r.w}–${r.l}</span></div>`).join('')}${L[S]?`<div class="pbrow out"><span class="dot" style="background:#33415c"></span><i></i><b>First out: ${esc(tname(L[S].id))}</b><span class="prc">${gDiff(L[S-1],L[S])?gamesWord(gDiff(L[S-1],L[S]))+' back':'tied'}</span></div>`:''}</div>`; };
+  return `<div class="hcard pbcard"><h4>If the season ended today</h4><div class="pbr two">${side('W')}${side('E')}</div><p class="legend">${confLegend().replace(' (dashed line)','')} ${SEASON_GAMES-F.day} game${SEASON_GAMES-F.day===1?'':'s'} left.</p></div>`;
+}
+function poTabHTML(){
+  if(F.phase==='reg') return poProjectedHTML()+(F.history.length?`<div class="hcard"><h4>Last season</h4><p>${esc(F.history[F.history.length-1].champName)} won the Floodlight Series ${esc(F.history[F.history.length-1].score)}.</p></div>`:'');
+  return poBracketHTML(true);
+}
+
+/* ---------- watching the computer's playoff games ---------- */
+function poWatch(label){
+  if(!F||F.phase!=='post'||F.live||busy) return;
+  const s=activeSeries().find(x=>x.label===label); if(!s||s.hi===F.userId||s.lo===F.userId) return;
+  const h=seriesHome(s), a=h===s.hi?s.lo:s.hi, A=F.teams[a], H=F.teams[h];
+  prepCards([A,H]);
+  autoSave(); frMode=false; FR=null; setFrUI(); closeHub(); closeMenu(); pendingToast='';
+  const ov=$('ov'); ov.hidden=true; ov.innerHTML=''; ov.onclick=null;
+  mode='sim'; paintModeTabs(); renderFaces();
+  G=newState('sim',[gameTeam(A),gameTeam(H)],[true,true]);
+  G.challenge={id:'watch',title:poGameName(s).replace(/^the /,''),watch:true,goals:[['win']],start:[0,0],inn0:1,inn:9,hr0:0,cards:0,u:1,from:'fr',key:poKey(s),label:s.label,fs:s.need===4};
+  busy=false; $('pcard').dataset.nm=''; annStart(); renderGame(); fitTop();
+  const recd=id=>`${F.rec[id].w}–${F.rec[id].l}`;
+  openX(`<div class="xpanel" role="dialog" aria-modal="true" aria-labelledby="pwT">${xHead('<span id="pwT">'+esc(G.challenge.title)+'</span>',`Season ${F.season} playoffs · ${esc(A.name)} at ${esc(H.name)}`)}
+<div class="matchup"><div class="tm">${teamMark(A,'big')}<b style="color:${ink(A.color)}">${esc(A.name)}</b><span>${seedTag(A.id)} · ${recd(A.id)}</span></div><span class="vs">at</span><div class="tm">${teamMark(H,'big')}<b style="color:${ink(H.color)}">${esc(H.name)}</b><span>${seedTag(H.id)} · ${recd(H.id)}</span></div></div>
+<p>${esc(s.need===1?poWcStory(s):s.g.length?seriesText(s)+'.':'Game 1 of the series.')} The computer manages both clubs and rolls on its own. Sit back and watch, press <b>Roll</b> to hurry it along, or use <b>Finish game</b> to see how it ends.</p>
+<div class="ovbtns"><button class="btn primary" type="button" data-x data-focus>Play ball</button></div></div>`,{onClose:()=>{ sfx.organ&&sfx.organ(); autoCpuKick(); }});
+}
+/* the final out of a game you watched: it counts as that series game */
+function poWatchFinal(){
+  const c=G.challenge, a=total(G,0), h=total(G,1), s=F.phase==='post'?activeSeries().find(x=>x.label===c.label):null;
+  let note='';
+  if(s&&poKey(s)===c.key){
+    const copy=JSON.parse(JSON.stringify(G)); delete copy.challenge; F.poWatched={key:c.key,G:copy};
+    if(!userSeries()){ const was=F.phase; frPlayoffDay(null); frSave(); maybeTrophy(was); note=F.phase==='off'?`${tname(F.history[F.history.length-1].champ)} win the Floodlight Series!`:''; }
+    else { frSave(); note='It counts once you play (or sim) your own game today.'; }
+  }
+  const s2=[...(F.po&&F.po.wcs||[]),...(F.po?F.po.series:[]),F.po&&F.po.final].filter(Boolean).find(x=>x.label===c.label);
+  const W=a>h?G.teams[0]:G.teams[1];
+  openX(`<div class="xpanel chres" role="dialog" aria-modal="true" aria-labelledby="pfT"><span class="aside" style="color:var(--flood)">${esc(c.title)} · Season ${F.season}</span>
+<h3 id="pfT">${esc(W.name)} win${G.fin?'':'!'}</h3>
+<p class="fin">Final: ${esc(G.teams[0].abbr)} ${a}, ${esc(G.teams[1].abbr)} ${h}${G.inning>9?` in ${G.inning}`:''}</p>
+${s2?`<p class="fin">${esc(s2.need===1?(s2.winner?`${tname(s2.winner)} move on to the ${s2.label.replace('Wild Card','Final')}.`:''):seriesText(s2)+'.')}</p>`:''}${note?`<p class="fin">${esc(note)}</p>`:''}
+<div class="ovbtns"><button class="btn primary" type="button" id="pfBack" data-focus>Back to the playoffs</button><button class="btn small" type="button" id="pfBox">See the box score</button></div></div>`);
+  setTimeout(()=>sfx.organ&&sfx.organ(),400);
+  $('pfBack').onclick=()=>{ closeX(true); hubTab='playoffs'; exitChallenge(); };
+  $('pfBox').onclick=()=>{ closeX(true); G.challengeShown=true; showFinal(); };
+  return true;
+}
+/* the series game you watched replaces the computer's sim of it */
+function poTakeWatched(s){ const W=F.poWatched; if(!W||W.key!==poKey(s)) return null; F.poWatched=null; return W.G; }
+function poAct(a,el){ if(a==='pwatch') poWatch(el&&el.dataset.s); }
+
+/* ---------- Player of the Week: after games 10, 20 and 32, one in each conference ---------- */
+const POTW_AT=[10,20,SEASON_GAMES], POTW_K=['PA','AB','H','2B','3B','HR','RBI','R','BB','K','SB'];
+const potwSnap=()=>Object.fromEntries(Object.entries(F.stats||{}).map(([n,s])=>[n,Object.fromEntries(POTW_K.map(k=>[k,s[k]||0]))]));
+function potwCheck(){
+  if(!F||F.phase!=='reg') return;
+  if(!F.potw||F.potw.s!==F.season) F.potw={s:F.season,from:F.day<=1?1:F.day+1,base:F.day<=1?{}:potwSnap(),list:[]};
+  const d=F.day; if(!POTW_AT.includes(d)||F.potw.list.some(x=>x.to===d)) return;
+  const P=F.potw, span=d-P.from+1, rows=[];
+  for(const [n,s] of Object.entries(F.stats)){ const b=P.base[n]||{}, x={team:s.team}; for(const k of POTW_K) x[k]=(s[k]||0)-(b[k]||0); if(x.PA>0&&F.teams[s.team]) rows.push({n,x}); }
+  const sc=x=>pscore(x)+ops(x)*20, minPA=Math.max(4,Math.round(span*2.5));
+  const best=L=>{ const q=L.filter(r=>r.x.PA>=minPA); return (q.length?q:L).sort((a,b)=>sc(b.x)-sc(a.x))[0]||null; };
+  const pack=r=>r&&{name:r.n,team:r.x.team,line:`${f3(avg(r.x))}, ${r.x.HR} HR, ${r.x.RBI} RBI`,s:r.x};
+  const aw={wk:POTW_AT.indexOf(d)+1,from:P.from,to:d};
+  if(confOn()){ aw.W=pack(best(rows.filter(r=>confOf(r.x.team)==='W'))); aw.E=pack(best(rows.filter(r=>confOf(r.x.team)==='E'))); }
+  else aw.L=pack(best(rows));
+  P.list.push(aw); P.base=potwSnap(); P.from=d+1;
+  try{ const ws=[aw.W,aw.E,aw.L].filter(Boolean), mine=ws.some(w=>w.team===F.userId);
+    nwAdd('award',`Player${ws.length>1?'s':''} of the Week: ${ws.map(w=>w.name).join(' and ')}`,ws.map(w=>`${confOn()?CONF_NAME[confOf(w.team)]+': ':''}${nwT(w.team)} ${w.name}, ${w.line} over games ${aw.from}–${aw.to}.`).join('\n'),{t:ws.map(w=>w.team),p:{n:ws[0].name,tid:ws[0].team},pr:mine?6:4}); }catch(e){}
+}
+const potwList=()=>F&&F.potw&&F.potw.s===F.season?F.potw.list:[];
+const potwWho=w=>[w.W,w.E,w.L].filter(Boolean).map(a=>Object.assign({conf:w.L?'League':CONF_NAME[confOf(a.team)]||''},a));
+function potwCardHTML(){
+  const L=potwList(), w=L[L.length-1]; if(!w||F.phase!=='reg') return '';
+  return `<div class="hcard"><h4>Player${potwWho(w).length>1?'s':''} of the Week · games ${w.from}–${w.to}</h4><div class="awards potw">${potwWho(w).map(a=>`<div class="award"><img src="${cardSrc(a.name,F.teams[a.team])}" alt=""><div><span class="aside">${esc(a.conf)}</span><b>${esc(a.name)}</b><span>${esc(tname(a.team))} · ${esc(a.line)}</span></div></div>`).join('')}</div></div>`;
+}
+function potwSeg(m){
+  const w=potwList().find(x=>x.to===m); if(!w) return null; const P=potwWho(w);
+  return {tag:'Player of the Week',title:`Player${P.length>1?'s':''} of the Week`,html:`<div class="tvcards">${P.map((a,i)=>`<div class="tvc${i?'':' one'}"><i>${esc(a.conf)}</i><b>${tdot(a.team)}${esc(a.name)}</b><span>${esc(tname(a.team))}</span><small>${esc(a.line)} · games ${w.from}–${w.to}</small></div>`).join('')}</div>`,
+    say:P.map((a,i)=>`${i?'And in the '+a.conf:a.conf==='League'?'Our':'In the '+a.conf+', our'}${i?', it\'s':' Player of the Week is'} ${a.name} of ${theTeam(tname(a.team))}: ${a.s.H} hit${a.s.H===1?'':'s'}, ${a.s.HR} home run${a.s.HR===1?'':'s'} and ${a.s.RBI} RBI over games ${w.from} through ${w.to}.`).join(' ')};
+}
+
+/* ---------- season awards: Rookie of the Year and Slugger of the Year join the MVP, HR king and batting title ---------- */
+function moreAwards(stats,o){
+  const rows=Object.entries(stats).map(([name,s])=>({name,s})).filter(r=>r.s.PA>0&&F.teams[r.s.team]);
+  const rook=n=>!(F.career&&F.career[n]&&F.career[n].seasons>0), sc=s=>pscore(s)+ops(s)*20;
+  let R=rows.filter(r=>rook(r.name)); if(R.length>1&&o&&o.mvp) R=R.filter(r=>r.name!==o.mvp.name);
+  const rq=R.filter(r=>r.s.PA>=MIN_PA/2); if(rq.length) R=rq;
+  const roy=R.sort((a,b)=>sc(b.s)-sc(a.s))[0]||null;
+  const sq=rows.filter(r=>r.s.PA>=MIN_PA), slugger=(sq.length?sq:rows).sort((a,b)=>slg(b.s)-slg(a.s)||b.s.HR-a.s.HR)[0]||null;
+  return {roy:roy&&{name:roy.name,team:roy.s.team,line:`${f3(avg(roy.s))}, ${roy.s.HR} HR, ${roy.s.RBI} RBI`},
+    slug:slugger&&{name:slugger.name,team:slugger.s.team,line:`${f3(slg(slugger.s))} slugging, ${slugger.s.HR} HR`},
+    potw:potwList().map(w=>Object.assign({},w,{W:w.W&&Object.assign({},w.W,{s:undefined}),E:w.E&&Object.assign({},w.E,{s:undefined}),L:w.L&&Object.assign({},w.L,{s:undefined})}))};
+}
+/* the Awards tab: this season's Players of the Week, the season awards, and every season's winners */
+function awardsTabHTML(){
+  const L=potwList(), A=F.phase!=='reg'?F.awards:null;
+  const pw=L.length?`<div class="hcard"><h4>Players of the Week · Season ${F.season}</h4><div class="tscroll"><table class="tbl"><thead><tr><th class="l">Games</th>${confOn()?'<th class="l">West</th><th class="l">East</th>':'<th class="l">Player</th>'}</tr></thead><tbody>${L.map(w=>`<tr><td class="l">${w.from}–${w.to}</td>${(confOn()?[w.W,w.E]:[w.L]).map(a=>`<td class="l">${a?`${tdot(a.team)}<b>${esc(a.name)}</b> <small style="color:var(--muted)">${esc(a.line)}</small>`:''}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div>`
+    :`<div class="hcard"><h4>Players of the Week</h4><p class="empty2">The first Player of the Week is named after game 10.</p></div>`;
+  const H=F.history.slice().reverse(), who=a=>a?`${F.teams[a.team]?tdot(a.team):''}${esc(a.name)}`:'';
+  const hist=H.length?`<div class="hcard"><h4>Award winners</h4><div class="tscroll"><table class="tbl"><thead><tr><th class="l">Season</th><th class="l">MVP</th><th class="l">Rookie of the Year</th><th class="l">Slugger of the Year</th><th class="l">HR king</th><th class="l">Batting title</th></tr></thead><tbody>${H.map(h=>{ const a=h.awards||{}; return `<tr><td class="l">${h.season}</td><td class="l">${who(a.mvp)}</td><td class="l">${who(a.roy)}</td><td class="l">${who(a.slug)}</td><td class="l">${who(a.hr)}</td><td class="l">${who(a.bat)}</td></tr>`; }).join('')}</tbody></table></div></div>`:'';
+  return `${A?awardsHTML(A):''}${pw}${hist}`;
+}
+/* the TV show's playoff picture with the wild card */
+function poTvSeg(u){
+  const c=F.po.cs, by=k=>Object.keys(c).find(id=>c[id]===k), rec=id=>`${F.rec[id].w}–${F.rec[id].l}`, nm=id=>tname(id);
+  const tm=(k)=>{ const id=by(k); return `<div>${tdot(id)}<i>${k}</i>${esc(nm(id))}<small>${rec(id)}</small></div>`; };
+  const mine=c[u];
+  return {tag:'Playoffs',title:'The playoff picture',html:`<div class="tvbr"><div class="tvm">${tm('W2')}${tm('W3')}</div><div class="tvm">${tm('E2')}${tm('E3')}</div></div><p class="tvnote">Wild card: one game at the 2 seed. The winners face ${esc(nm(by('W1')))} (W1) and ${esc(nm(by('E1')))} (E1) in the best-of-3 conference finals.</p>`,
+    say:`On to the playoffs. ${TheTeam(nm(by('W1')))} and ${theTeam(nm(by('E1')))} earn the top seeds and a bye. In the West wild card game, ${theTeam(nm(by('W2')))} host ${theTeam(nm(by('W3')))}. In the East, ${theTeam(nm(by('E2')))} host ${theTeam(nm(by('E3')))}. One game, winner moves on.${mine?` Good luck to ${theTeam(nm(u))}.`:''}`};
+}
+function confLegend(){
+  return poWcOn()?'The top three in each conference make the playoffs (dashed line). The 2 and 3 seeds meet in a one-game wild card, and the winner plays the 1 seed in a best-of-3 conference final. The West and East champions meet in the best-of-7 Floodlight Series, with home field going to the conference that won the All-Star Game.'
+    :'The top two in each conference make the playoffs (dashed line). The conference finals are best of 3; the West and East champions meet in the best-of-7 Floodlight Series, with home field going to the conference that won the All-Star Game.';
+}
+TABS.splice(TABS.findIndex(t=>t[0]==='standings')+1,0,['playoffs','Playoffs']);
+TABS.splice(TABS.findIndex(t=>t[0]==='champs'),0,['awards','Awards']);
+
+window.__fdl={addon:{ACHD:()=>ACHD,CHD:()=>CHD,DAYD:()=>DAYD,FSET:()=>FSET,start:id=>startChallenge(id==='daily'?dailyFor(today()):CH_BY[id]),achUnlock,openSettings,openAchievements,openChallenges,litActions,padPress,layerRoot,chFinal,buildChallenge,CHALL,ACHS,dailyFor,badgeSVG,exitChallenge,startTutorial,TUT:()=>TUT,FIELD:()=>FIELD,VO:()=>VO,voSay,voPick,voName,voBatter,fieldCheck,sfx:()=>sfx,parkSync,parkFor,PARK:()=>PARK_CUR,FR_CLUBS:()=>FR_CLUBS,trGain,plValue,drGet,lgOps,TR:()=>TR,stretchScene:()=>stretchScene(),crowdCanvas,asgSim,asgPending,asgStart,confOf,drOrder,genLogoKey,poWatch,poIn,potwList,seedTag,tvSegments:m=>tvSegments(m),activeSeries:()=>activeSeries()}, get G(){return G}, get F(){return F}, get busy(){return busy}, setOpp:o=>setOpp(o,true), cpuPick:()=>cpuPick(), showFinal:()=>showFinal(), playWhole, MODES, ACTIONS, ABIL, DHS, P, render:()=>renderGame(),
   setHand:(t,ids)=>{ G.hands[t]=ids.slice(); renderGame(); }, setBases:b=>{ G.bases=b.slice(); renderGame(); }, setOuts:n=>{ G.outs=n; renderGame(); },
   setInning:(i,h)=>{ G.inning=i; G.half=h; G.halfPA=0; while(G.line[0].length<i) G.line[0].push(0); while(G.line[1].length<i-(h?0:1)) G.line[1].push(0); renderGame(); },
   setIdx:(t,i)=>{ G.idx[t]=i; renderGame(); }, activeAbils:t=>activeAbils(t), runAbility:(t,i)=>runAbility(t,activeAbils(t)[i]), newGame, openHub, frCreate:(n,a)=>{ frCreate(n,a); setFrUI(); }, frPregame, frSimToPlayoffs, frSimPlayoffs, frSimUser, frNextSeason, frResume, frExit, genPlayerCard, cardSrc, snapshot, applySnap, toCode, fromCode, openSaves, editQuickNames, frEditNames, quickGame, get tipsOn(){return tipsOn}};
