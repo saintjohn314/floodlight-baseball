@@ -1,0 +1,83 @@
+name: iPhone app
+# Builds the Floodlight Baseball iPhone app on one of GitHub's Macs, so no Mac of your own is needed.
+#  - With no Apple keys set up it only checks that the app builds (for the iPhone simulator).
+#  - Once these four repository secrets exist (Settings > Secrets and variables > Actions), it signs the app
+#    and uploads it to App Store Connect, where it shows up in TestFlight and can be sent for App Store review:
+#      APPLE_TEAM_ID   your Team ID (developer.apple.com > Account > Membership details)
+#      ASC_KEY_ID      an App Store Connect API key's Key ID (App Store Connect > Users and Access > Integrations, Admin access)
+#      ASC_ISSUER_ID   the Issuer ID shown above that key list
+#      ASC_KEY_P8      the whole text of the AuthKey_XXXXXXXXXX.p8 file you downloaded for that key
+on:
+  workflow_dispatch:
+    inputs:
+      source:
+        description: The app project to build (a zip of the mobile folder)
+        default: https://floodlight-baseball-dice-lab.netlify.app/dl/floodlight-ios-src.zip
+permissions:
+  contents: read
+jobs:
+  ios:
+    runs-on: macos-26
+    timeout-minutes: 75
+    env:
+      HAS_KEYS: ${{ secrets.ASC_KEY_P8 != '' && secrets.ASC_KEY_ID != '' && secrets.ASC_ISSUER_ID != '' && secrets.APPLE_TEAM_ID != '' }}
+    steps:
+      - name: Get the app project
+        run: |
+          curl -fsSL "${{ inputs.source }}" -o src.zip
+          unzip -q src.zip -d src
+          ls src/mobile
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Capacitor and copy the game into the app
+        working-directory: src/mobile
+        run: |
+          npm ci --omit=dev
+          npx cap sync ios
+      - name: Use the newest Xcode
+        run: |
+          X=$(ls -d /Applications/Xcode_*.app | sort -V | tail -1)
+          sudo xcode-select -s "$X"
+          xcodebuild -version
+      - name: Build for the iPhone simulator (checks the app builds)
+        if: env.HAS_KEYS != 'true'
+        working-directory: src/mobile/ios/App
+        run: |
+          xcodebuild -project App.xcodeproj -scheme App -configuration Debug -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' -derivedDataPath build CODE_SIGNING_ALLOWED=NO build
+          cd build/Build/Products/Debug-iphonesimulator && zip -qry "$GITHUB_WORKSPACE/FloodlightBaseball-simulator.zip" App.app
+      - uses: actions/upload-artifact@v4
+        if: env.HAS_KEYS != 'true'
+        with:
+          name: FloodlightBaseball-simulator
+          path: FloodlightBaseball-simulator.zip
+      - name: Sign and send to App Store Connect (TestFlight)
+        if: env.HAS_KEYS == 'true'
+        working-directory: src/mobile/ios/App
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: |
+          KEY="$RUNNER_TEMP/AuthKey_$ASC_KEY_ID.p8"
+          printf '%s\n' "$ASC_KEY_P8" > "$KEY"
+          AUTH=(-allowProvisioningUpdates -authenticationKeyPath "$KEY" -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID")
+          xcodebuild -project App.xcodeproj -scheme App -configuration Release -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/App.xcarchive" DEVELOPMENT_TEAM="$APPLE_TEAM_ID" CODE_SIGN_STYLE=Automatic \
+            CURRENT_PROJECT_VERSION="$GITHUB_RUN_NUMBER" "${AUTH[@]}" archive
+          cat > "$RUNNER_TEMP/export.plist" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>upload</string>
+            <key>teamID</key><string>$APPLE_TEAM_ID</string>
+            <key>signingStyle</key><string>automatic</string>
+          </dict></plist>
+          PLIST
+          xcodebuild -exportArchive -archivePath "$RUNNER_TEMP/App.xcarchive" -exportOptionsPlist "$RUNNER_TEMP/export.plist" \
+            -exportPath "$RUNNER_TEMP/export" "${AUTH[@]}"
+          rm -f "$KEY"
+          echo "Uploaded build $GITHUB_RUN_NUMBER. It appears in App Store Connect > TestFlight after Apple finishes processing (about 10-30 minutes)."
