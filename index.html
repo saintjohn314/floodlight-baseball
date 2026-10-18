@@ -1134,6 +1134,21 @@ html.rm .stretch image.crowd{animation:none}
 @media (max-width:560px){.asgrid{grid-template-columns:1fr}}
 .confst .tbl{table-layout:fixed}
 .confst .tbl th.l,.confst .tbl td.l{width:44%}
+/* ---------- the iPhone and Android apps (html.app): the game is drawn edge to edge, so keep it clear of the notch,
+   the rounded corners and the home bar, and make it feel like an app rather than a web page ---------- */
+html.app{--sa-t:env(safe-area-inset-top,0px);--sa-r:env(safe-area-inset-right,0px);--sa-b:env(safe-area-inset-bottom,0px);--sa-l:env(safe-area-inset-left,0px);-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%;text-size-adjust:100%;overscroll-behavior:none}
+html.app body{overscroll-behavior:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+html.app input,html.app textarea,html.app .sel,html.app code{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
+html.app .wrap{padding-top:calc(10px + var(--sa-t));padding-left:calc(16px + var(--sa-l));padding-right:calc(16px + var(--sa-r));padding-bottom:calc(40px + var(--sa-b))}
+html.app .ov,html.app .ov2,html.app .hub,html.app .ynwrap{padding:calc(16px + var(--sa-t)) calc(16px + var(--sa-r)) calc(16px + var(--sa-b)) calc(16px + var(--sa-l))}
+html.app .menu,html.app .tv{box-sizing:border-box;padding:var(--sa-t) var(--sa-r) var(--sa-b) var(--sa-l)}
+html.app .achtoast{top:calc(14px + var(--sa-t))}
+html.app .stretch .bug{left:calc(16px + var(--sa-l));right:calc(16px + var(--sa-r))}
+html.app .mquit{right:calc(16px + var(--sa-r))}
+html.app .mver{left:calc(16px + var(--sa-l))}
+@media (max-width:560px){html.app .park{width:calc(100% + 32px + var(--sa-l) + var(--sa-r));margin-left:calc(-16px - var(--sa-l))!important;margin-right:calc(-16px - var(--sa-r))!important}}
+/* short screens (a phone on its side, a small laptop window): the title menu scrolls instead of losing its top */
+@media (max-height:560px){.menu{overflow-y:auto;align-items:flex-start}.mcontent{margin:auto 0;padding-block:14px;gap:6px}.mlogo{font-size:clamp(40px,9vh + 16px,90px)}.mplay{margin-top:6px;padding:8px 40px}}
 </style>
 </head>
 <body>
@@ -3148,6 +3163,7 @@ ${ADDON_READY?ksLine():""}
     const text=F.share+(best?` Player of the game: ${best.name} (${statLine(best.b)}).`:''), full=text+' Play it: '+SITE_URL, note=$('fNote');
     const show=html=>{ note.hidden=false; note.innerHTML=html; };
     const manual=()=>show(`Copy this and post it anywhere:<span class="sel">${esc(full)}</span>`);
+    if(ADDON_READY&&IS_APP){ appShare({title:'Floodlight Baseball', text, url:SITE_URL}).catch(manual); return; }
     if(navigator.share){ navigator.share({title:'Floodlight Baseball', text, url:SITE_URL}).catch(e=>{ if(e && e.name!=='AbortError') manual(); }); return; }
     if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(full).then(()=>show('Copied. Paste it anywhere: X, Discord, a text.')).catch(manual); return; }
     manual();
@@ -3696,6 +3712,7 @@ ${frExpandHTML()}<h4 style="margin-top:8px">Saving</h4><p>Your franchise saves a
 <h4 style="margin-top:8px">Leave or restart</h4><div class="hbtns"><button class="btn" type="button" data-act="exit">Exit to quick games</button><button class="btn danger" type="button" data-act="reset">Delete franchise</button></div></div></div>`;
 }
 function exportSave(){
+  if(ADDON_READY&&IS_APP){ appSaveFile(new File([JSON.stringify(F)],`floodlight-franchise-season-${F.season}.json`,{type:'application/json'})).catch(()=>{}); return; }
   const blob=new Blob([JSON.stringify(F)],{type:'application/json'}), a=document.createElement('a');
   a.href=URL.createObjectURL(blob); a.download=`floodlight-franchise-season-${F.season}.json`; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500);
 }
@@ -4078,6 +4095,7 @@ async function fromCode(code){
 function saveFile(){
   const b=snapshot(), d=new Date(), name=`floodlight-save-${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}.json`;
   const file=new File([JSON.stringify(b)],name,{type:'application/json'});
+  if(ADDON_READY&&IS_APP) return appSaveFile(file).catch(()=>'Couldn’t open the share sheet. Use a save code instead.');
   if(navigator.canShare && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) && navigator.canShare({files:[file]})){
     return navigator.share({files:[file],title:'Floodlight Baseball save'}).then(()=>'Shared. Save it to Files, Drive, or send it to yourself.').catch(e=>e&&e.name==='AbortError'?'':downloadFile(file));
   }
@@ -4097,7 +4115,7 @@ function openSaves(firstMsg){
     ov.innerHTML=`<div class="ovcard pre saves" role="dialog" aria-modal="true" aria-labelledby="svT">
 <button class="x" type="button" id="svX" aria-label="Close">×</button>
 <span class="aside" style="color:var(--flood)">Save &amp; load</span><h3 id="svT">Your games, saved</h3>
-<p class="frnote"><b>Autosave is on.</b> Every roll is saved on this device. Close the tab or lock your phone mid-inning and the game is waiting right where you left it.<br><span style="color:var(--muted)">Right now: ${esc(describeSnap(cur))}</span></p>
+<p class="frnote"><b>Autosave is on.</b> Every roll is saved on this device. ${ADDON_READY&&IS_APP?'Close the app or lock your phone':'Close the tab or lock your phone'} mid-inning and the game is waiting right where you left it.<br><span style="color:var(--muted)">Right now: ${esc(describeSnap(cur))}</span></p>
 ${msg?`<p class="frnote" role="status">${msg}</p>`:''}
 <h4 class="svh">Franchises · up to 3</h4><ol class="slots">${[1,2,3].map(frRow).join('')}</ol>
 <p class="svsub">${frFull()?'All three slots are full. To start a fourth franchise, tap <b>New here</b> on the one you want to replace.':'Tap <b>Start new franchise</b> on an empty slot. Each franchise keeps its own seasons, stats and records.'}</p>
@@ -4479,6 +4497,10 @@ if(/(^|[#&])play\b/.test(location.hash)) closeMenu(); else openMenu();
 var ADDON_READY = false; // the game's own start-up runs before this code; hooks wait for it
 const NATIVE = (typeof window!=='undefined' && window.fdlNative) || null; // set by the desktop app's preload script
 const IS_DESKTOP = !!(NATIVE && NATIVE.isDesktop);
+/* the iPhone and Android apps (Capacitor): the page runs inside the app, with the native bridge as window.Capacitor */
+const CAP = (typeof window!=='undefined' && window.Capacitor && typeof window.Capacitor.isNativePlatform==='function' && window.Capacitor.isNativePlatform()) ? window.Capacitor : null;
+const IS_APP = !!CAP;
+const APP_OS = CAP ? String(CAP.getPlatform()) : '';
 const GAME_VERSION = '1.5.0';
 const FULL_GAME = true; /*@edition*/ // the website is the free demo; build.py turns this on for the Steam game
 
@@ -4524,7 +4546,7 @@ async function setFull(on){
   if(IS_DESKTOP && NATIVE.setFullscreen){ FSET.fs=!!on; saveSet(); try{ await NATIVE.setFullscreen(!!on); }catch(e){} return; }
   try{ if(on && !document.fullscreenElement) await document.documentElement.requestFullscreen(); else if(!on && document.fullscreenElement) await document.exitFullscreen(); }catch(e){}
 }
-const canFull = () => IS_DESKTOP || !!(document.fullscreenEnabled && document.documentElement.requestFullscreen);
+const canFull = () => !IS_APP && (IS_DESKTOP || !!(document.fullscreenEnabled && document.documentElement.requestFullscreen));
 
 function openSettings(back){
   const lights=!$('park').classList.contains('off');
@@ -4546,12 +4568,12 @@ ${IS_DESKTOP?`<div class="srow"><span class="sl"><b>Interface size</b><small>Big
 <div class="srow"><span class="sl"><b>Announcer, sound effects, crowd</b><small>Switches and volume for each.</small></span><button class="btn small" type="button" id="setAudio">Audio settings</button></div>
 <div class="srow"><span class="sl"><b>Play-by-play calls</b><small>The recorded announcer calls every play and introduces the hitters.</small></span>${segHTML('voice',[['true','On'],['false','Off']],FSET.voice!==false)}</div>
 <div class="srow"><span class="sl"><b>Device voice for the TV show</b><small>The franchise TV show and championship call can be read by your device's built-in voice. Off shows them as captions. The pregame and postgame calls always use the recorded announcer.</small></span>${segHTML('tts',[['true','On'],['false','Off']],FSET.tts!==false)}</div>
-<div class="srow"><span class="sl"><b>Controller rumble</b><small>A buzz on home runs, grand slams and walk-offs.</small></span>${segHTML('rumble',[['true','On'],['false','Off']],FSET.rumble)}</div>
+<div class="srow"><span class="sl"><b>${IS_APP?'Vibration':'Controller rumble'}</b><small>${IS_APP?'A tap when you roll, and a buzz on home runs, grand slams and walk-offs.':'A buzz on home runs, grand slams and walk-offs.'}</small></span>${segHTML('rumble',[['true','On'],['false','Off']],FSET.rumble)}</div>
 </section>
 <section class="xsec"><h4>Controls</h4>${controlsHTML()}</section>
 <section class="xsec"><h4>More</h4>
 <div class="ovbtns"><button class="btn" type="button" id="setAch">Achievements</button><button class="btn" type="button" id="setCh">Clutch Challenges</button><button class="btn" type="button" id="setTut">Guided first game</button><button class="btn" type="button" id="setCred">Credits</button>${IS_DESKTOP?'':'<button class="btn" type="button" id="setGuide">How to play</button>'}</div>
-<p class="xsub" style="margin:0;color:var(--muted);font-size:12px">Floodlight Baseball ${GAME_VERSION}${IS_DESKTOP?' · desktop':''}</p>
+<p class="xsub" style="margin:0;color:var(--muted);font-size:12px">Floodlight Baseball ${GAME_VERSION}${IS_DESKTOP?' · desktop':IS_APP?(APP_OS==='ios'?' · iPhone':' · Android'):''}</p>
 </section></div>`;
   openX(html, {back});
   ov2.querySelectorAll('[data-set]').forEach(g=>g.addEventListener('click',e=>{
@@ -5553,7 +5575,7 @@ document.addEventListener('keydown',e=>{
 const PADB={A:0,B:1,X:2,Y:3,LB:4,RB:5,LT:6,RT:7,VIEW:8,MENU:9,UP:12,DOWN:13,LEFT:14,RIGHT:15};
 const padState={prev:[], held:{}, next:{}, run:false, barT:0};
 function padsNow(){ try{ return [...(navigator.getGamepads?navigator.getGamepads():[])].filter(p=>p&&p.connected); }catch(e){ return []; } }
-function rumble(mag,ms){ if(!FSET.rumble) return; for(const p of padsNow()){ try{ const v=p.vibrationActuator; if(v&&v.playEffect) v.playEffect('dual-rumble',{duration:ms,strongMagnitude:Math.min(1,mag),weakMagnitude:Math.min(1,mag*.75)}).catch(()=>{}); }catch(e){} } }
+function rumble(mag,ms){ if(!FSET.rumble) return; if(IS_APP){ appBuzz(mag,ms); return; } for(const p of padsNow()){ try{ const v=p.vibrationActuator; if(v&&v.playEffect) v.playEffect('dual-rumble',{duration:ms,strongMagnitude:Math.min(1,mag),weakMagnitude:Math.min(1,mag*.75)}).catch(()=>{}); }catch(e){} } }
 function padPress(btn){
   inputMode('pad');
   if(tutPad(btn)) return;
@@ -5972,7 +5994,7 @@ function autoCpuTry(){
   const anchor=$('annBtn'); anchor.parentNode.insertBefore(b,anchor.nextSibling);
   b.addEventListener('click',()=>openSettings());
   $('lights').addEventListener('click',()=>achLights(!$('park').classList.contains('off')));
-  if(IS_DESKTOP) $('fs').hidden=true; // the desktop app has its own full-screen switch in Settings (and F11)
+  if(IS_DESKTOP||IS_APP) $('fs').hidden=true; // the desktop app has its own full-screen switch in Settings (and F11)
 })();
 
 /* the tabletop edition: set KICKSTARTER_URL once the campaign page is live; until then the links go to the launch list */
@@ -6031,7 +6053,7 @@ function openCredits(back){
 <section class="xsec"><h4>Game</h4><p class="credp"><b>Floodlight Baseball</b> created by <b>John Wood</b>, Seattle, Washington. Inspired by the dice game his family played on nights too dark for baseball.</p></section>
 <section class="xsec"><h4>Sound</h4><p class="credp">Play-by-play voice made with the <b>Kokoro-82M</b> open voice model (Apache License 2.0).<br>Crowd made with the <b>Piper</b> LibriTTS voice model (LibriTTS corpus by Zen et al., CC BY 4.0).<br>Organ: “Take Me Out to the Ball Game” (Albert Von Tilzer, 1908, public domain). Bat, mitt and dice sounds are synthesized live.</p></section>
 <section class="xsec"><h4>Fonts</h4><p class="credp">Barlow and Barlow Condensed (Jeremy Tribby), DM Mono (Colophon Foundry), DotGothic16 (Fontworks), Yellowtail (Astigmatic). All under the SIL Open Font License 1.1.</p></section>
-${IS_DESKTOP?'<section class="xsec"><h4>Software</h4><p class="credp">Built with Electron (MIT License) and steamworks.js (MIT License). Steam and the Steam logo are trademarks of Valve Corporation.</p></section>':''}
+${IS_DESKTOP?'<section class="xsec"><h4>Software</h4><p class="credp">Built with Electron (MIT License) and steamworks.js (MIT License). Steam and the Steam logo are trademarks of Valve Corporation.</p></section>':''}${IS_APP?'<section class="xsec"><h4>Software</h4><p class="credp">Built with Capacitor (MIT License).</p></section>':''}
 <div class="ovbtns"><button class="btn primary" type="button" data-x data-focus>Close</button></div></div>`,{back});
 }
 
@@ -6648,6 +6670,110 @@ function genLogoKey(T){
   }
   return key;
 }
+
+/* ---------- the iPhone and Android apps ----------
+   Everything here only runs inside the phone apps (IS_APP, the Capacitor build in mobile/). It adds what a phone app
+   needs and a browser tab doesn't: the Android back button, saving and going quiet when the app is put away, a backup
+   copy of every save in the app's own files, the phone's vibration, sharing save files through the share sheet,
+   and room for the notch and the home bar (the CSS for that is in addons.css under html.app). */
+const MAPP={plug:{}, ctxs:[], quiet:[], bkTimer:0, bkBusy:false, bkAgain:false, bkSlot:0, bkLast:'', ready:false};
+function appPlug(n){
+  if(!CAP) return null;
+  if(MAPP.plug[n]!==undefined) return MAPP.plug[n];
+  let p=null; try{ p=(CAP.Plugins&&CAP.Plugins[n])||(typeof CAP.registerPlugin==='function'?CAP.registerPlugin(n):null); }catch(e){ p=null; }
+  return (MAPP.plug[n]=p);
+}
+const appQ=pr=>{ try{ if(pr&&pr.catch) pr.catch(()=>{}); }catch(e){} return pr; };
+
+/* vibration: rumble() sends phones here; a light tap on every roll */
+function appBuzz(mag,ms){
+  const H=appPlug('Haptics'); if(!H) return;
+  const st=mag>=.9?'HEAVY':mag>=.5?'MEDIUM':'LIGHT';
+  try{ appQ(H.impact({style:st}));
+    if(ms>=300) setTimeout(()=>appQ(H.impact({style:st})),150);
+    if(ms>=600) setTimeout(()=>appQ(H.impact({style:'HEAVY'})),330); }catch(e){}
+}
+function appTap(){ if(!IS_APP||!FSET.rumble) return; const H=appPlug('Haptics'); try{ if(H) appQ(H.impact({style:'LIGHT'})); }catch(e){} }
+
+/* sharing: the share sheet for save files and results (Android's web view has no navigator.share) */
+async function appSaveFile(file){
+  const FS=appPlug('Filesystem'), SH=appPlug('Share'); if(!FS||!SH) throw new Error('no share');
+  const text=await file.text();
+  const w=await FS.writeFile({path:file.name, data:text, directory:'CACHE', encoding:'utf8'});
+  try{ await SH.share({title:'Floodlight Baseball save', files:[w.uri], dialogTitle:'Save or send your game'}); }
+  catch(e){ if(/cancel/i.test(String(e&&e.message||e))) return ''; throw e; }
+  return 'Shared. Save it to Files or Drive, or send it to yourself.';
+}
+function appShare(o){ const SH=appPlug('Share'); if(!SH) return Promise.reject(new Error('no share'));
+  return SH.share({title:o.title, text:o.text, url:o.url, dialogTitle:'Share'}).catch(e=>{ if(/cancel/i.test(String(e&&e.message||e))) return; throw e; }); }
+
+/* a backup of every save in the app's own files. The web view's storage is normally safe, but a phone that runs
+   low on space can clear it; if that happens, the game comes back from this copy the next time it opens.
+   Two copies are kept and written in turn, so a write cut off halfway never costs the last good one. */
+const APP_BK=['floodlight-saves-a.json','floodlight-saves-b.json'];
+function appSnap(){ const o={}; try{ for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k!=null) o[k]=localStorage.getItem(k); } }catch(e){} return o; }
+const appKeepers=o=>Object.keys(o).filter(k=>/^fdl-(franchise|ach|case|challenges|save|slot|quick-live)/.test(k));
+const APP_ALIVE='fdl-app-alive'; // set once the app has checked its storage; gone means the web view's storage was wiped
+async function appBackup(){
+  const FS=appPlug('Filesystem'); if(!FS||!MAPP.ready) return;
+  if(MAPP.bkBusy){ MAPP.bkAgain=true; return; }
+  const ls=appSnap(); if(!appKeepers(ls).length) return; // nothing worth keeping yet
+  const body=JSON.stringify(ls); if(body===MAPP.bkLast) return;
+  MAPP.bkBusy=true;
+  try{ await FS.writeFile({path:APP_BK[MAPP.bkSlot], data:JSON.stringify({v:1, at:Date.now(), ver:GAME_VERSION, ls}), directory:'DATA', encoding:'utf8'});
+    MAPP.bkSlot=1-MAPP.bkSlot; MAPP.bkLast=body; }
+  catch(e){} finally{ MAPP.bkBusy=false; if(MAPP.bkAgain){ MAPP.bkAgain=false; appBackup(); } }
+}
+function appBackupSoon(){ if(!IS_APP) return; clearTimeout(MAPP.bkTimer); MAPP.bkTimer=setTimeout(appBackup,4000); }
+async function appRestore(){
+  const FS=appPlug('Filesystem');
+  const done=()=>{ try{ localStorage.setItem(APP_ALIVE,'1'); }catch(e){} MAPP.ready=true; };
+  let alive=null; try{ alive=localStorage.getItem(APP_ALIVE); }catch(e){}
+  if(alive||!FS){ done(); return; }
+  let best=null;
+  for(const path of APP_BK){ try{ const r=await FS.readFile({path, directory:'DATA', encoding:'utf8'}); const o=JSON.parse(r.data); if(o&&o.ls&&(!best||o.at>best.at)) best=o; }catch(e){} }
+  if(!best||!appKeepers(best.ls).length){ done(); return; } // a first launch: nothing to bring back
+  try{ for(const k of Object.keys(best.ls)) localStorage.setItem(k,best.ls[k]); localStorage.setItem(APP_ALIVE,'1'); }catch(e){ done(); return; }
+  try{ sessionStorage.setItem('fdl-restored','1'); }catch(e){}
+  location.reload();
+}
+
+/* Android's back button: close whatever is open; in a game it opens the menu; on the menu it puts the app away */
+function appBack(){
+  const root=layerRoot();
+  if(root===$('menu')){ try{ autoSave(); }catch(e){} appBackup(); const A=appPlug('App'); if(A&&A.minimizeApp) appQ(A.minimizeApp()); return; }
+  if(root){ goBack(); return; }
+  if(G){ openMenuF(); return; }
+}
+/* put away / brought back: save, back up, and hush the stadium so it doesn't play on in a pocket */
+function appAway(){
+  try{ if(!busy) autoSave(); }catch(e){}
+  appBackup();
+  MAPP.quiet=MAPP.ctxs.filter(c=>{ try{ if(c.state==='running'){ appQ(c.suspend()); return true; } }catch(e){} return false; });
+  try{ if(window.speechSynthesis) speechSynthesis.cancel(); }catch(e){}
+}
+function appBack2(){ for(const c of MAPP.quiet){ try{ appQ(c.resume()); }catch(e){} } MAPP.quiet=[]; }
+
+function appInit(){
+  if(!IS_APP) return;
+  const H=document.documentElement; H.classList.add('app', 'app-'+APP_OS);
+  if($('fs')) $('fs').hidden=true;
+  // keep track of the game's audio so it can be paused with the app
+  const C=window.AudioContext||window.webkitAudioContext;
+  if(C&&!C.__fdlApp){ const W=function(...a){ const c=new C(...a); MAPP.ctxs.push(c); return c; }; W.prototype=C.prototype; W.__fdlApp=true; window.AudioContext=W; window.webkitAudioContext=W; }
+  // every change to the saves schedules a backup
+  try{ const sp=Storage.prototype, set=sp.setItem, rem=sp.removeItem;
+    sp.setItem=function(k,v){ set.call(this,k,v); if(this===window.localStorage) appBackupSoon(); };
+    sp.removeItem=function(k){ rem.call(this,k); if(this===window.localStorage) appBackupSoon(); }; }catch(e){}
+  document.addEventListener('click',e=>{ const t=e.target; if(t&&t.closest&&t.closest('#roll')) appTap(); },true);
+  const A=appPlug('App');
+  if(A){ try{ appQ(A.addListener('backButton',()=>appBack()));
+    appQ(A.addListener('appStateChange',s=>{ if(s&&s.isActive) appBack2(); else appAway(); })); }catch(e){} }
+  document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden') appAway(); else appBack2(); });
+  appRestore().then(()=>appBackupSoon());
+  try{ if(sessionStorage.getItem('fdl-restored')){ sessionStorage.removeItem('fdl-restored'); setTimeout(()=>{ if(G) toast(G.half,'Your saved games were brought back from the app’s backup.',''); },2500); } }catch(e){}
+}
+appInit();
 
 window.__fdl={addon:{ACHD:()=>ACHD,CHD:()=>CHD,DAYD:()=>DAYD,FSET:()=>FSET,start:id=>startChallenge(id==='daily'?dailyFor(today()):CH_BY[id]),achUnlock,openSettings,openAchievements,openChallenges,litActions,padPress,layerRoot,chFinal,buildChallenge,CHALL,ACHS,dailyFor,badgeSVG,exitChallenge,startTutorial,TUT:()=>TUT,FIELD:()=>FIELD,VO:()=>VO,voSay,voPick,voName,voBatter,fieldCheck,sfx:()=>sfx,parkSync,parkFor,PARK:()=>PARK_CUR,FR_CLUBS:()=>FR_CLUBS,trGain,plValue,drGet,lgOps,TR:()=>TR,stretchScene:()=>stretchScene(),crowdCanvas,asgSim,asgPending,asgStart,confOf,drOrder,genLogoKey}, get G(){return G}, get F(){return F}, get busy(){return busy}, setOpp:o=>setOpp(o,true), cpuPick:()=>cpuPick(), showFinal:()=>showFinal(), playWhole, MODES, ACTIONS, ABIL, DHS, P, render:()=>renderGame(),
   setHand:(t,ids)=>{ G.hands[t]=ids.slice(); renderGame(); }, setBases:b=>{ G.bases=b.slice(); renderGame(); }, setOuts:n=>{ G.outs=n; renderGame(); },
