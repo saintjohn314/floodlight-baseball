@@ -1184,8 +1184,6 @@ html.app .mver{left:calc(16px + var(--sa-l))}
 .prd{font-family:var(--f-head);font-weight:700;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--flood);opacity:.8;margin-top:2px}
 .pbox.csbox{border-color:rgba(255,200,97,.35)}
 /* ---------- contracts and free agency (src/js/61-contracts.js) ---------- */
-.ctbar{height:10px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;border:1px solid var(--line)}
-.ctbar div{height:100%;background:linear-gradient(90deg,#3fae5a,#ffc861 70%,#e5533d)}
 .tbl tr.exp td{background:rgba(255,200,97,.07)}
 .ctx{font-style:normal;font-size:11px;color:var(--flood);margin-left:4px;text-transform:uppercase;letter-spacing:.06em}
 .ctact{white-space:nowrap}
@@ -2282,7 +2280,7 @@ function frStory(A,H,kind=FR&&FR.kind){
     }
   } else {
     const day=F.day, left=SEASON_GAMES-day;
-    if(day===0) out.push(F.season===1?`It's Opening Day, the first game in league history.`:`It's Opening Day of Season ${F.season}.`);
+    if(day===0) out.push(F.season===1?`It's Opening Day, the first game in league history.`:`It's Opening Day of the ${frYear(F.season)} season.`);
     else if(left===1) out.push(`It's the final game of the regular season.`);
     else if(day===SEASON_GAMES/2) out.push(`We've reached the halfway point of the season.`);
     if(day>=6&&ADDON_READY&&confOn()) out.push(confRaceLine(u)); else if(day>=6){ const R=frRace(u), st=R.st, nm=Nk(u);
@@ -2354,10 +2352,10 @@ function tvSegments(m){
   const leaderRows=(L,fmt)=>L.length?L.map((x,i)=>`<li><i>${i+1}</i>${tdot(x.s.team)}<span>${esc(x.n)}</span><b>${fmt(x.v)}</b></li>`).join(''):'<li class="none">No qualifier yet</li>';
   // 1. open
   const title=m===10?'The 10-game report':m===20?'The 20-game report':'Regular season wrap-up';
-  segs.push({tag:'Tonight',title,html:`<div class="tvopen"><span class="tvk">Season ${F.season} · ${end?'Final regular season':`After ${m} of ${SEASON_GAMES} games`}</span><b class="tvbig">${title}</b><div class="tvstats"><div><span>League leader</span><b>${dotN(st[0].id)}</b><small>${rec(st[0].id)}</small></div><div><span>Your club</span><b>${dotN(u)}</b><small>${rec(u)} · ${ordinal(st.findIndex(r=>r.id===u)+1)}</small></div>${D.hr[0]?`<div><span>Home run leader</span><b>${tdot(D.hr[0].s.team)}${esc(D.hr[0].n)}</b><small>${D.hr[0].v} HR</small></div>`:''}</div></div>`,
-    say: m===10?`Welcome to Floodlight Tonight! We're ten games into Season ${F.season}, and the league is starting to take shape. Let's get you caught up.`
-      : m===20?`Welcome to Floodlight Tonight! Twenty games down, twelve to go in Season ${F.season}. The stretch run starts now, so let's check the races.`
-      : `Welcome to Floodlight Tonight! Thirty-two games are in the books, and the regular season of Season ${F.season} is over. Let's wrap it all up.`});
+  segs.push({tag:'Tonight',title,html:`<div class="tvopen"><span class="tvk">${frYear(F.season)} season · ${end?'Final regular season':`After ${m} of ${SEASON_GAMES} games`}</span><b class="tvbig">${title}</b><div class="tvstats"><div><span>League leader</span><b>${dotN(st[0].id)}</b><small>${rec(st[0].id)}</small></div><div><span>Your club</span><b>${dotN(u)}</b><small>${rec(u)} · ${ordinal(st.findIndex(r=>r.id===u)+1)}</small></div>${D.hr[0]?`<div><span>Home run leader</span><b>${tdot(D.hr[0].s.team)}${esc(D.hr[0].n)}</b><small>${D.hr[0].v} HR</small></div>`:''}</div></div>`,
+    say: m===10?`Welcome to Floodlight Tonight! We're ten games into the ${frYear(F.season)} season, and the league is starting to take shape. Let's get you caught up.`
+      : m===20?`Welcome to Floodlight Tonight! Twenty games down, twelve to go in the ${frYear(F.season)} season. The stretch run starts now, so let's check the races.`
+      : `Welcome to Floodlight Tonight! Thirty-two games are in the books, and the ${frYear(F.season)} regular season is over. Let's wrap it all up.`});
   // 2. standings
   if(ADDON_READY&&confOn()) segs.push(confTvStandings(end)); else { const lead=st[0], second=st[1], g=gDiff(lead,second), fourth=st[3], fifth=st[4], gap=gDiff(fourth,fifth), ui=st.findIndex(r=>r.id===u), parts=[];
     if(end){ parts.push(`Here are your final standings. ${TheTeam(nm(lead.id))} finish on top at ${rec(lead.id)}${g>0?`, ${gamesWord(g)} ahead of ${theTeam(nm(second.id))}`:', winning first place on run differential'}.`);
@@ -2408,7 +2406,7 @@ function tvShow(m){
   if(!F||document.querySelector('div.tv')) return; const segs=tvSegments(m); let i=-1, t1=0, t2=0, gone=false;
   const tick=[...F.games.filter(g=>g.d===F.day-1).map(g=>`${F.teams[g.a].abbr} ${g.ra}, ${F.teams[g.h].abbr} ${g.rh}${g.inn>9?` (${g.inn})`:''}`), ...frStandings().map((r,k)=>`${k+1}. ${F.teams[r.id].abbr} ${r.w}–${r.l}`)].map(esc).join('<span>•</span>');
   const el=document.createElement('div'); el.className='tv'; el.setAttribute('role','dialog'); el.setAttribute('aria-label','Floodlight Tonight');
-  el.innerHTML=`<div class="tvbg"></div><header class="tvbug"><span class="tvlogo"><b>Floodlight</b><em>Tonight</em></span><span class="tvlive">Live</span><span class="tvsub">Season ${F.season} · ${m==='pre'?'Season preview':m>=SEASON_GAMES?'Regular season final':`After game ${m}`}</span></header>
+  el.innerHTML=`<div class="tvbg"></div><header class="tvbug"><span class="tvlogo"><b>Floodlight</b><em>Tonight</em></span><span class="tvlive">Live</span><span class="tvsub">${frYear(F.season)} season · ${m==='pre'?'Preview':m>=SEASON_GAMES?'Regular season final':`After game ${m}`}</span></header>
 <main class="tvstage"><div class="tvseg" id="tvSeg"></div></main>
 <div class="tvlower"><span class="tvtag" id="tvTag"></span><p id="tvCap"></p></div>
 <footer class="tvfoot"><div class="tvtick"><b>Floodlight</b><div class="tvrun"><div>${tick}<span>•</span>${tick}</div></div></div><div class="tvctl"><span class="tvdots">${segs.map(()=>'<i></i>').join('')}</span><span class="tvhint">Space or click: next story</span><button class="btn small" type="button" id="tvNext">Next ›</button><button class="btn small" type="button" id="tvSkip">Skip show</button></div></footer>`;
@@ -2434,7 +2432,7 @@ function annStart(){ if(G) G.annPrev={inning:G.inning,half:G.half,outs:G.outs,a:
 /* ---------- pregame cutscene: who's playing, what's at stake, then play ball ---------- */
 /* the pregame call: who, the records, and the two biggest storylines */
 function pregameCall(A,H,kind,label){
-  const r=id=>F.rec[id]?`${F.rec[id].w}–${F.rec[id].l}`:'', story=frStory(A,H,kind), kicker=label||`Season ${F.season}`;
+  const r=id=>F.rec[id]?`${F.rec[id].w}–${F.rec[id].l}`:'', story=frStory(A,H,kind), kicker=label||`${frYear(F.season)} season`;
   const open=kind==='po'?`Good evening, and welcome to the ballpark. ${TheTeam(A.name)} take on ${theTeam(H.name)}.`
     :`Good evening, and welcome to the ballpark. ${kicker.replace(/\s*·/g,',')}. ${TheTeam(A.name)}, ${r(A.id)}, take on ${theTeam(H.name)}, ${r(H.id)}.`;
   return {kicker,story,recA:r(A.id),recH:r(H.id),say:`${open} ${story.slice(0,2).join(' ')}`.trim()};
@@ -2473,7 +2471,7 @@ const CUP_SVG=`<svg class="cup" viewBox="0 0 200 240" aria-hidden="true"><defs><
 <ellipse class="shine" cx="70" cy="42" rx="10" ry="22" fill="url(#cupS)" transform="rotate(-18 70 42)"/></svg>`;
 function showTrophy(h){
   if(!F||!h) return; const ov=$('ov'), titles=F.history.filter(x=>x.champ===h.champ).length;
-  ov.onclick=null; ov.innerHTML=`<div class="troph" role="dialog" aria-modal="true" aria-labelledby="trT">${CUP_SVG}<span class="aside">Season ${h.season} · Floodlight Series champions</span><h3 id="trT">${F&&F.teams[h.champ]?teamMark(F.teams[h.champ]):''}${esc(h.champName)}</h3>
+  ov.onclick=null; ov.innerHTML=`<div class="troph" role="dialog" aria-modal="true" aria-labelledby="trT">${CUP_SVG}<span class="aside">${frYear(h.season)} Floodlight Series champions</span><h3 id="trT">${F&&F.teams[h.champ]?teamMark(F.teams[h.champ]):''}${esc(h.champName)}</h3>
 <p>Beat the ${esc(h.runnerName)} <b>${esc(h.score)}</b> in the Floodlight Series.</p>
 ${h.smvp?`<p>Series MVP: <b>${esc(h.smvp.n)}</b>, ${esc(h.smvp.line)}</p>`:''}
 <p>Regular season ${h.user.w}–${h.user.l} · ${titles>1?`Title No. ${titles} for the franchise`:'The first title in franchise history'}</p>
@@ -2490,7 +2488,7 @@ function caseGet(){ try{ const L=JSON.parse(localStorage.getItem(CASE_KEY)); ret
 function caseAdd(e){ const L=caseGet(); L.push(Object.assign({d:Date.now()},e)); while(L.length>400) L.shift(); try{ localStorage.setItem(CASE_KEY,JSON.stringify(L)); }catch(x){} }
 /* your side: your club in a franchise, the team you manage against the computer, both teams in a two-player game */
 function mySides(){ if(G.isFr&&F) return [0,1].filter(i=>G.teams[i].id===F.userId); const me=G.cpu[0]!==G.cpu[1]?(G.cpu[0]?1:0):-1; return me>=0?[me]:[0,1]; }
-const caseWhere=()=>G.challenge?(G.challenge.asg?'All-Star Game':'Clutch Challenge · '+G.challenge.title):G.isFr&&F?`Franchise ${frSlot} · Season ${F.season}`:'Exhibition';
+const caseWhere=()=>G.challenge?(G.challenge.asg?'All-Star Game':'Clutch Challenge · '+G.challenge.title):G.isFr&&F?`Franchise ${frSlot} · ${frYear(F.season)} season`:'Exhibition';
 function caseNote(t,list){ if(list.length) setTimeout(()=>toast(t,`Trophy case: <b>${list.map(e=>CASE_KINDS[e.k][0]+(e.who?` by ${esc(e.who)}`:'')).join(', ')}</b>`,'abil'),1300); }
 function casePlay(){
   if(ADDON_READY&&G&&G.challenge&&G.challenge.watch) return; // nothing from a game you only watched goes in your trophy case
@@ -2505,7 +2503,7 @@ function caseFinal(){
     if(G.walkoff&&t===1) got.push(Object.assign({k:'wo',who:G.last&&G.last.team===1?G.last.batter:''},base));
     got.forEach(caseAdd); caseNote(t,got); }
 }
-function caseTitle(h){ const where=`Franchise ${frSlot} · Season ${h.season}`; if(caseGet().some(e=>e.k==='ch'&&e.where===where)) return; const T=F.teams[h.champ];
+function caseTitle(h){ const where=`Franchise ${frSlot} · ${frYear(h.season)} season`; if(caseGet().some(e=>e.k==='ch'&&frYrText(e.where)===where)) return; const T=F.teams[h.champ];
   caseAdd({k:'ch',team:T.name,color:T.color,vs:h.runnerName,score:h.score,where}); }
 function openCase(){
   const L=caseGet().slice().reverse(), ov=$('ov'), n=k=>L.filter(e=>e.k===k).length;
@@ -2514,7 +2512,7 @@ function openCase(){
 <p class="tcsub">The big moments from your games on this device.</p>
 <div class="tcbad">${Object.entries(CASE_KINDS).map(([k,[nm,ic]])=>`<div class="${n(k)?'':'none'}"><i>${ic}</i><b>${n(k)}</b><span>${nm}</span></div>`).join('')}</div>
 ${L.length?`<ol class="tclist">${L.map(e=>`<li><i>${CASE_KINDS[e.k]?CASE_KINDS[e.k][1]:''}</i><div><b>${esc((CASE_KINDS[e.k]||[''])[0])}${e.who?` · ${esc(e.who)}`:''}</b>
-<span><em style="color:${ink(e.color||'#ffd77a')}">${esc(e.team)}</em>${e.score?` ${esc(e.score)}`:''} vs ${esc(e.vs)}${e.inn?` · ${esc(e.inn)}`:''}</span><small>${esc(e.where)} · ${when(e.d)}</small></div></li>`).join('')}</ol>`
+<span><em style="color:${ink(e.color||'#ffd77a')}">${esc(e.team)}</em>${e.score?` ${esc(e.score)}`:''} vs ${esc(e.vs)}${e.inn?` · ${esc(e.inn)}`:''}</span><small>${esc(frYrText(e.where))} · ${when(e.d)}</small></div></li>`).join('')}</ol>`
 :`<p class="tcnone">Nothing here yet. No-hitters, perfect games, hitting for the cycle, grand slams, walk-off wins and Floodlight Series titles will land here.</p>`}</div>`;
   ov.hidden=false; const close=()=>{ ov.hidden=true; ov.innerHTML=''; ov.onclick=null; document.removeEventListener('keydown',key); }, key=e=>{ if(e.key==='Escape') close(); };
   ov.onclick=e=>{ if(e.target===ov) close(); }; $('tcX').onclick=close; document.addEventListener('keydown',key); $('tcX').focus();
@@ -3316,7 +3314,7 @@ function frSwitch(i){
   else if(F) frSave();
   frSlot=i; try{ localStorage.setItem('fdl-fr-slot',String(i)); }catch(e){}
   F=null; frLoad(); if(F) prepCards(F.ids.map(id=>F.teams[id]));
-  hubTab='home'; hubMsg=F?`Switched to Franchise ${i}: ${esc(me().name)}, Season ${F.season}.`:`Franchise ${i} is empty. Start a new one below.`;
+  hubTab='home'; hubMsg=F?`Switched to Franchise ${i}: ${esc(me().name)}, ${frYear(F.season)} season.`:`Franchise ${i} is empty. Start a new one below.`;
   setFrUI(); renderHub();
 }
 /* open a franchise slot from anywhere (Save / Load, the hub) */
@@ -3332,7 +3330,7 @@ function frNewIn(i){
 function frNewAny(){ for(let i=1;i<=FR_SLOTS;i++) if(!(i===frSlot?F:frPeek(i))) return frNewIn(i); openSaves('All three franchise slots are full. Pick one to replace with a new franchise.'); }
 function slotBarHTML(){
   const cells=[...Array(FR_SLOTS)].map((_,k)=>{ const i=k+1, o=i===frSlot?F:frPeek(i);
-    let body; if(o){ const T=o.teams[o.userId], r=o.rec[o.userId]; body=`<b>${esc(T.name)}</b><small>Season ${o.season} · ${r.w}–${r.l}${o.live?' · game in progress':''}</small>`; } else body=`<b class="empty">Empty</b><small>Start a new franchise</small>`;
+    let body; if(o){ const T=o.teams[o.userId], r=o.rec[o.userId]; body=`<b>${esc(T.name)}</b><small>${frYear(o.season)} season · ${r.w}–${r.l}${o.live?' · game in progress':''}</small>`; } else body=`<b class="empty">Empty</b><small>Start a new franchise</small>`;
     return `<button type="button" class="frslot${i===frSlot?' on':''}" data-slot="${i}" aria-pressed="${i===frSlot}"><span class="sn">${i}</span><span class="sd">${body}</span></button>`; }).join('');
   return `<div class="frslots" role="group" aria-label="Franchise slots"><span class="frslab">Franchises</span>${cells}<button type="button" class="btn small frnew" id="frNewBtn">+ New franchise</button></div>`;
 }
@@ -3506,7 +3504,7 @@ function frRecords(){
 /* ---------- playing the user's games ---------- */
 function frNext(){
   const u=F.userId;
-  if(F.phase==='reg'){ const g=userGameToday(); if(!g) return null; const opp=g[0]===u?g[1]:g[0]; return {kind:'reg',opp,home:g[1]===u,label:`Season ${F.season} · Game ${F.day+1} of ${F.sched.length}`}; }
+  if(F.phase==='reg'){ const g=userGameToday(); if(!g) return null; const opp=g[0]===u?g[1]:g[0]; return {kind:'reg',opp,home:g[1]===u,label:`${frYear(F.season)} · Game ${F.day+1} of ${F.sched.length}`}; }
   if(F.phase==='post'){ const s=userSeries(); if(!s) return null; const opp=s.hi===u?s.lo:s.hi; return {kind:'po',opp,home:seriesHome(s)===u,label:`${(ADDON_READY&&F.po.conf)||s.need===4?s.label:'Semifinal'} · Game ${s.g.length+1}`,series:s}; }
   return null;
 }
@@ -3559,7 +3557,7 @@ function frNextSeason(){
   try{ if(ADDON_READY) drAuto(); }catch(e){}
   try{ if(ADDON_READY) faResolve(); }catch(e){ console.error(e); } // free agency closes: re-signings, then the market
   const gone=frRetire(), cls=frInduct(gone); F.season++; frNewSeason(); nwRetire(gone); nwHof(cls); F.rookies=gone.map(g=>g.rookie);
-  hubMsg=`Season ${F.season} is set. Same ${frCountWord(F.ids.length)} teams, a fresh 32-game schedule.`+(gone.length?` ${gone.length} player${gone.length===1?'':'s'} retired at ${RETIRE_AGE} and ${gone.length===1?'a rookie takes that spot':'rookies take their spots'}. <button class="btn small" type="button" data-act="rookies">Name the rookies</button>`:'')
+  hubMsg=`The ${frYear(F.season)} season is set. Same ${frCountWord(F.ids.length)} teams, a fresh 32-game schedule.`+(gone.length?` ${gone.length} player${gone.length===1?'':'s'} retired at ${RETIRE_AGE} and ${gone.length===1?'a rookie takes that spot':'rookies take their spots'}. <button class="btn small" type="button" data-act="rookies">Name the rookies</button>`:'')
     +(cls.length?` ${cls.length} ${cls.length===1?'legend was':'legends were'} voted into the Hall of Fame. <button class="btn small" type="button" data-act="hof">See the Hall of Fame</button>`:'');
   frSave(); renderHub();
 }
@@ -3626,7 +3624,7 @@ function frEditRookies(){
   const rk=new Set((F.rookies||[]).filter(n=>nwInfo(n))); if(!rk.size){ hubMsg='No rookies to name right now.'; renderHub(); return; }
   const teams=F.ids.filter(id=>F.teams[id].lineup.some(n=>rk.has(n))).map(id=>{ const T=F.teams[id]; return {id,name:T.name,abbr:T.abbr,color:T.color,players:T.lineup.filter(n=>rk.has(n)).map(n=>({key:n,name:n,ab:T.roster[n].ab}))}; });
   closeHub();
-  openNameEditor({kicker:`Franchise · Season ${F.season}`, title:'Name your rookies', teams, cancelText:'Keep these names',
+  openNameEditor({kicker:`Franchise · ${frYear(F.season)} season`, title:'Name your rookies', teams, cancelText:'Keep these names',
     sub:'This year’s 18-year-old rookies. Tap a name to change it. Their stats and cards follow the new name.',
     onSave:out=>{ const taken=new Set([...F.ids.flatMap(id=>F.teams[id].lineup).filter(n=>!rk.has(n)),...Object.keys(F.career||{}),...(F.retired||[]).map(r=>r.name)]);
       const clash=out.flatMap(t=>t.players).find(p=>p.name!==p.key&&taken.has(p.name));
@@ -3645,7 +3643,7 @@ function setFrUI(){
 function renderFbar(){
   const el=$('fbar'); el.classList.remove('chbar'); if(G&&G.challenge&&!frMode){ chBar(el); return; } if(!frMode||!F){ el.hidden=true; return; }
   el.hidden=false; const M=me(), r=F.rec[M.id];
-  el.innerHTML=`<span class="tagx">Franchise · Season ${F.season}</span><span>${tdot(M.id)}<b>${esc(M.name)}</b> ${r.w}–${r.l}</span><span style="color:var(--muted)">${esc(G&&G.frLabel||'')}${G&&G.isFr&&ADDON_READY?' · '+esc(parkFor(G).place||parkFor(G).text):''}</span>${F.news&&F.news[0]?`<span class="fbnews" title="Latest from the Floodlight Gazette">${nwText(F.news[0].h)}</span>`:''}<span class="sp"><button class="btn small" type="button" id="fbHub">Franchise hub</button><button class="btn small" type="button" id="fbExit" title="Back to quick games. Your franchise stays saved.">Exit franchise</button></span>`;
+  el.innerHTML=`<span class="tagx">Franchise · ${frYear(F.season)} season</span><span>${tdot(M.id)}<b>${esc(M.name)}</b> ${r.w}–${r.l}</span><span style="color:var(--muted)">${esc(G&&G.frLabel||'')}${G&&G.isFr&&ADDON_READY?' · '+esc(parkFor(G).place||parkFor(G).text):''}</span>${F.news&&F.news[0]?`<span class="fbnews" title="Latest from the Floodlight Gazette">${nwText(F.news[0].h)}</span>`:''}<span class="sp"><button class="btn small" type="button" id="fbHub">Franchise hub</button><button class="btn small" type="button" id="fbExit" title="Back to quick games. Your franchise stays saved.">Exit franchise</button></span>`;
   $('fbHub').onclick=openHub; $('fbExit').onclick=frExit;
 }
 function frExit(){ autoSave(); frMode=false; FR=null; setFrUI(); closeHub(); setWhere('quick'); if(!resumeQuick(jparse(lsGet(QKEY)))||G.over) startExhibition(); }
@@ -3660,7 +3658,7 @@ function renderHub(){
   if(!F){ hub.innerHTML=`<div class="hubpanel" role="dialog" aria-modal="true" aria-label="Franchise"><div class="hubhead"><span class="logo">Floodlight Baseball</span><h3>Franchise</h3><button class="btn small x" type="button" id="hubX">Close</button></div><div class="hubbody">${slotBarHTML()}${hubMsg?`<p class="frnote">${hubMsg}</p>`:''}${newFranchiseHTML()}</div></div>`;
     hubMsg=''; $('hubX').onclick=closeHub; wireNewFranchise(); wireSlots(); return; }
   hub.innerHTML=`<div class="hubpanel" role="dialog" aria-modal="true" aria-label="Franchise hub">
-<div class="hubhead"><span class="logo">Floodlight Baseball</span><h3>Franchise · Season ${F.season}</h3><button class="btn small x" type="button" id="hubQS" title="Save everything right now. Load it from Save / Load.">Quick save</button><button class="btn small" type="button" id="hubX">${frMode?'Back to the stadium':'Close'}</button></div>
+<div class="hubhead"><span class="logo">Floodlight Baseball</span><h3>Franchise · ${frYear(F.season)} season</h3><button class="btn small x" type="button" id="hubQS" title="Save everything right now. Load it from Save / Load.">Quick save</button><button class="btn small" type="button" id="hubX">${frMode?'Back to the stadium':'Close'}</button></div>
 <nav class="hubtabs" role="tablist">${TABS.map(([k,l])=>`<button type="button" role="tab" data-ht="${k}" aria-selected="${hubTab===k}">${l}</button>`).join('')}</nav>
 <div class="hubbody" id="hubBody">${slotBarHTML()}${hubMsg?`<p class="frnote">${hubMsg}</p>`:''}${hubBody()}</div></div>`;
   hubMsg='';
@@ -3701,7 +3699,7 @@ function hubAct(a,el){
 }
 function hubBody(){
   switch(hubTab){
-    case 'standings': return `<div class="hcard"><h4>Standings · Season ${F.season}</h4>${standingsHTML(false)}<p class="legend">${ADDON_READY&&confOn()?confLegend():"Top four make the playoffs (dashed line). Semifinals are best of 3, the Floodlight Series is best of 7."} Ties broken by run differential.</p></div>`;
+    case 'standings': return `<div class="hcard"><h4>Standings · ${frYear(F.season)}</h4>${standingsHTML(false)}<p class="legend">${ADDON_READY&&confOn()?confLegend():"Top four make the playoffs (dashed line). Semifinals are best of 3, the Floodlight Series is best of 7."} Ties broken by run differential.</p></div>`;
     case 'schedule': return scheduleHTML();
     case 'news': return newsHTML();
     case 'stats': return statsHTML();
@@ -3736,8 +3734,8 @@ function homeHTML(){
       :ADDON_READY?poIdleHTML():`<p>${F.po.seeds.slice(0,4).includes(M.id)?'Your season is over. ':'You missed the playoffs this year. '}Watch the rest play out.</p><div class="hbtns"><button class="btn primary" type="button" data-act="sim">Sim next game</button><button class="btn" type="button" data-act="simpo">Sim rest of playoffs</button></div>`}</div>${bracketHTML()}`;
   } else {
     const h=F.history[F.history.length-1];
-    main=`<div class="champ"><span class="aside">Season ${h.season} · Floodlight Series champions</span><b>${esc(h.champName)}</b><span>Beat ${esc(h.runnerName)} ${h.score}</span></div>
-<div class="hcard"><h4>Your season</h4><p><b>${esc(M.name)}</b> went <b>${h.user.w}–${h.user.l}</b>, finished ${ordinal(h.user.rank)} and <b>${h.user.result.toLowerCase()}</b>.</p>${ADDON_READY?drHomeLine()+faHomeLine()+demoHomeLine():""}<div class="hbtns"><button class="btn primary" type="button" data-act="next">Start Season ${F.season+1}${ADDON_READY&&!FULL_GAME?" · full game":""}</button></div></div>${awardsHTML(h.awards)}${bracketHTML()}`;
+    main=`<div class="champ"><span class="aside">${frYear(h.season)} Floodlight Series champions</span><b>${esc(h.champName)}</b><span>Beat ${esc(h.runnerName)} ${h.score}</span></div>
+<div class="hcard"><h4>Your season</h4><p><b>${esc(M.name)}</b> went <b>${h.user.w}–${h.user.l}</b>, finished ${ordinal(h.user.rank)} and <b>${h.user.result.toLowerCase()}</b>.</p>${ADDON_READY?drHomeLine()+faHomeLine()+demoHomeLine():""}<div class="hbtns"><button class="btn primary" type="button" data-act="next">Start the ${frYear(F.season+1)} season${ADDON_READY&&!FULL_GAME?" · full game":""}</button></div></div>${awardsHTML(h.awards)}${bracketHTML()}`;
   }
   if(ADDON_READY&&F.phase==='reg'&&!F.live) main+=potwCardHTML();
   if(ADDON_READY&&demoFrLocked()&&F.phase!=='off') main=`<div class="hcard">${demoHomeLine()}</div>`+main;
@@ -3763,7 +3761,7 @@ function bracketHTML(){
 function awardsHTML(A){
   if(!A) return '';
   const one=(lbl,a)=>a?`<div class="award"><img src="${cardSrc(a.name,F.teams[a.team])}" alt=""><div><span class="aside">${lbl}</span><b>${esc(a.name)}</b><span>${esc(tname(a.team))} · ${esc(a.line)}</span></div></div>`:'';
-  return `<div class="hcard"><h4>Season awards</h4><div class="awards">${one('MVP',A.mvp)}${one('Home run king',A.hr)}${one('Batting title',A.bat)}${ADDON_READY?one('Rookie of the Year',A.roy)+one('Slugger of the Year',A.slug):''}</div></div>`;
+  return `<div class="hcard"><h4>${frYear(F.season)} awards</h4><div class="awards">${one('MVP',A.mvp)}${one('Home run king',A.hr)}${one('Batting title',A.bat)}${ADDON_READY?one('Rookie of the Year',A.roy)+one('Slugger of the Year',A.slug):''}</div></div>`;
 }
 function leadersHTML(){
   const rows=Object.entries(F.stats), top=(fn,fmt,ok)=>rows.filter(([,s])=>!ok||ok(s)).sort((a,b)=>fn(b[1])-fn(a[1])).slice(0,3).map(([n,s])=>`${tdot(s.team)}${esc(n)} <b>${fmt(fn(s))}</b>`).join('<br>');
@@ -3775,7 +3773,7 @@ function scheduleHTML(){
   const rows=F.sched.map((day,d)=>{ const g=day.find(x=>x.includes(u)), opp=g[0]===u?g[1]:g[0], res=played.find(x=>x.d===d);
     return `<tr class="${d===F.day&&F.phase==='reg'?'me':''}"><td class="l">${d+1}</td><td class="l">${tdot(opp)}${esc(tname(opp))}</td><td class="l">${g[1]===u?'Home':'Away'}</td><td class="l">${res?resLine(res.a,res.h,res.ra,res.rh,res.inn).replace(/ (at|vs) .*/,''):d===F.day&&F.phase==='reg'?'<b>Next</b>':''}</td></tr>`; }).join('');
   const po=F.po?[...F.po.series,F.po.final].filter(Boolean).flatMap(s=>s.g.filter(g=>g.a===u||g.h===u).map((g,i)=>`<tr><td class="l">${esc(s.label.split(' ').slice(0,2).join(' '))}</td><td class="l">${tdot(g.a===u?g.h:g.a)}${esc(tname(g.a===u?g.h:g.a))}</td><td class="l">${g.a===u?'Away':'Home'}</td><td class="l">${resLine(g.a,g.h,g.ra,g.rh,g.inn).replace(/ (at|vs) .*/,'')}</td></tr>`)).join(''):'';
-  return `<div class="hcard"><h4>Your schedule · Season ${F.season}</h4><div class="tscroll"><table class="tbl"><thead><tr><th class="l">Game</th><th class="l">Opponent</th><th class="l">Home / away</th><th class="l">Result</th></tr></thead><tbody>${rows}${po}</tbody></table></div><p class="legend">Home and away are set before the season: every team plays ${SEASON_GAMES/2} at home and ${SEASON_GAMES/2} on the road. In the playoffs the higher seed has home field: games 1 and 3 of the semifinals, and games 1, 2, 5 and 7 of the Floodlight Series.</p></div>`;
+  return `<div class="hcard"><h4>Your schedule · ${frYear(F.season)}</h4><div class="tscroll"><table class="tbl"><thead><tr><th class="l">Game</th><th class="l">Opponent</th><th class="l">Home / away</th><th class="l">Result</th></tr></thead><tbody>${rows}${po}</tbody></table></div><p class="legend">Home and away are set before the season: every team plays ${SEASON_GAMES/2} at home and ${SEASON_GAMES/2} on the road. In the playoffs the higher seed has home field: games 1 and 3 of the semifinals, and games 1, 2, 5 and 7 of the Floodlight Series.</p></div>`;
 }
 function statsHTML(){
   const store = statScope==='season'?F.stats: statScope==='post'?F.pstats: careerNow();
@@ -3785,18 +3783,18 @@ function statsHTML(){
   rows.sort((a,b)=>(val(b[1],statSort)-val(a[1],statSort)) || (b[1].PA-a[1].PA));
   const teamOpts=`<option value="mine"${statTeam==='mine'?' selected':''}>${esc(me().name)}</option><option value="all"${statTeam==='all'?' selected':''}>Whole league</option>`+F.ids.filter(i=>i!==F.userId).map(i=>`<option value="${i}"${statTeam===i?' selected':''}>${esc(tname(i))}</option>`).join('');
   const abFor=(n,s)=>{ const T=F.teams[s.team], r=T&&T.roster[n]; return r?abChip(r.ab):''; };
-  return `<div class="hcard"><h4>Player stats</h4><div class="prerow"><select data-sel="scope" class="btn small"><option value="season"${statScope==='season'?' selected':''}>Season ${F.season}</option><option value="post"${statScope==='post'?' selected':''}>Season ${F.season} playoffs</option><option value="career"${statScope==='career'?' selected':''}>Career (all seasons)</option></select><select data-sel="team" class="btn small">${teamOpts}</select><span class="legend">Tap a column to sort.</span></div>
+  return `<div class="hcard"><h4>Player stats</h4><div class="prerow"><select data-sel="scope" class="btn small"><option value="season"${statScope==='season'?' selected':''}>${frYear(F.season)} season</option><option value="post"${statScope==='post'?' selected':''}>${frYear(F.season)} playoffs</option><option value="career"${statScope==='career'?' selected':''}>Career (all seasons)</option></select><select data-sel="team" class="btn small">${teamOpts}</select><span class="legend">Tap a column to sort.</span></div>
 ${rows.length?`<div class="tscroll"><table class="tbl"><thead><tr><th class="l">Player</th><th class="l">Ability</th>${COLS.map(([k])=>`<th data-act="sort" data-k="${k}" data-sort class="${statSort===k?'on':''}">${k}</th>`).join('')}</tr></thead><tbody>${rows.map(([n,s])=>`<tr class="${s.team===F.userId&&statTeam!=='mine'?'me':''}"><td class="l">${tdot(s.team)}<b>${esc(n)}</b></td><td class="l">${abFor(n,s)}</td>${COLS.map(([k,fn])=>`<td>${fn?f3(fn(s)):s[k]}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`:'<p class="empty2">No stats yet. Play or sim a game.</p>'}</div>`;
 }
 function careerNow(){ const out={}; for(const [n,c] of Object.entries(F.career)) out[n]=Object.assign({},c); for(const [n,s] of Object.entries(F.stats)){ if(F.phase==='off') break; const c=out[n]||(out[n]=blank(s.team)); for(const k of STATK) c[k]+=s[k]; } return out; }
 function recordsHTML(){
   const R=F.records, u=F.userId, mineH=F.history.map(h=>h);
   const titles=F.history.filter(h=>h.champ===u).length, apps=F.history.filter(h=>h.user.rank<=4).length;
-  const cards=REC_DEF.map(([k,lbl,,fmt])=>R[k]?`<div class="rec"><span class="aside">${lbl}</span><b>${fmt(R[k].v)}</b><span>${esc(R[k].name)}</span><small>${esc(R[k].team)} · Season ${R[k].season}</small></div>`:'').join('')
-    +(R.W?`<div class="rec"><span class="aside">Most wins</span><b>${R.W.v}–${R.W.l}</b><span>${esc(R.W.name)}</span><small>Season ${R.W.season}</small></div>`:'')
-    +(R.RS?`<div class="rec"><span class="aside">Most runs, team</span><b>${R.RS.v}</b><span>${esc(R.RS.name)}</span><small>Season ${R.RS.season}</small></div>`:'');
+  const cards=REC_DEF.map(([k,lbl,,fmt])=>R[k]?`<div class="rec"><span class="aside">${lbl}</span><b>${fmt(R[k].v)}</b><span>${esc(R[k].name)}</span><small>${esc(R[k].team)} · ${frYear(R[k].season)}</small></div>`:'').join('')
+    +(R.W?`<div class="rec"><span class="aside">Most wins</span><b>${R.W.v}–${R.W.l}</b><span>${esc(R.W.name)}</span><small>${frYear(R.W.season)}</small></div>`:'')
+    +(R.RS?`<div class="rec"><span class="aside">Most runs, team</span><b>${R.RS.v}</b><span>${esc(R.RS.name)}</span><small>${frYear(R.RS.season)}</small></div>`:'');
   return `<div class="hcard"><h4>Your franchise</h4><p><b>${titles}</b> Floodlight Series title${titles===1?'':'s'} · <b>${apps}</b> playoff trip${apps===1?'':'s'} in <b>${F.history.length}</b> finished season${F.history.length===1?'':'s'}.</p>
-${mineH.length?`<div class="tscroll"><table class="tbl"><thead><tr><th class="l">Season</th><th class="l">Team</th><th>W</th><th>L</th><th>Finish</th><th class="l">Postseason</th></tr></thead><tbody>${mineH.map(h=>`<tr><td class="l">${h.season}</td><td class="l">${esc(h.user.name)}</td><td>${h.user.w}</td><td>${h.user.l}</td><td>${ordinal(h.user.rank)}</td><td class="l">${esc(h.user.result)}</td></tr>`).join('')}</tbody></table></div>`:'<p class="empty2">Finish a season to start your record book.</p>'}</div>
+${mineH.length?`<div class="tscroll"><table class="tbl"><thead><tr><th class="l">Year</th><th class="l">Team</th><th>W</th><th>L</th><th>Finish</th><th class="l">Postseason</th></tr></thead><tbody>${mineH.map(h=>`<tr><td class="l">${frYear(h.season)}</td><td class="l">${esc(h.user.name)}</td><td>${h.user.w}</td><td>${h.user.l}</td><td>${ordinal(h.user.rank)}</td><td class="l">${esc(h.user.result)}</td></tr>`).join('')}</tbody></table></div>`:'<p class="empty2">Finish a season to start your record book.</p>'}</div>
 ${careerLeadersHTML()}
 <div class="hcard"><h4>League single-season records</h4>${cards?`<div class="recs">${cards}</div>`:'<p class="empty2">Records are set when a season ends.</p>'}<p class="legend">Average and OPS need ${MIN_PA} plate appearances.</p></div>`;
 }
@@ -3805,7 +3803,7 @@ function hofHTML(){
   if(!H.length) return `<div class="hcard"><h4>Floodlight Hall of Fame</h4><p class="empty2">Nobody has been inducted yet. Players retire at ${RETIRE_AGE}, and each time a group retires, the best ${HOF_CLASS} careers among them are voted in.</p></div>`;
   const classes=[...new Set(H.map(x=>x.cls))].sort((a,b)=>b-a);
   return `<div class="hcard"><h4>Floodlight Hall of Fame</h4><p class="legend">${H.length} member${H.length===1?'':'s'}. Each retirement class sends at most ${HOF_CLASS} players in, picked on career hits, home runs, RBI, runs, steals, awards and championships.</p></div>`
-    +classes.map(y=>`<div class="hcard"><h4>Class of Season ${y}</h4><div class="hof">${H.filter(x=>x.cls===y).sort((a,b)=>a.rank-b.rank).map(x=>{ const hn=honorsText(x.hon);
+    +classes.map(y=>`<div class="hcard"><h4>Class of ${frYear(y)}</h4><div class="hof">${H.filter(x=>x.cls===y).sort((a,b)=>a.rank-b.rank).map(x=>{ const hn=honorsText(x.hon);
       return `<div class="plq"><b>${F.teams[x.tid]?tdot(x.tid):''}${esc(x.name)}</b><small>#${x.num} · ${esc(x.team)} · ${x.seasons} seasons</small><span>${x.avg} · ${x.H} H · ${x.HR} HR · ${x.RBI} RBI</span>${hn.length?`<span class="hon">${hn.join(' · ')}</span>`:''}</div>`; }).join('')}</div></div>`).join('');
 }
 function careerLeadersHTML(){
@@ -3815,8 +3813,8 @@ function careerLeadersHTML(){
   return `<div class="hcard"><h4>All-time career leaders</h4><div class="awards">${col('HR','Home runs')}${col('H','Hits')}${col('RBI','RBI')}</div><p class="legend">Every franchise player starts at ${ROOKIE_AGE} and retires at ${RETIRE_AGE}, so careers are the same length and comparable.</p></div>`;
 }
 function champsHTML(){
-  if(!F.history.length) return '<div class="hcard"><h4>Floodlight Series champions</h4><p class="empty2">No champion yet. Finish Season 1 to crown the first one.</p></div>';
-  return `<div class="hcard"><h4>Floodlight Series champions</h4><div class="tscroll"><table class="tbl"><thead><tr><th class="l">Season</th><th class="l">Champion</th><th class="l">Series</th><th class="l">MVP</th><th class="l">HR king</th><th class="l">Batting title</th></tr></thead><tbody>${F.history.slice().reverse().map(h=>`<tr class="${h.champ===F.userId?'me':''}"><td class="l">${h.season}</td><td class="l">${tdot(h.champ)}<b>${esc(h.champName)}</b></td><td class="l">${h.score} over ${esc(h.runnerName)}</td><td class="l">${h.awards&&h.awards.mvp?esc(h.awards.mvp.name):''}</td><td class="l">${h.awards&&h.awards.hr?esc(h.awards.hr.name)+' ('+esc(h.awards.hr.line.split(' ')[0])+')':''}</td><td class="l">${h.awards&&h.awards.bat?esc(h.awards.bat.name)+' ('+esc(h.awards.bat.line.split(' ')[0])+')':''}</td></tr>`).join('')}</tbody></table></div></div>`;
+  if(!F.history.length) return '<div class="hcard"><h4>Floodlight Series champions</h4><p class="empty2">No champion yet. Finish the 2026 season to crown the first one.</p></div>';
+  return `<div class="hcard"><h4>Floodlight Series champions</h4><div class="tscroll"><table class="tbl"><thead><tr><th class="l">Year</th><th class="l">Champion</th><th class="l">Series</th><th class="l">MVP</th><th class="l">HR king</th><th class="l">Batting title</th></tr></thead><tbody>${F.history.slice().reverse().map(h=>`<tr class="${h.champ===F.userId?'me':''}"><td class="l">${frYear(h.season)}</td><td class="l">${tdot(h.champ)}<b>${esc(h.champName)}</b></td><td class="l">${h.score} over ${esc(h.runnerName)}</td><td class="l">${h.awards&&h.awards.mvp?esc(h.awards.mvp.name):''}</td><td class="l">${h.awards&&h.awards.hr?esc(h.awards.hr.name)+' ('+esc(h.awards.hr.line.split(' ')[0])+')':''}</td><td class="l">${h.awards&&h.awards.bat?esc(h.awards.bat.name)+' ('+esc(h.awards.bat.line.split(' ')[0])+')':''}</td></tr>`).join('')}</tbody></table></div></div>`;
 }
 function teamsHTML(){
   return `${ADDON_READY?rvCardHTML():''}<div class="teams6">${F.ids.map(id=>{ const T=F.teams[id], r=F.rec[id];
@@ -3831,9 +3829,9 @@ ${frExpandHTML()}<h4 style="margin-top:8px">Saving</h4><p>Your franchise saves a
 <h4 style="margin-top:8px">Leave or restart</h4><div class="hbtns"><button class="btn" type="button" data-act="exit">Exit to quick games</button><button class="btn danger" type="button" data-act="reset">Delete franchise</button></div></div></div>`;
 }
 function exportSave(){
-  if(ADDON_READY&&IS_APP){ appSaveFile(new File([JSON.stringify(F)],`floodlight-franchise-season-${F.season}.json`,{type:'application/json'})).catch(()=>{}); return; }
+  if(ADDON_READY&&IS_APP){ appSaveFile(new File([JSON.stringify(F)],`floodlight-franchise-${frYear(F.season)}.json`,{type:'application/json'})).catch(()=>{}); return; }
   const blob=new Blob([JSON.stringify(F)],{type:'application/json'}), a=document.createElement('a');
-  a.href=URL.createObjectURL(blob); a.download=`floodlight-franchise-season-${F.season}.json`; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500);
+  a.href=URL.createObjectURL(blob); a.download=`floodlight-franchise-${frYear(F.season)}.json`; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500);
 }
 function importSave(file){
   if(!file) return; const rd=new FileReader();
@@ -3849,7 +3847,7 @@ function newFranchiseHTML(){
 <div class="hcard"><h4>How it works</h4><p>Before every game you pick <b>home or away</b> and set your <b>batting order</b>. Games use Simulation rules: the D12, action cards, designated hitters and player abilities. Can't play them all? <b>Sim</b> any game or skip to the playoffs. Other teams' games are simulated as you go.</p><p>Every club has its <b>own ballpark</b>, and the Floodlight Series is played in a grand neutral stadium. Make <b>trades</b> with the other general managers until the deadline, and pick a rookie in the <b>draft</b> every offseason.</p><p>${ADDON_READY&&!FULL_GAME?'The free demo includes your whole first season, all the way through the Floodlight Series. ':''}Saved in this browser, with room for three franchises at once. Grab a backup from Settings any time.</p></div></div>`;
 }
 function wireNewFranchise(){
-  $('nfGo').onclick=()=>{ const n=$('nfName').value.trim()||'California Kings', a=($('nfAbbr').value.trim()||n.slice(0,3)).toUpperCase().slice(0,4); const custom=(document.querySelector('input[name=nfNames]:checked')||{}).value==='custom', size=+((document.querySelector('input[name=nfSize]:checked')||{}).value||24); frCreate(n,a,size); prepCards(F.ids.map(id=>F.teams[id])); hubTab='home'; hubMsg=`Welcome to Season 1. Meet the league in the Teams tab.`; setFrUI(); if(custom) frEditNames(); else renderHub(); };
+  $('nfGo').onclick=()=>{ const n=$('nfName').value.trim()||'California Kings', a=($('nfAbbr').value.trim()||n.slice(0,3)).toUpperCase().slice(0,4); const custom=(document.querySelector('input[name=nfNames]:checked')||{}).value==='custom', size=+((document.querySelector('input[name=nfSize]:checked')||{}).value||24); frCreate(n,a,size); prepCards(F.ids.map(id=>F.teams[id])); hubTab='home'; hubMsg=`Welcome to the ${frYear(1)} season. Meet the league in the Teams tab.`; setFrUI(); if(custom) frEditNames(); else renderHub(); };
 }
 
 /* ---------- franchise news: The Floodlight Gazette ---------- */
@@ -4054,7 +4052,7 @@ function nwPreseason(){
     return;
   }
   const h=F.history[F.history.length-1], titles=id=>F.history.filter(x=>x.champ===id).length;
-  nwAdd('pre',`Season ${F.season} preview: everyone is chasing the ${nwN(h.champ)}`,`${nwT(h.champ)} are the defending champions${titles(h.champ)>1?`, with ${titles(h.champ)} titles in ${F.history.length} seasons`:''}. ${h.awards&&h.awards.mvp?`${h.awards.mvp.name} is back after an MVP season. `:''}${h.champ===u?`The ${nwN(u)} open with a target on their backs.`:`The ${nwN(u)} went ${h.user.w}–${h.user.l} last year and ${h.user.result.toLowerCase()}. This year, the goal is simple.`}`,{w:'Preseason',t:[h.champ,u],pr:3});
+  nwAdd('pre',`${frYear(F.season)} season preview: everyone is chasing the ${nwN(h.champ)}`,`${nwT(h.champ)} are the defending champions${titles(h.champ)>1?`, with ${titles(h.champ)} titles in ${F.history.length} seasons`:''}. ${h.awards&&h.awards.mvp?`${h.awards.mvp.name} is back after an MVP season. `:''}${h.champ===u?`The ${nwN(u)} open with a target on their backs.`:`The ${nwN(u)} went ${h.user.w}–${h.user.l} last year and ${h.user.result.toLowerCase()}. This year, the goal is simple.`}`,{w:'Preseason',t:[h.champ,u],pr:3});
   const vet=F.nx.arcs.find(a=>a.k==='vet'); if(vet&&nwInfo(vet.n)){ const B=nwBio(vet.n); nwAdd('club',`Still going at ${B.age}: ${vet.n}`,`The oldest player in the league reported to camp first again. ${B.quirk}. ${B.back}.`,{w:'Preseason',t:[nwInfo(vet.n).tid],p:{n:vet.n,tid:nwInfo(vet.n).tid},pr:2}); }
 }
 function nwRetire(gone){
@@ -4066,7 +4064,7 @@ function nwRetire(gone){
 }
 function nwHof(cls){
   if(!cls.length) return; const u=F.userId, top=cls[0], mine=cls.filter(x=>x.tid===u);
-  nwAdd('lore',`Hall of Fame Class of Season ${cls[0].cls}`,`${cls.length} legends are headed to the Floodlight Hall of Fame. Leading the class: ${top.name} of the ${nwN(top.tid)}, ${top.H} hits, ${top.HR} home runs and ${top.RBI} RBI over ${top.seasons} seasons.\nThe class: ${cls.map(x=>x.name).join(', ')}.${mine.length?`\n${mine.length===1?`${mine[0].name} goes in`:`${mine.length} of them go in`} wearing your colors.`:''}`,{w:'Preseason',t:[...new Set(cls.map(x=>x.tid))],p:{n:top.name,tid:top.tid},pr:5});
+  nwAdd('lore',`Hall of Fame Class of ${frYear(cls[0].cls)}`,`${cls.length} legends are headed to the Floodlight Hall of Fame. Leading the class: ${top.name} of the ${nwN(top.tid)}, ${top.H} hits, ${top.HR} home runs and ${top.RBI} RBI over ${top.seasons} seasons.\nThe class: ${cls.map(x=>x.name).join(', ')}.${mine.length?`\n${mine.length===1?`${mine[0].name} goes in`:`${mine.length} of them go in`} wearing your colors.`:''}`,{w:'Preseason',t:[...new Set(cls.map(x=>x.tid))],p:{n:top.name,tid:top.tid},pr:5});
 }
 function nwPlayoffs(){
   nwInit(); const s=F.po.seeds, u=F.userId, A=F.awards||{}; F.nx.fs={};
@@ -4095,9 +4093,9 @@ function nwCrown(pre){
   if(best) b+=`\nSeries MVP: ${best[0]}, ${nwLine(best[1])}.`;
   h.smvp=best?{n:best[0],line:nwLine(best[1]),tid:c}:null;
   nwAdd('champ',c===u?`CHAMPIONS! The ${nwN(c)} win the Floodlight Series`:`${nwN(c)} win the Floodlight Series`,b,{t:[c,h.runner],p:best?{n:best[0],tid:c}:null,pr:9});
-  if(c===u&&!F.nx.firsts.title){ F.nx.firsts.title=F.season; nwAdd('lore',`Franchise first: a championship`,`Season ${F.season} goes up on the outfield wall forever. The first Floodlight Series title in ${nwN(u)} history.`,{t:[u],pr:5}); }
+  if(c===u&&!F.nx.firsts.title){ F.nx.firsts.title=F.season; nwAdd('lore',`Franchise first: a championship`,`${frYear(F.season)} goes up on the outfield wall forever. The first Floodlight Series title in ${nwN(u)} history.`,{t:[u],pr:5}); }
   else if(c!==u) nwAdd('game',`${nwN(u)} season review: ${h.user.w}–${h.user.l}`,`${nwT(u)} finished ${ordinal(h.user.rank)} and ${h.user.result.toLowerCase()}. ${h.user.rank<=2?'Close. The core is in place.':h.user.rank<=4?'A playoff team with work to do.':'Back to the drawing board.'}`,{t:[u],pr:3});
-  for(const [k,lbl,,fmt] of REC_DEF){ const r=F.records[k], o=pre[k]; if(r&&r.season===F.season&&(!o||r.v>o.v)&&F.season>1) nwAdd('record',`Record book: ${r.name} sets the single-season mark`,`${lbl}: ${fmt(r.v)} for ${r.name} of the ${r.team}${o?`, breaking ${o.name}’s ${fmt(o.v)} from Season ${o.season}`:''}.`,{t:[],p:nwInfo(r.name)?{n:r.name,tid:nwInfo(r.name).tid}:null,pr:4}); }
+  for(const [k,lbl,,fmt] of REC_DEF){ const r=F.records[k], o=pre[k]; if(r&&r.season===F.season&&(!o||r.v>o.v)&&F.season>1) nwAdd('record',`Record book: ${r.name} sets the single-season mark`,`${lbl}: ${fmt(r.v)} for ${r.name} of the ${r.team}${o?`, breaking ${o.name}’s ${fmt(o.v)} from ${frYear(o.season)}`:''}.`,{t:[],p:nwInfo(r.name)?{n:r.name,tid:nwInfo(r.name).tid}:null,pr:4}); }
   const yg=F.nx.arcs.find(a=>a.k==='young'); if(yg&&F.stats[yg.n]&&F.stats[yg.n].PA>=MIN_PA&&ops(F.stats[yg.n])>=.85) nwAdd('club',`Breakout year for ${yg.n}`,`The youngest bat on the ${nwN(u)} put up ${nwLine(F.stats[yg.n])} over the season. Not a prospect anymore.`,{t:[u],p:{n:yg.n,tid:u},pr:3});
 }
 
@@ -4109,13 +4107,13 @@ function newsHTML(){
   nwInit(); const u=F.userId;
   if(!F.news.length) return `<div class="hcard"><h4>The Floodlight Gazette</h4><p class="empty2">No news yet. Play or sim a game.</p></div>`;
   const top=nwTop(), list=newsFilter==='big'?(F.nx.arch||[]).filter(x=>x.id!==top.id):F.news.filter(x=>x!==top&&(newsFilter==='all'||(newsFilter==='mine'?x.t.includes(u):!x.t.includes(u))));
-  const when=x=>`Season ${x.s} · ${x.w}`;
+  const when=x=>`${frYear(x.s)} · ${x.w}`;
   const items=list.slice(0,newsShow).map(x=>`<li class="nwi">${nwChip(x.k)}<b>${nwText(x.h)}</b><small>${when(x)}</small><p>${nwText(x.b)}</p></li>`).join('');
   const spot=newsSpot&&nwInfo(newsSpot)?newsSpot:me().lineup[F.day%9]||me().lineup[0], B=nwBio(spot), I=B.I, s=F.stats[spot], c=careerNow()[spot];
-  const hon=[]; for(const h of F.history){ const a=h.awards||{}; if(a.mvp&&a.mvp.name===spot) hon.push(`MVP ${h.season}`); if(a.hr&&a.hr.name===spot) hon.push(`HR king ${h.season}`); if(a.bat&&a.bat.name===spot) hon.push(`Batting title ${h.season}`); }
+  const hon=[]; for(const h of F.history){ const a=h.awards||{}; if(a.mvp&&a.mvp.name===spot) hon.push(`MVP ${frYear(h.season)}`); if(a.hr&&a.hr.name===spot) hon.push(`HR king ${frYear(h.season)}`); if(a.bat&&a.bat.name===spot) hon.push(`Batting title ${frYear(h.season)}`); }
   const opts=F.ids.map(id=>`<optgroup label="${esc(tname(id))}">${F.teams[id].lineup.map(n=>`<option value="${esc(n)}"${n===spot?' selected':''}>${esc(n)}</option>`).join('')}</optgroup>`).join('');
   const hot=Object.entries(F.nx.hs).filter(([n,v])=>v>=3&&nwInfo(n)).sort((a,b)=>b[1]-a[1]).slice(0,3), tsk=F.ids.map(id=>[id,F.nx.ts[id]||0]).filter(x=>Math.abs(x[1])>=3).sort((a,b)=>b[1]-a[1]);
-  return `<div class="gz"><div class="gzhead"><span class="gzname">The Floodlight Gazette</span><span class="gzdate">Season ${F.season} · ${esc(nwWhen())}</span></div>
+  return `<div class="gz"><div class="gzhead"><span class="gzname">The Floodlight Gazette</span><span class="gzdate">${frYear(F.season)} · ${esc(nwWhen())}</span></div>
 <div class="hgrid"><div style="display:flex;flex-direction:column;gap:14px">
 <div class="hcard gztop">${nwImg(top.p)}<div>${nwChip(top.k)}<h2>${nwText(top.h)}</h2><small>${when(top)}</small><p>${nwText(top.b)}</p></div></div>
 <div class="hcard"><div class="nwf"><h4>Headlines</h4><span class="sp">${[['all','All'],['mine','My team'],['league','League'],['big','Big moments']].map(([k,l])=>`<button type="button" class="btn small${newsFilter===k?' on':''}" data-act="nf" data-k="${k}">${l}</button>`).join('')}</span></div>
@@ -4172,7 +4170,7 @@ function inningText(g){ return g.over?'Final':(g.half?'Bot ':'Top ')+ordinal(g.i
 function describeSnap(b){
   if(!b) return '';
   const parts=[];
-  if(b.F){ const T=b.F.teams[b.F.userId], r=b.F.rec[b.F.userId]; parts.push(`Franchise: ${T.name}, Season ${b.F.season}, ${r.w}–${r.l}${b.F.live?` (game in progress, ${inningText(b.F.live.G)})`:''}`); }
+  if(b.F){ const T=b.F.teams[b.F.userId], r=b.F.rec[b.F.userId]; parts.push(`Franchise: ${T.name}, ${frYear(b.F.season)} season, ${r.w}–${r.l}${b.F.live?` (game in progress, ${inningText(b.F.live.G)})`:''}`); }
   if(b.quick&&b.quick.G&&!b.quick.G.over){ const g=b.quick.G; parts.push(`Quick game: ${g.teams[0].abbr} ${total(g,0)}, ${g.teams[1].abbr} ${total(g,1)}, ${inningText(g)}`); }
   return parts.join(' · ')||'No game in progress';
 }
@@ -4228,7 +4226,7 @@ function openSaves(firstMsg){
   closeHub();
   const ov=$('ov'), cur=snapshot();
   const slotRow=i=>{ const s=slotRead(i); return `<li class="slot"><span class="sn">${i}</span><span class="sd">${s?`<b>${esc(describeSnap(s))}</b><small>Saved ${esc(stamp(s.at))}</small>`:'<b class="empty2">Empty slot</b>'}</span><span class="sb"><button class="btn small" type="button" data-sv="save" data-i="${i}">Save here</button>${s?`<button class="btn small" type="button" data-sv="load" data-i="${i}">Load</button><button class="btn small danger" type="button" data-sv="del" data-i="${i}" aria-label="Delete slot ${i}">✕</button>`:''}</span></li>`; };
-  const frRow=i=>{ const o=i===frSlot?F:frPeek(i); let d; if(o){ const T=o.teams[o.userId], r=o.rec[o.userId]; d=`<b>${esc(T.name)}${i===frSlot?' <em class="frcur">current</em>':''}</b><small>Season ${o.season} · ${r.w}–${r.l}${o.live?` · game in progress (${inningText(o.live.G)})`:''}</small>`; } else d='<b class="empty2">Empty franchise slot</b>';
+  const frRow=i=>{ const o=i===frSlot?F:frPeek(i); let d; if(o){ const T=o.teams[o.userId], r=o.rec[o.userId]; d=`<b>${esc(T.name)}${i===frSlot?' <em class="frcur">current</em>':''}</b><small>${frYear(o.season)} season · ${r.w}–${r.l}${o.live?` · game in progress (${inningText(o.live.G)})`:''}</small>`; } else d='<b class="empty2">Empty franchise slot</b>';
     return `<li class="slot"><span class="sn">${i}</span><span class="sd">${d}</span><span class="sb">${o?`<button class="btn small primary" type="button" data-sv="frplay" data-i="${i}">${o.live?'Resume':'Open'}</button><button class="btn small" type="button" data-sv="frnew" data-i="${i}" title="Replace this franchise with a brand-new one">New here</button>`:`<button class="btn small primary" type="button" data-sv="frnew" data-i="${i}">Start new franchise</button>`}</span></li>`; };
   const frFull=()=>[1,2,3].every(i=>i===frSlot?F:frPeek(i));
   const draw=msg=>{
@@ -4256,7 +4254,7 @@ ${msg?`<p class="frnote" role="status">${msg}</p>`:''}
     const t=e.target; if(t.id==='svX'||t===ov){ close(); return; }
     const b=t.closest('[data-sv]'); if(!b) return; const a=b.dataset.sv, i=b.dataset.i;
     if(a==='frplay'){ close(); frGo(+i); return; }
-    if(a==='frnew'){ const n=+i, o=n===frSlot?F:frPeek(n); if(o){ const T=o.teams[o.userId], r=o.rec[o.userId]; if(!(await askYes(`Start a new franchise in slot ${n}? ${T.name} (Season ${o.season}, ${r.w}–${r.l}) and all its stats and records will be deleted. This cannot be undone.`,'Start new franchise',true))) return; } close(); frNewIn(n); return; }
+    if(a==='frnew'){ const n=+i, o=n===frSlot?F:frPeek(n); if(o){ const T=o.teams[o.userId], r=o.rec[o.userId]; if(!(await askYes(`Start a new franchise in slot ${n}? ${T.name} (${frYear(o.season)} season, ${r.w}–${r.l}) and all its stats and records will be deleted. This cannot be undone.`,'Start new franchise',true))) return; } close(); frNewIn(n); return; }
     if(a==='qsave'){ draw(quickSaveNow()?'Quick saved.':'Could not save: this browser’s storage is full or blocked.'); return; }
     if(a==='qload'){ const q=jparse(lsGet('fdl-quicksave')); if(q && await askYes('Load your quick save? Your current game will be replaced.','Load')){ applySnap(q); close(); toast(G.half,'Quick save loaded.','abil'); } return; }
     if(a==='save'){ const ok=lsSet('fdl-slot-'+i,JSON.stringify(snapshot())); draw(ok?`Saved to slot ${i}.`:'Could not save: this browser’s storage is full or blocked. Try a save file instead.'); }
@@ -4375,7 +4373,7 @@ function frApplyNames(out){
 function frEditNames(after){
   const teams=F.ids.map(id=>{ const T=F.teams[id]; return {id,name:T.name,abbr:T.abbr,color:T.color,players:T.lineup.map(n=>({key:n,name:n,ab:T.roster[n].ab}))}; });
   closeHub();
-  openNameEditor({kicker:`Franchise · Season ${F.season}`, title:'League names', teams, cancelText:'Keep these names',
+  openNameEditor({kicker:`Franchise · ${frYear(F.season)} season`, title:'League names', teams, cancelText:'Keep these names',
     sub:'Every team and player in your league. Tap a name to change it, or keep them all. Stats, records and player cards follow the new names.',
     onSave:out=>{ frApplyNames(out); if(F.live){ renameInGame(F.live.G,out); if(G===F.live.G){ $('pcard').dataset.nm=''; renderGame(); } frSave(); } hubMsg='Names saved.'; openHub(); if(after) after(); }, onCancel:()=>{ openHub(); if(after) after(); }});
 }
@@ -4621,7 +4619,7 @@ const IS_DESKTOP = !!(NATIVE && NATIVE.isDesktop);
 const CAP = (typeof window!=='undefined' && window.Capacitor && typeof window.Capacitor.isNativePlatform==='function' && window.Capacitor.isNativePlatform()) ? window.Capacitor : null;
 const IS_APP = !!CAP;
 const APP_OS = CAP ? String(CAP.getPlatform()) : '';
-const GAME_VERSION = '1.7.0';
+const GAME_VERSION = '1.7.2';
 const FULL_GAME = true; /*@edition*/ // the website is the free demo; build.py turns this on for the Steam game
 
 /* ---------- a shared add-on dialog layer (sits above the menu, never touches the game's own pop-ups) ---------- */
@@ -5377,10 +5375,10 @@ function exitChallenge(){
 }
 function chBar(el){
   const c=G.challenge; el.hidden=false; el.classList.add('chbar');
-  if(c.watch){ el.innerHTML=`<span class="tagx">Playoffs · Season ${F?F.season:''}</span><b>${esc(c.title)}</b><span style="color:var(--muted)">Watching: ${esc(G.teams[0].name)} at ${esc(G.teams[1].name)}</span><span class="sp"><button class="btn small" type="button" id="cbFin">Finish game</button><button class="btn small" type="button" id="cbExit">Back to playoffs</button></span>`;
+  if(c.watch){ el.innerHTML=`<span class="tagx">Playoffs · ${F?frYear(F.season):''}</span><b>${esc(c.title)}</b><span style="color:var(--muted)">Watching: ${esc(G.teams[0].name)} at ${esc(G.teams[1].name)}</span><span class="sp"><button class="btn small" type="button" id="cbFin">Finish game</button><button class="btn small" type="button" id="cbExit">Back to playoffs</button></span>`;
     $('cbFin').onclick=()=>{ if(!G||G.over) return; askYes('Skip to the end? The rest of the game plays out in one go.','Finish game').then(ok=>{ if(!ok) return; const go=()=>{ if(!G||G.over||!watchOn()) return; if(busy||layerRoot()){ setTimeout(go,150); return; } $('finish').click(); }; go(); }); };
     $('cbExit').onclick=()=>{ if(busy) return; askYes('Stop watching? This game will be simmed with the rest of the day.','Stop watching').then(ok=>{ if(ok){ hubTab='playoffs'; exitChallenge(); } }); }; return; }
-  if(c.asg){ el.innerHTML=`<span class="tagx">Franchise · Season ${F?F.season:''}</span><b>All-Star Game</b><span style="color:var(--muted)">${esc(G.teams[0].name)} at ${esc(G.teams[1].name)} · the winning conference gets home field in the Floodlight Series</span><span class="sp"><button class="btn small" type="button" id="cbExit">Back to franchise</button></span>`;
+  if(c.asg){ el.innerHTML=`<span class="tagx">Franchise · ${F?frYear(F.season):''}</span><b>All-Star Game</b><span style="color:var(--muted)">${esc(G.teams[0].name)} at ${esc(G.teams[1].name)} · the winning conference gets home field in the Floodlight Series</span><span class="sp"><button class="btn small" type="button" id="cbExit">Back to franchise</button></span>`;
     $('cbExit').onclick=()=>{ if(busy) return; askYes('Leave the All-Star Game? It will be simmed when the season moves on.','Leave').then(ok=>{ if(ok) exitChallenge(); }); }; return; }
   el.innerHTML=`<span class="tagx">Clutch Challenge</span><b>${esc(c.title)}</b><span style="color:var(--muted)">${c.goals.map(g=>esc(goalText(g))).join(' · ')}</span><span class="sp"><button class="btn small" type="button" id="cbRetry">Restart</button><button class="btn small" type="button" id="cbAll">Challenges</button><button class="btn small" type="button" id="cbExit">Exit</button></span>`;
   $('cbRetry').onclick=()=>{ if(busy) return; startChallenge(c.id==='daily'?dailyFor(c.date):CH_BY[c.id]); };
@@ -6276,7 +6274,6 @@ function trValid(){
   if(fCount(u,TR.me)!==fCount(o,TR.them)) return 'Each club keeps the same lineup spots: swap a player for a player in the same spot.';
   const back=(F.trades||[]).find(t=>t.s===F.season&&t.b===o&&t.a===u&&TR.them.some(n=>t.ga.includes(n)));
   if(back) return `The ${tname(o)} just got ${back.ga.find(n=>TR.them.includes(n))} from you. They won't send him back this season.`;
-  if(typeof ctTradeOK==='function'&&F.ct){ const B=ctTradeOK(u,TR.me,o,TR.them); if(!B.ok) return B.pa>CT_BUDGET&&B.pa>ctPay(u)?`That would put your payroll at ${ctMoney(B.pa)}, over your ${ctMoney(CT_BUDGET)} budget.`:`The ${tname(o)} can't fit that much salary under their budget.`; }
   return '';
 }
 /* the other GM's answer: [gain for them, a short line] */
@@ -6327,7 +6324,7 @@ function trCpuDay(){
     const x=pick(F.teams[a].lineup), info=F.teams[a].roster[x];
     const ys=F.teams[b].lineup.filter(y=>!!F.teams[b].roster[y].f===!!info.f&&F.teams[b].roster[y].ab!==info.ab);
     for(const y of shuffle(ys)){ const ga=trGain(a,trPack(a,[x]),trPack(b,[y]),lg), gb=trGain(b,trPack(b,[y]),trPack(a,[x]),lg);
-      if(ga>=.2&&gb>=.2&&(!F.ct||ctTradeOK(a,[x],b,[y]).ok)){ trDo(a,b,[x],[y],false); return; } } }
+      if(ga>=.2&&gb>=.2){ trDo(a,b,[x],[y],false); return; } } }
 }
 
 /* ---------- the rookie draft: one round, worst record picks first ---------- */
@@ -6369,9 +6366,9 @@ function drTake(tid,p,rel){
   delete T.roster[rel]; T.lineup[i]=p.name; T.roster[p.name]=info;
   F.bio[p.name]=Object.assign(nwBioNew(p.name),{a:p.age});
   const FA=typeof faGet==='function'?faGet():null; // a player released for a rookie becomes a free agent while the market is open
-  if(FA&&!FA.done){ const ri=Object.assign({},relInfo), ra=plAge(rel), rw=ctWorth(rel,ri); if(!FA.pool.some(x=>x.name===rel)) FA.pool.push({name:rel,from:tid,info:ri,age:ra,w:rw,ask:{s:Math.max(CT_MIN,ctSalary(rw)),y:ctYears(ra+1)}}); delete FA.dec[rel]; }
+  if(FA&&!FA.done){ const ri=Object.assign({},relInfo), ra=plAge(rel), rw=ctWorth(rel,ri); if(!FA.pool.some(x=>x.name===rel)) FA.pool.push({name:rel,from:tid,info:ri,age:ra,w:rw,ask:{y:ctYears(ra+1)}}); delete FA.dec[rel]; }
   else (F.gone||(F.gone=[])).push(rel);
-  if(F.ct){ F.ct[p.name]={y:3,s:Math.max(CT_MIN,3-Math.floor(D.picks.length/6))}; if(FA) (FA.fresh||(FA.fresh=[])).push(p.name); }
+  if(F.ct){ F.ct[p.name]={y:3}; if(FA) (FA.fresh||(FA.fresh=[])).push(p.name); }
   D.pool=D.pool.filter(x=>x!==p); D.picks.push({tid,name:p.name,ab:p.ab,age:p.age,rel}); prepCards([T]);
 }
 function drCpuPick(tid){ const D=F.draft, lg=lgOps(), T=F.teams[tid]; let best=null;
@@ -6413,7 +6410,7 @@ function movesHTML(){
   if(!FULL_GAME&&drOn()) h+=`<div class="hcard"><h4>Rookie Draft</h4><p>Every offseason, each club drafts a rookie: worst record picks first. The draft and every season after the first are part of the full game.</p><div class="hbtns"><button class="btn primary" type="button" data-act="full">Get the full game</button></div></div>`;
   if(D){
     const turn=!D.done&&D.order[D.at]===u, started=D.at>0||D.done;
-    h+=`<div class="hcard"><h4>Rookie Draft · Season ${F.season+1}</h4>`;
+    h+=`<div class="hcard"><h4>Rookie Draft · ${frYear(F.season+1)}</h4>`;
     if(D.done) h+=`<p>The draft is over.</p>`;
     else h+=`<p>One round, worst record picks first. Every club may draft one rookie, who takes the place of a player it releases. You can also pass and keep your roster.${started?'':' Clubs that pick before you go when you start.'}</p>`;
     h+=`<ol class="drorder">${D.order.map((id,i)=>{ const p=D.picks[i]; return `<li class="${id===u?'me':''}${i===D.at&&!D.done?' now':''}">${tdot(id)}<b>${esc(tname(id))}</b><span>${p?(p.pass?'Passed':`${esc(p.name)} · ${ABIL[p.ab].name}${p.rel?` (releases ${esc(p.rel)})`:''}`):i===D.at&&!D.done?(id===u?'Your pick':'On the clock'):''}</span></li>`; }).join('')}</ol>`;
@@ -6605,7 +6602,7 @@ function asgStart(){
   G=newState('sim',[gameTeam(A),gameTeam(H)],u?[true,false]:[false,true]);
   G.challenge={id:'asg',title:'All-Star Game',asg:true,goals:[['win']],start:[0,0],inn0:1,inn:9,hr0:0,cards:0,u,from:'fr'};
   busy=false; $('pcard').dataset.nm=''; annStart(); renderGame(); fitTop();
-  openX(`<div class="xpanel" role="dialog" aria-modal="true" aria-labelledby="asT">${xHead('<span id="asT">All-Star Game</span>',`Season ${F.season} · ${esc(A.name)} at ${esc(H.name)}`)}
+  openX(`<div class="xpanel" role="dialog" aria-modal="true" aria-labelledby="asT">${xHead('<span id="asT">All-Star Game</span>',`${frYear(F.season)} · ${esc(A.name)} at ${esc(H.name)}`)}
 <p>You manage the <b>${esc(G.teams[u].name)}</b>: the best players from every ${CONF_NAME[confOf(F.userId)]} club, yours included. The winning conference gets <b>home field in the Floodlight Series</b>. It doesn't count in the standings or the stat sheets.</p>
 <div class="asgrid">${[A,H].map(T=>`<div><h5 style="color:${T.color}">${esc(T.name)}</h5><ol class="troster">${T.lineup.map((n,i)=>`<li><span>${i+1}</span><span>${esc(n)} <small style="color:var(--muted)">${esc(F.teams[T.roster[n].from]?F.teams[T.roster[n].from].abbr:'')}</small></span>${abChip(T.roster[n].ab)}</li>`).join('')}</ol></div>`).join('')}</div>
 <div class="ovbtns"><button class="btn primary" type="button" data-x data-focus>Play ball</button></div></div>`,{onClose:()=>{ sfx.organ&&sfx.organ(); autoCpuKick(); }});
@@ -6614,7 +6611,7 @@ function asgStart(){
 function asgFinal(){
   const sim=!!G.fin; asgRecord(G,sim);
   const a=total(G,0), h=total(G,1), u=G.challenge.u, won=(u===0?a>h:h>a), A=F.asg;
-  openX(`<div class="xpanel chres" role="dialog" aria-modal="true" aria-labelledby="afT"><span class="aside" style="color:var(--flood)">All-Star Game · Season ${F.season}</span>
+  openX(`<div class="xpanel chres" role="dialog" aria-modal="true" aria-labelledby="afT"><span class="aside" style="color:var(--flood)">All-Star Game · ${frYear(F.season)}</span>
 <h3 id="afT">${won?'Your All-Stars win!':'The '+CONF_NAME[A.w]+' wins it'}</h3>
 <p class="fin">Final: ${esc(G.teams[0].abbr)} ${a}, ${esc(G.teams[1].abbr)} ${h}${G.inning>9?` in ${G.inning}`:''}</p>
 <p class="fin">${A.mvp?`MVP: <b>${esc(A.mvp)}</b>. `:''}The ${CONF_NAME[A.w]} will have home field in the Floodlight Series.</p>
@@ -6628,7 +6625,7 @@ function asgFinal(){
 function asgCardHTML(){
   const [A,H]=asgTeams(), mine=confOf(F.userId);
   const col=T=>`<div><h5 style="color:${T.color}">${esc(T.name)}</h5><ol class="troster">${T.lineup.map((n,i)=>`<li><span>${i+1}</span><span>${esc(n)}</span><small style="color:var(--muted)">${esc(F.teams[T.roster[n].from]?F.teams[T.roster[n].from].abbr:'')}</small></li>`).join('')}</ol></div>`;
-  return `${dbCardHTML()}<div class="hcard nextg"><h4>All-Star break · Season ${F.season}</h4><p>Halfway home. The ${esc(A.name)} visit the ${esc(H.name)}, and the winning conference gets <b>home field in the Floodlight Series</b>. You manage the ${CONF_NAME[mine]}.</p><div class="asgrid">${col(A)}${col(H)}</div>
+  return `${dbCardHTML()}<div class="hcard nextg"><h4>All-Star break · ${frYear(F.season)}</h4><p>Halfway home. The ${esc(A.name)} visit the ${esc(H.name)}, and the winning conference gets <b>home field in the Floodlight Series</b>. You manage the ${CONF_NAME[mine]}.</p><div class="asgrid">${col(A)}${col(H)}</div>
 <div class="hbtns"><button class="btn primary" type="button" data-act="asgplay">Play the All-Star Game</button><button class="btn" type="button" data-act="asgsim">Sim it</button></div></div>`;
 }
 function asgAct(a){
@@ -6934,7 +6931,8 @@ appInit();
    Franchises saved before the change pick up the new names, abbreviations and logo when they load (frPeek, save slots,
    save files and codes all pass through here). A plain function with only local data, so it is safe to call while the
    game is still starting up. */
-function frRenameClubs(o){
+function frRenameClubs(o){ return ctMig(frYearsMig(frRenameClubs0(o))); } // and seasons become years (64-years.js), and money comes out (61-contracts.js)
+function frRenameClubs0(o){
   if(!o||typeof o!=='object'||!o.teams) return o;
   const R=[{from:'Las Vegas High Rollers', to:'Nevada Jokers', city:['Las Vegas','Nevada'], nick:['High Rollers','Jokers'], abbr:['LV','NEV'], logo:['dice','joker']},
            {from:'Kansas City Cyclones', to:'Tennessee Cyclones', city:['Kansas City','Tennessee'], nick:null, abbr:['KC','TEN'], logo:null}];
@@ -7062,9 +7060,9 @@ function poBracketHTML(tab){
     const cf=P.series.find(s=>s.label===C+' Final');
     return `<div class="pcol"><h5>${C}</h5>${box(cf,C+' Final',2)}</div>`; };
   const fin=P.final, champ=fin&&fin.winner, cw=c=>{ const x=P.series.find(q=>q.label===CONF_NAME[c]+' Final'||q.id===c+'-cs'); return x&&x.winner||null; };
-  const mid=`<div class="pcol pmid"><h5>Floodlight Series</h5>${box(fin,'Floodlight Series',4,'fsbox',cw('W'),cw('E'),['West champion','East champion'])}${champ?`<div class="pchamp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10v3a5 5 0 0 1-3.5 4.8V14h2.5v2H8v-2h2.5v-3.2A5 5 0 0 1 7 6V3Zm-4 1h3v2.5A3.5 3.5 0 0 1 3 4Zm18 0a3.5 3.5 0 0 1-3 2.5V4h3ZM6 18h12v3H6v-3Z"/></svg><span>Season ${F.season} champions</span><b>${esc(tname(champ))}</b></div>`:''}</div>`;
+  const mid=`<div class="pcol pmid"><h5>Floodlight Series</h5>${box(fin,'Floodlight Series',4,'fsbox',cw('W'),cw('E'),['West champion','East champion'])}${champ?`<div class="pchamp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10v3a5 5 0 0 1-3.5 4.8V14h2.5v2H8v-2h2.5v-3.2A5 5 0 0 1 7 6V3Zm-4 1h3v2.5A3.5 3.5 0 0 1 3 4Zm18 0a3.5 3.5 0 0 1-3 2.5V4h3ZM6 18h12v3H6v-3Z"/></svg><span>${frYear(F.season)} champions</span><b>${esc(tname(champ))}</b></div>`:''}</div>`;
   const legend=P.fmt==='mlb'?'The top two seeds in each conference get a bye. Wild Card Series: best of 3, every game at the higher seed. Division Series: best of 5. Championship Series and Floodlight Series: best of 7. Home field in the Floodlight Series goes to the conference that won the All-Star Game.':P.wc?'The 1 seeds wait for the winner of their conference’s one-game wild card. Home field in the Floodlight Series goes to the conference that won the All-Star Game.':'Home field in the Floodlight Series goes to the conference that won the All-Star Game.';
-  return `<div class="hcard pbcard"><h4>${tab?`Season ${F.season} playoffs`:'Playoff bracket'}</h4><div class="pbr">${conf('W')}${mid}${conf('E')}</div><p class="legend">${legend}</p></div>`;
+  return `<div class="hcard pbcard"><h4>${tab?`${frYear(F.season)} playoffs`:'Playoff bracket'}</h4><div class="pbr">${conf('W')}${mid}${conf('E')}</div><p class="legend">${legend}</p></div>`;
 }
 /* during the season: who's in if it ended today */
 function poProjectedHTML(){
@@ -7075,7 +7073,7 @@ function poProjectedHTML(){
   return `<div class="hcard pbcard"><h4>If the season ended today</h4><div class="pbr two">${side('W')}${side('E')}</div><p class="legend">${confLegend().replace(' (dashed line)','')} ${SEASON_GAMES-F.day} game${SEASON_GAMES-F.day===1?'':'s'} left.</p></div>`;
 }
 function poTabHTML(){
-  if(F.phase==='reg') return poProjectedHTML()+(F.history.length?`<div class="hcard"><h4>Last season</h4><p>${esc(F.history[F.history.length-1].champName)} won the Floodlight Series ${esc(F.history[F.history.length-1].score)}.</p></div>`:'');
+  if(F.phase==='reg') return poProjectedHTML()+(F.history.length?`<div class="hcard"><h4>Last season · ${frYear(F.history[F.history.length-1].season)}</h4><p>${esc(F.history[F.history.length-1].champName)} won the Floodlight Series ${esc(F.history[F.history.length-1].score)}.</p></div>`:'');
   return poBracketHTML(true);
 }
 
@@ -7092,7 +7090,7 @@ function poWatch(label){
   G.challenge={id:'watch',title:(s.need===1?`the ${s.label} game`:`${s.label} Game ${s.g.length+1}`).replace(/^the /,''),watch:true,goals:[['win']],start:[0,0],inn0:1,inn:9,hr0:0,cards:0,u:1,from:'fr',key:poKey(s),label:sid(s),fs:poIsFS(s)}; G.poRound=poRoundOf(s); G.rival=rvOn(A.id,H.id);
   busy=false; $('pcard').dataset.nm=''; annStart(); renderGame(); fitTop();
   const recd=id=>`${F.rec[id].w}–${F.rec[id].l}`;
-  openX(`<div class="xpanel" role="dialog" aria-modal="true" aria-labelledby="pwT">${xHead('<span id="pwT">'+esc(G.challenge.title)+'</span>',`Season ${F.season} playoffs · ${esc(A.name)} at ${esc(H.name)}`)}
+  openX(`<div class="xpanel" role="dialog" aria-modal="true" aria-labelledby="pwT">${xHead('<span id="pwT">'+esc(G.challenge.title)+'</span>',`${frYear(F.season)} playoffs · ${esc(A.name)} at ${esc(H.name)}`)}
 <div class="matchup"><div class="tm">${teamMark(A,'big')}<b style="color:${ink(A.color)}">${esc(A.name)}</b><span>${seedTag(A.id)} · ${recd(A.id)}</span></div><span class="vs">at</span><div class="tm">${teamMark(H,'big')}<b style="color:${ink(H.color)}">${esc(H.name)}</b><span>${seedTag(H.id)} · ${recd(H.id)}</span></div></div>
 <p>${esc(s.need===1?poWcStory(s):s.g.length?seriesText(s)+'.':'Game 1 of the series.')} The computer manages both clubs and rolls on its own. Sit back and watch, press <b>Roll</b> to hurry it along, or use <b>Finish game</b> to see how it ends.</p>
 <div class="ovbtns"><button class="btn primary" type="button" data-x data-focus>Play ball</button></div></div>`,{onClose:()=>{ sfx.organ&&sfx.organ(); autoCpuKick(); }});
@@ -7108,7 +7106,7 @@ function poWatchFinal(){
   }
   const s2=F.po?poAllSeries().find(x=>sid(x)===c.label):null;
   const W=a>h?G.teams[0]:G.teams[1];
-  openX(`<div class="xpanel chres" role="dialog" aria-modal="true" aria-labelledby="pfT"><span class="aside" style="color:var(--flood)">${esc(c.title)} · Season ${F.season}</span>
+  openX(`<div class="xpanel chres" role="dialog" aria-modal="true" aria-labelledby="pfT"><span class="aside" style="color:var(--flood)">${esc(c.title)} · ${frYear(F.season)}</span>
 <h3 id="pfT">${esc(W.name)} win${G.fin?'':'!'}</h3>
 <p class="fin">Final: ${esc(G.teams[0].abbr)} ${a}, ${esc(G.teams[1].abbr)} ${h}${G.inning>9?` in ${G.inning}`:''}</p>
 ${s2?`<p class="fin">${esc(s2.need===1?(s2.winner?`${tname(s2.winner)} move on to ${poNextName(s2)}.`:''):seriesText(s2)+(s2.winner&&!poIsFS(s2)?`, and they move on to ${poNextName(s2)}`:'')+'.')}</p>`:''}${note?`<p class="fin">${esc(note)}</p>`:''}
@@ -7168,12 +7166,12 @@ function moreAwards(stats,o){
 /* the Awards tab: this season's Players of the Week, the season awards, and every season's winners */
 function awardsTabHTML(){
   const L=potwList(), A=F.phase!=='reg'?F.awards:null;
-  const pw=L.length?`<div class="hcard"><h4>Players of the Week · Season ${F.season}</h4><div class="tscroll"><table class="tbl"><thead><tr><th class="l">Games</th>${confOn()?'<th class="l">West</th><th class="l">East</th>':'<th class="l">Player</th>'}</tr></thead><tbody>${L.map(w=>`<tr><td class="l">${w.from}–${w.to}</td>${(confOn()?[w.W,w.E]:[w.L]).map(a=>`<td class="l">${a?`${tdot(a.team)}<b>${esc(a.name)}</b> <small style="color:var(--muted)">${esc(a.line)}</small>`:''}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div>`
+  const pw=L.length?`<div class="hcard"><h4>Players of the Week · ${frYear(F.season)}</h4><div class="tscroll"><table class="tbl"><thead><tr><th class="l">Games</th>${confOn()?'<th class="l">West</th><th class="l">East</th>':'<th class="l">Player</th>'}</tr></thead><tbody>${L.map(w=>`<tr><td class="l">${w.from}–${w.to}</td>${(confOn()?[w.W,w.E]:[w.L]).map(a=>`<td class="l">${a?`${tdot(a.team)}<b>${esc(a.name)}</b> <small style="color:var(--muted)">${esc(a.line)}</small>`:''}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div>`
     :`<div class="hcard"><h4>Players of the Week</h4><p class="empty2">The first Player of the Week is named after game 10.</p></div>`;
   const H=F.history.slice().reverse(), who=a=>a?`${F.teams[a.team]?tdot(a.team):''}${esc(a.name)}`:'';
   const dby=s=>(F.derbyHist||[]).find(x=>x.s===s), dbw=d=>d?`${F.teams[d.team]?tdot(d.team):''}${esc(d.name)} <small style="color:var(--muted)">(${d.n})</small>`:'';
-  const hist=H.length?`<div class="hcard"><h4>Award winners</h4><div class="tscroll"><table class="tbl"><thead><tr><th class="l">Season</th><th class="l">MVP</th><th class="l">Rookie of the Year</th><th class="l">Slugger of the Year</th><th class="l">HR king</th><th class="l">Batting title</th><th class="l">HR Derby</th></tr></thead><tbody>${H.map(h=>{ const a=h.awards||{}; return `<tr><td class="l">${h.season}</td><td class="l">${who(a.mvp)}</td><td class="l">${who(a.roy)}</td><td class="l">${who(a.slug)}</td><td class="l">${who(a.hr)}</td><td class="l">${who(a.bat)}</td><td class="l">${dbw(dby(h.season))}</td></tr>`; }).join('')}</tbody></table></div></div>`:'';
-  const dNow=dby(F.season), dCard=dNow&&!H.some(h=>h.season===F.season)?`<div class="hcard"><h4>Home Run Derby · Season ${F.season}</h4><p>${tdot(dNow.team)}<b>${esc(dNow.name)}</b> won with ${dNow.n} home runs, beating ${esc(dNow.vs)} (${dNow.vn}).</p></div>`:'';
+  const hist=H.length?`<div class="hcard"><h4>Award winners</h4><div class="tscroll"><table class="tbl"><thead><tr><th class="l">Year</th><th class="l">MVP</th><th class="l">Rookie of the Year</th><th class="l">Slugger of the Year</th><th class="l">HR king</th><th class="l">Batting title</th><th class="l">HR Derby</th></tr></thead><tbody>${H.map(h=>{ const a=h.awards||{}; return `<tr><td class="l">${frYear(h.season)}</td><td class="l">${who(a.mvp)}</td><td class="l">${who(a.roy)}</td><td class="l">${who(a.slug)}</td><td class="l">${who(a.hr)}</td><td class="l">${who(a.bat)}</td><td class="l">${dbw(dby(h.season))}</td></tr>`; }).join('')}</tbody></table></div></div>`:'';
+  const dNow=dby(F.season), dCard=dNow&&!H.some(h=>h.season===F.season)?`<div class="hcard"><h4>Home Run Derby · ${frYear(F.season)}</h4><p>${tdot(dNow.team)}<b>${esc(dNow.name)}</b> won with ${dNow.n} home runs, beating ${esc(dNow.vs)} (${dNow.vn}).</p></div>`:'';
   return `${A?awardsHTML(A):''}${pw}${dCard}${hist}`;
 }
 /* the TV show's playoff picture with the wild card */
@@ -7199,18 +7197,19 @@ function confLegend(){
 TABS.splice(TABS.findIndex(t=>t[0]==='standings')+1,0,['playoffs','Playoffs']);
 TABS.splice(TABS.findIndex(t=>t[0]==='champs'),0,['awards','Awards']);
 
-/* ---------- franchise: contracts, the budget and free agency ----------
-   Every player is under contract: a salary (in millions) and the seasons left on it. Every club has the same
-   $100M budget. When the Floodlight Series ends, contracts with one season left run out:
-   - you choose who to re-sign (at the player's asking price) and who to let go;
+/* ---------- franchise: contracts and free agency ----------
+   No money: Floodlight Baseball mirrors the tabletop game, which has no salaries, payrolls or budgets (John, Oct 2026).
+   Every player is signed for a number of seasons. When the Floodlight Series ends, deals with one season left run out:
+   - you choose who to re-sign and who to let go;
    - the computer clubs make their own calls, and the players they don't keep become free agents;
-   - you get the first chance at the free agents: sign one and pick who loses his spot (that player becomes a free
-     agent himself). When the next season starts, the computer clubs sign the rest, so a star you can't afford
-     may well end up on a rival.
-   Rookies (from the draft or replacing a retired player) start on a three-year deal near the minimum. */
-const CT_BUDGET=100, CT_MIN=1, CT_MAX=34;
+   - you get the first call on the free agents, up to FA_MAX signings a winter: sign one and pick who loses his spot
+     (that player becomes a free agent himself). When the next season starts, the computer clubs fill their open
+     spots from the rest, worst record first, so a star you pass on may well end up on a rival.
+   Rookies (from the draft or replacing a retired player) start on a three-season deal. */
+const FA_MAX=2;
 NW_KIND.fa='Free agency';
-/* what a player is worth on the open market (no team's taste or race in it): about 2 to 18 */
+/* how good a player is on the open market (no team's taste or race in it): about 2 to 18. It decides who the
+   computer keeps and who gets signed first; it is never shown as a price. */
 function ctWorth(n,info){
   const r=info||ctInfo(n)||{}; let v=AB_VAL[r.ab]||5, perf=0; const lg=lgOps(), s=F.stats&&F.stats[n], c=F.career&&F.career[n];
   if(s&&s.PA>=12) perf+=(ops(s)-lg)*14*Math.min(1,s.PA/110);
@@ -7219,22 +7218,30 @@ function ctWorth(n,info){
   const a=r.age!=null?r.age:plAge(n); v+=a<=24?1:a<=31?1.5:a<=34?0:-(a-34)*1.2;
   return Math.round(v*10)/10;
 }
-const ctSalary=v=>Math.max(CT_MIN,Math.min(CT_MAX,Math.round(Math.pow(Math.max(0,v-3)/12,1.3)*30+1)));
 const ctYears=a=>a<=26?3+Math.floor(Math.random()*3):a<=31?2+Math.floor(Math.random()*3):a<=34?1+Math.floor(Math.random()*2):1;
-const ctMoney=x=>'$'+(Math.round(x*10)/10)+'M';
+const ctYrs=y=>`${y} season${y===1?'':'s'}`;
 function ctInfo(n){ for(const id of F.ids){ const r=F.teams[id].roster[n]; if(r) return r; } const p=F.fa&&F.fa.pool.find(x=>x.name===n); return p&&p.info; }
 const ctOf=n=>(F.ct||{})[n]||null;
-const ctPay=tid=>F.teams[tid].lineup.reduce((t,n)=>t+((ctOf(n)||{}).s||0),0);
 const ctTeamOf=n=>F.ids.find(id=>F.teams[id].roster[n])||null;
 /* every player gets a deal: on a new (or older) league, and for anyone who joined without one */
 function ctEnsure(){
   if(!F||!F.ids) return; const first=!F.ct; F.ct=F.ct||{};
-  for(const id of F.ids){ const T=F.teams[id]; let made=false;
-    for(const n of T.lineup){ if(F.ct[n]) continue; made=true; const a=plAge(n), w=ctWorth(n,T.roster[n]);
-      // a brand-new rookie starts near the minimum; everyone else signs for what he's worth
-      F.ct[n]=!first&&a<=ROOKIE_AGE+1?{y:3,s:CT_MIN}:{y:1+Math.floor(Math.random()*4),s:Math.max(CT_MIN,Math.round(ctSalary(w)*(.85+Math.random()*.25)))};
-      if(a>=34) F.ct[n].y=Math.min(F.ct[n].y,2); }
-    if(made){ const p=ctPay(id); if(p>CT_BUDGET*.95) for(const n of T.lineup) F.ct[n].s=Math.max(CT_MIN,Math.floor(F.ct[n].s*CT_BUDGET*.92/p)); } }
+  for(const id of F.ids) for(const n of F.teams[id].lineup){ if(F.ct[n]) continue; const a=plAge(n);
+    F.ct[n]={y:!first&&a<=ROOKIE_AGE+1?3:1+Math.floor(Math.random()*4)};
+    if(a>=34) F.ct[n].y=Math.min(F.ct[n].y,2); }
+}
+/* saves from before money came out: scrub dollar amounts from the stories (plain function, safe during startup) */
+function ctMig(o){
+  if(!o||typeof o!=='object'||!o.teams||o.nomoney) return o;
+  let s; try{ s=JSON.stringify(o); }catch(e){ return o; }
+  let n=o;
+  if(/\$\d|million a year/.test(s)){
+    const t=s.replace(/ at \$[\d.]+M a year/g,'').replace(/, \$[\d.]+M a year/g,'').replace(/\(\$[\d.]+M, /g,'(')
+      .replace(/ \(\$[\d.]+M\)/g,'').replace(/: no room for his \$[\d.]+M ask/g,'').replace(/, at \d+ million a year/g,'');
+    try{ n=JSON.parse(t); }catch(e){ n=o; }
+  }
+  if(n.ct) for(const k of Object.keys(n.ct)) if(n.ct[k]) delete n.ct[k].s; // deals are seasons only
+  n.nomoney=1; return n;
 }
 /* ---------- the offseason market ---------- */
 function faOn(){ return !!F&&F.phase==='off'&&F.history.length>0; }
@@ -7244,41 +7251,40 @@ function faGet(){
   const pool=[], dec={}, order=typeof drOrder==='function'?drOrder():F.ids.slice();
   for(const id of F.ids){ const T=F.teams[id];
     for(const n of T.lineup){ const c=ctOf(n); if(!c||c.y>1) continue;
-      const a=plAge(n), w=ctWorth(n,T.roster[n]), ask={s:Math.max(CT_MIN,ctSalary(w)), y:ctYears(a+1)};
+      const a=plAge(n), w=ctWorth(n,T.roster[n]), ask={y:ctYears(a+1)};
       if(id===F.userId){ dec[n]={ask, d:null}; continue; }
-      // the computer keeps the players it values, if the money works
-      const room=CT_BUDGET-ctPay(id)+c.s, keep=a<38&&ask.s<=room&&(w>=9||(w>=7&&Math.random()<.6)||Math.random()<.25);
+      // the computer keeps the players it values
+      const keep=a<38&&(w>=9||(w>=7&&Math.random()<.6)||Math.random()<.25);
       if(keep) dec[n]={ask,d:'re',cpu:1}; else { dec[n]={ask,d:'go',cpu:1}; pool.push({name:n,from:id,info:Object.assign({},T.roster[n]),age:a,w,ask}); }
     } }
   F.fa={s:F.season,pool,dec,signed:[],order};
   frSave(); return F.fa;
 }
-/* the price of signing free agent p for the user: his ask, against the room left once the released player's pay is gone */
-function faRoom(rel){ const c=rel&&ctOf(rel); return CT_BUDGET-ctPay(F.userId)+(c?c.s:0); }
+/* free agents the user has signed this winter (they count against FA_MAX) */
+const faMine=D=>(D.signed||[]).filter(x=>x.tid===F.userId&&x.pick).length;
 /* the user's own expiring deals */
 function faDecide(n,d){ const D=faGet(); if(!D||!D.dec[n]||D.dec[n].cpu) return; D.dec[n].d=d; frSave(); }
 /* sign free agent `name` to the user's club; `rel` loses his spot (and becomes a free agent) */
 function faSign(name,rel){
   const D=faGet(), u=F.userId, M=F.teams[u]; if(!D) return 'The market is closed.';
   const p=D.pool.find(x=>x.name===name); if(!p) return 'He has already signed somewhere else.';
+  if(faMine(D)>=FA_MAX) return `You've made your ${FA_MAX} free-agent signings for this winter.`;
   if(!M.roster[rel]) return 'Pick who loses his spot.';
   if(!!M.roster[rel].f!==!!p.info.f) return 'Each club keeps the same lineup spots: release a player from the same spot.';
-  const room=faRoom(rel);
-  if(p.ask.s>room) return `That deal (${ctMoney(p.ask.s)}) would put you over your ${ctMoney(CT_BUDGET)} budget.`;
   // the swap
   const i=M.lineup.indexOf(rel), info=Object.assign({},p.info), nums=new Set(M.lineup.filter(n=>n!==rel).map(n=>M.roster[n].n)); delete info.age;
   if(nums.has(info.n)){ let k=1; while(nums.has(k)) k++; info.n=k; }
   const relInfo=Object.assign({},M.roster[rel]); delete M.roster[rel]; M.lineup[i]=name; M.roster[name]=info;
   for(const st of [F.stats,F.pstats]) if(st&&st[name]) st[name].team=u;
-  F.ct[name]={y:p.ask.y,s:p.ask.s}; (D.fresh||(D.fresh=[])).push(name);
+  F.ct[name]={y:p.ask.y}; (D.fresh||(D.fresh=[])).push(name);
   // a player the computer was letting go is still on its roster: a stand-in holds his spot until the season starts
   const O=p.from&&p.from!==u&&F.teams[p.from]; if(O&&O.roster[name]){ const used=new Set([...Object.keys(F.bio||{}),...F.ids.flatMap(id=>F.teams[id].lineup)]), R=frRookie(O,name,used), j=O.lineup.indexOf(name);
-    delete O.roster[name]; O.lineup[j]=R.name; O.roster[R.name]=R.info; F.bio[R.name]=Object.assign(nwBioNew(R.name),{a:ROOKIE_AGE}); F.ct[R.name]={y:1,s:CT_MIN}; D.dec[R.name]={cpu:1,d:'go',ph:1,ask:{s:CT_MIN,y:1}}; }
+    delete O.roster[name]; O.lineup[j]=R.name; O.roster[R.name]=R.info; F.bio[R.name]=Object.assign(nwBioNew(R.name),{a:ROOKIE_AGE}); F.ct[R.name]={y:1}; D.dec[R.name]={cpu:1,d:'go',ph:1,ask:{y:1}}; }
   delete D.dec[name];
   D.pool=D.pool.filter(x=>x.name!==name&&x.name!==rel); delete D.dec[rel];
-  const ra=plAge(rel), rw=ctWorth(rel,relInfo); D.pool.push({name:rel,from:u,info:relInfo,age:ra,w:rw,ask:{s:Math.max(CT_MIN,ctSalary(rw)),y:ctYears(ra+1)}});
-  D.signed.push({tid:u,name,s:p.ask.s,y:p.ask.y,from:p.from});
-  try{ nwAdd('fa',`${name} signs with your club`,`${nwT(u)} sign ${name} (${ABIL[info.ab].name}, ${p.age}) for ${p.ask.y} season${p.ask.y===1?'':'s'} at ${ctMoney(p.ask.s)} a year.${p.from&&p.from!==u&&F.teams[p.from]?` He played for ${nwT(p.from)} last season.`:''} ${rel} is let go to make room.`,{t:[u],p:{n:name,tid:u},pr:4}); }catch(e){}
+  const ra=plAge(rel), rw=ctWorth(rel,relInfo); D.pool.push({name:rel,from:u,info:relInfo,age:ra,w:rw,ask:{y:ctYears(ra+1)}});
+  D.signed.push({tid:u,name,y:p.ask.y,from:p.from,w:p.w,pick:1});
+  try{ nwAdd('fa',`${name} signs with your club`,`${nwT(u)} sign ${name} (${ABIL[info.ab].name}, ${p.age}) for ${ctYrs(p.ask.y)}.${p.from&&p.from!==u&&F.teams[p.from]?` He played for ${nwT(p.from)} last season.`:''} ${rel} is let go to make room.`,{t:[u],p:{n:name,tid:u},pr:4}); }catch(e){}
   prepCards([M]); frSave(); return '';
 }
 /* when the new season starts: your decisions go through, then the computer clubs sign the rest */
@@ -7287,29 +7293,26 @@ function faResolve(){
   const u=F.userId, M=F.teams[u], notes=[], fresh=new Set(D.fresh||[]);
   { const seen=new Set(); D.pool=D.pool.filter(x=>!seen.has(x.name)&&seen.add(x.name)); } // one entry per player
   const used=new Set([...Object.keys(F.bio||{}),...Object.keys(F.career||{}),...F.ids.flatMap(id=>F.teams[id].lineup),...RED_LINEUP,...BLUE_LINEUP,...DHS.map(d=>d.name),...(F.retired||[]).map(r=>r.name)]);
-  // 1. your expiring players: re-sign (if the money works) or let go
+  // 1. your expiring players: re-sign or let go (anyone you didn't decide on stays)
   for(const [n,x] of Object.entries(D.dec)){ if(x.cpu||!M.roster[n]) continue;
-    const room=CT_BUDGET-ctPay(u)+((ctOf(n)||{}).s||0);
-    if(x.d!=='go'&&x.ask.s<=room){ F.ct[n]={y:x.ask.y,s:x.ask.s}; fresh.add(n); if(x.d==null) notes.push(`${n} re-signed (${ctMoney(x.ask.s)}, ${x.ask.y} yr${x.ask.y===1?'':'s'})`); continue; }
-    if(x.d!=='go') notes.push(`${n} left: no room for his ${ctMoney(x.ask.s)} ask`);
+    if(x.d!=='go'){ F.ct[n]={y:x.ask.y}; fresh.add(n); if(x.d==null) notes.push(`${n} re-signed for ${ctYrs(x.ask.y)}`); continue; }
     D.pool.push({name:n,from:u,info:Object.assign({},M.roster[n]),age:plAge(n),w:ctWorth(n,M.roster[n]),ask:x.ask,open:true}); D.dec[n].gone=true; }
   // 2. the computer clubs' re-signings
-  for(const [n,x] of Object.entries(D.dec)) if(x.cpu&&x.d==='re'){ F.ct[n]={y:x.ask.y,s:x.ask.s}; fresh.add(n); }
-  // 3. fill every open spot: worst clubs choose first; the best affordable free agent for that spot, else a rookie
+  for(const [n,x] of Object.entries(D.dec)) if(x.cpu&&x.d==='re'){ F.ct[n]={y:x.ask.y}; fresh.add(n); }
+  // 3. fill every open spot: worst clubs choose first; the best free agent for that spot, else a rookie
   const open=[]; // [tid, departing player]
   for(const id of D.order) for(const n of F.teams[id].lineup){ const x=D.dec[n]; if(x&&(x.cpu?x.d==='go':x.gone)) open.push([id,n]); }
   D.pool.sort((a,b)=>b.w-a.w);
-  const big=[];
   for(const [id,n] of open){ const T=F.teams[id], i=T.lineup.indexOf(n); if(i<0) continue;
-    const f=!!T.roster[n].f, room=CT_BUDGET-(ctPay(id)-((ctOf(n)||{}).s||0));
-    let p=D.pool.find(x=>!x.taken&&!!x.info.f===f&&x.name!==n&&!T.roster[x.name]&&x.ask.s<=room); // (never a player already on this club)
+    const f=!!T.roster[n].f;
+    let p=D.pool.find(x=>!x.taken&&!!x.info.f===f&&x.name!==n&&!T.roster[x.name]); // (never a player already on this club)
     if(p&&F.ids.some(t=>t!==p.from&&F.teams[t].roster[p.name])) p.taken=true, p=null; // already signed elsewhere
     if(p){ p.taken=true; const info=Object.assign({},p.info), nums=new Set(T.lineup.filter(x=>x!==n).map(x=>T.roster[x].n)); delete info.age; if(nums.has(info.n)){ let k=1; while(nums.has(k)) k++; info.n=k; }
-      delete T.roster[n]; T.lineup[i]=p.name; T.roster[p.name]=info; F.ct[p.name]={y:p.ask.y,s:p.ask.s}; fresh.add(p.name);
+      delete T.roster[n]; T.lineup[i]=p.name; T.roster[p.name]=info; F.ct[p.name]={y:p.ask.y}; fresh.add(p.name);
       for(const st of [F.stats,F.pstats]) if(st&&st[p.name]) st[p.name].team=id;
-      D.signed.push({tid:id,name:p.name,s:p.ask.s,y:p.ask.y,from:p.from}); if(p.w>=9||id===u) big.push(p);
-      if(id===u) notes.push(`${p.name} signed to fill ${n}'s spot (${ctMoney(p.ask.s)})`); }
-    else { const R=frRookie(T,n,used); delete T.roster[n]; T.lineup[i]=R.name; T.roster[R.name]=R.info; F.bio[R.name]=Object.assign(nwBioNew(R.name),{a:ROOKIE_AGE}); F.ct[R.name]={y:3,s:CT_MIN}; fresh.add(R.name);
+      D.signed.push({tid:id,name:p.name,y:p.ask.y,from:p.from,w:p.w});
+      if(id===u) notes.push(`${p.name} signed to fill ${n}'s spot`); }
+    else { const R=frRookie(T,n,used); delete T.roster[n]; T.lineup[i]=R.name; T.roster[R.name]=R.info; F.bio[R.name]=Object.assign(nwBioNew(R.name),{a:ROOKIE_AGE}); F.ct[R.name]={y:3}; fresh.add(R.name);
       if(id===u) notes.push(`rookie ${R.name} takes ${n}'s spot`); } }
   // players nobody signed leave the league
   for(const p of D.pool) if(!p.taken&&!F.ids.some(id=>F.teams[id].roster[p.name])) (F.gone||(F.gone=[])).push(p.name);
@@ -7317,42 +7320,33 @@ function faResolve(){
   for(const id of F.ids) for(const n of F.teams[id].lineup){ const c=ctOf(n); if(c&&!fresh.has(n)) c.y=Math.max(1,c.y-1); }
   for(const n of Object.keys(F.ct)) if(!F.ids.some(id=>F.teams[id].roster[n])) delete F.ct[n];
   // the news
-  try{ const top=D.signed.filter(x=>x.tid!==u).map(x=>Object.assign({},x,{w:ctWorth(x.name)})).sort((a,b)=>b.s-a.s).slice(0,6);
-    if(top.length) nwAdd('fa','Free agency: the big signings',top.map(x=>`${x.name} to ${nwT(x.tid)}: ${x.y} season${x.y===1?'':'s'}, ${ctMoney(x.s)} a year${x.from&&F.teams[x.from]&&x.from!==x.tid?` (from ${nwT(x.from)})`:''}.`).join('\n'),{w:'Offseason',t:top.map(x=>x.tid),p:{n:top[0].name,tid:top[0].tid},pr:4});
-    const lost=D.signed.filter(x=>x.from===u&&x.tid!==u); for(const x of lost) nwAdd('fa',`${x.name} leaves for the ${nickOf(F.teams[x.tid])}`,`${x.name} signs with ${nwT(x.tid)}: ${x.y} season${x.y===1?'':'s'}, ${ctMoney(x.s)} a year.`,{w:'Offseason',t:[u,x.tid],pr:5}); }catch(e){}
+  try{ const top=D.signed.filter(x=>x.tid!==u).map(x=>Object.assign({},x,{w:x.w!=null?x.w:ctWorth(x.name)})).sort((a,b)=>b.w-a.w).slice(0,6);
+    if(top.length) nwAdd('fa','Free agency: the big signings',top.map(x=>`${x.name} to ${nwT(x.tid)} for ${ctYrs(x.y)}${x.from&&F.teams[x.from]&&x.from!==x.tid?` (from ${nwT(x.from)})`:''}.`).join('\n'),{w:'Offseason',t:top.map(x=>x.tid),p:{n:top[0].name,tid:top[0].tid},pr:4});
+    const lost=D.signed.filter(x=>x.from===u&&x.tid!==u); for(const x of lost) nwAdd('fa',`${x.name} leaves for the ${nickOf(F.teams[x.tid])}`,`${x.name} signs with ${nwT(x.tid)} for ${ctYrs(x.y)}.`,{w:'Offseason',t:[u,x.tid],pr:5}); }catch(e){}
   prepCards(F.ids.map(id=>F.teams[id]));
   D.notes=notes;
-}
-/* ---------- trades must fit the budget ---------- */
-function ctTradeOK(a,ga,b,gb){
-  const pay=(tid,out,inn)=>ctPay(tid)-out.reduce((t,n)=>t+((ctOf(n)||{}).s||0),0)+inn.reduce((t,n)=>t+((ctOf(n)||{}).s||0),0);
-  const pa=pay(a,ga,gb), pb=pay(b,gb,ga);
-  return {ok:(pa<=CT_BUDGET||pa<=ctPay(a))&&(pb<=CT_BUDGET||pb<=ctPay(b)), pa, pb};
 }
 /* ---------- the Contracts tab ---------- */
 let FAsel=null, FAmsg='';
 function ctTabHTML(){
-  ctEnsure(); const u=F.userId, M=F.teams[u], pay=ctPay(u), D=faGet();
-  const bar=`<div class="ctbar"><div style="width:${Math.min(100,pay/CT_BUDGET*100)}%"></div></div>`;
-  let h=`<div class="hcard"><h4>Payroll</h4><p><b>${ctMoney(pay)}</b> of your <b>${ctMoney(CT_BUDGET)}</b> budget · ${ctMoney(Math.max(0,CT_BUDGET-pay))} of room</p>${bar}<p class="legend">Every club has the same budget. Trades and free-agent signings have to fit under it.</p></div>`;
+  ctEnsure(); const u=F.userId, M=F.teams[u], D=faGet();
+  let h='';
   const row=n=>{ const r=M.roster[n], c=ctOf(n)||{}, x=D&&D.dec[n], s=F.stats[n];
     const act=x&&!x.cpu?(x.d==='go'?`<span class="ctst go">Letting go</span><button class="btn small" type="button" data-act="ctre" data-n="${esc(n)}">Keep him</button>`
-      :`<span class="ctst">Asks ${ctMoney(x.ask.s)} × ${x.ask.y}</span><button class="btn small${x.d==='re'?' primary':''}" type="button" data-act="ctre" data-n="${esc(n)}">${x.d==='re'?'Re-signing':'Re-sign'}</button><button class="btn small" type="button" data-act="ctgo" data-n="${esc(n)}">Let go</button>`):'';
-    return `<tr${x&&!x.cpu?' class="exp"':''}><td class="l"><b>${esc(n)}</b> ${abChip(r.ab)}</td><td>${plAge(n)}</td><td>${s&&s.PA?f3(avg(s))+', '+s.HR+' HR':'–'}</td><td>${ctMoney(c.s||0)}</td><td>${c.y||'–'}${c.y===1?' <em class="ctx">final year</em>':''}</td><td class="l ctact">${act}</td></tr>`; };
-  h+=`<div class="hcard"><h4>Your players</h4>${D?`<p>Free agency is open. Players in their final year ask for a new deal: re-sign them or let them go. Anyone you haven't decided on is re-signed when the season starts, if the money works.</p>`:`<p>Contracts run out after the Floodlight Series. Free agency opens in the offseason.</p>`}
-<div class="tscroll"><table class="tbl"><thead><tr><th class="l">Player</th><th>Age</th><th>This season</th><th>Salary</th><th>Years</th><th class="l"></th></tr></thead><tbody>${M.lineup.map(row).join('')}</tbody></table></div></div>`;
+      :`<span class="ctst">Wants ${ctYrs(x.ask.y)}</span><button class="btn small${x.d==='re'?' primary':''}" type="button" data-act="ctre" data-n="${esc(n)}">${x.d==='re'?'Re-signing':'Re-sign'}</button><button class="btn small" type="button" data-act="ctgo" data-n="${esc(n)}">Let go</button>`):'';
+    return `<tr${x&&!x.cpu?' class="exp"':''}><td class="l"><b>${esc(n)}</b> ${abChip(r.ab)}</td><td>${plAge(n)}</td><td>${s&&s.PA?f3(avg(s))+', '+s.HR+' HR':'–'}</td><td>${c.y||'–'}${c.y===1?' <em class="ctx">final year</em>':''}</td><td class="l ctact">${act}</td></tr>`; };
+  h+=`<div class="hcard"><h4>Your players</h4>${D?`<p>Free agency is open. Players in their final year want a new deal: re-sign them or let them go. Anyone you haven't decided on is re-signed when the season starts.</p>`:`<p>Each player is signed for a number of seasons. Deals in their final year run out after the Floodlight Series, and free agency opens in the offseason.</p>`}
+<div class="tscroll"><table class="tbl"><thead><tr><th class="l">Player</th><th>Age</th><th>This season</th><th>Seasons left</th><th class="l"></th></tr></thead><tbody>${M.lineup.map(row).join('')}</tbody></table></div></div>`;
   if(D&&!D.done){
-    const P=D.pool.filter(p=>p.from!==u||!M.roster[p.name]).sort((a,b)=>b.w-a.w);
-    if(FAsel){ const p=D.pool.find(x=>x.name===FAsel);
-      if(p) h+=`<div class="hcard"><h4>Sign ${esc(p.name)}</h4><p>${esc(p.name)} (${ABIL[p.info.ab].name}, ${p.age}) wants <b>${ctMoney(p.ask.s)} a year for ${p.ask.y} season${p.ask.y===1?'':'s'}</b>. Who loses his spot? (He becomes a free agent.)</p>${FAmsg?`<p class="trmood no">${esc(FAmsg)}</p>`:''}
-<div class="plist">${M.lineup.filter(n=>!!M.roster[n].f===!!p.info.f).map(n=>{ const c=ctOf(n)||{}, room=faRoom(n); return `<button type="button" class="plrow" data-act="fasign" data-n="${esc(n)}" data-p="${esc(p.name)}"${p.ask.s>room?' disabled':''}><b>${esc(n)}</b>${abChip(M.roster[n].ab)}<span class="plm">${ctMoney(c.s||0)}${(D.dec[n]&&D.dec[n].d==='go')?' · letting go':''}${p.ask.s>room?' · over budget':''}</span></button>`; }).join('')}</div>
+    const P=D.pool.filter(p=>p.from!==u||!M.roster[p.name]).sort((a,b)=>b.w-a.w), left=Math.max(0,FA_MAX-faMine(D));
+    if(FAsel&&left){ const p=D.pool.find(x=>x.name===FAsel);
+      if(p) h+=`<div class="hcard"><h4>Sign ${esc(p.name)}</h4><p>${esc(p.name)} (${ABIL[p.info.ab].name}, ${p.age}) wants a deal for <b>${ctYrs(p.ask.y)}</b>. Who loses his spot? (He becomes a free agent.)</p>${FAmsg?`<p class="trmood no">${esc(FAmsg)}</p>`:''}
+<div class="plist">${M.lineup.filter(n=>!!M.roster[n].f===!!p.info.f).map(n=>{ const c=ctOf(n)||{}, s=F.stats[n]; return `<button type="button" class="plrow" data-act="fasign" data-n="${esc(n)}" data-p="${esc(p.name)}"><b>${esc(n)}</b>${abChip(M.roster[n].ab)}<span class="plm">${s&&s.PA?f3(avg(s))+', '+s.HR+' HR':'no at-bats'}${c.y?` · ${ctYrs(c.y)} left`:''}${(D.dec[n]&&D.dec[n].d==='go')?' · letting go':''}</span></button>`; }).join('')}</div>
 <div class="hbtns"><button class="btn" type="button" data-act="faback">Back to the free agents</button></div></div>`; }
-    else h+=`<div class="hcard"><h4>Free agents · ${P.length}</h4>${FAmsg?`<p class="frnote">${esc(FAmsg)}</p>`:''}<p>You get the first call. Sign anyone you can afford; the other clubs sign the rest when the season starts.</p>
-<div class="tscroll"><table class="tbl fatbl"><thead><tr><th class="l">Player</th><th>Age</th><th class="l">Last club</th><th>Last season</th><th>Asks</th><th></th></tr></thead><tbody>${P.slice(0,60).map(p=>{ const s=F.stats[p.name]; return `<tr><td class="l"><b>${esc(p.name)}</b> ${abChip(p.info.ab)}${p.info.f?'':''}</td><td>${p.age}</td><td class="l">${p.from&&F.teams[p.from]?tdot(p.from)+esc(F.teams[p.from].abbr):''}</td><td>${s&&s.PA?f3(avg(s))+', '+s.HR+' HR':'–'}</td><td>${ctMoney(p.ask.s)} × ${p.ask.y}</td><td><button class="btn small" type="button" data-act="fapick" data-n="${esc(p.name)}">Sign</button></td></tr>`; }).join('')}</tbody></table></div></div>`;
+    else h+=`<div class="hcard"><h4>Free agents · ${P.length}</h4>${FAmsg?`<p class="frnote">${esc(FAmsg)}</p>`:''}<p>You get the first call: sign up to ${FA_MAX} free agents each winter${left<FA_MAX?` (${left} left)`:''}. The other clubs sign the rest when the season starts, worst record first.</p>
+<div class="tscroll"><table class="tbl fatbl"><thead><tr><th class="l">Player</th><th>Age</th><th class="l">Last club</th><th>${frYear(F.season)}</th><th>Wants</th><th></th></tr></thead><tbody>${P.slice(0,60).map(p=>{ const s=F.stats[p.name]; return `<tr><td class="l"><b>${esc(p.name)}</b> ${abChip(p.info.ab)}</td><td>${p.age}</td><td class="l">${p.from&&F.teams[p.from]?tdot(p.from)+esc(F.teams[p.from].abbr):''}</td><td>${s&&s.PA?f3(avg(s))+', '+s.HR+' HR':'–'}</td><td>${ctYrs(p.ask.y)}</td><td>${left?`<button class="btn small" type="button" data-act="fapick" data-n="${esc(p.name)}">Sign</button>`:''}</td></tr>`; }).join('')}</tbody></table></div></div>`;
     FAmsg='';
   } else if(D&&D.done&&D.notes&&D.notes.length) h+=`<div class="hcard"><h4>Free agency</h4><p>${D.notes.map(esc).join('. ')}.</p></div>`;
-  const L=F.ids.map(id=>[id,ctPay(id)]).sort((a,b)=>b[1]-a[1]);
-  h+=`<div class="hcard"><h4>League payrolls</h4><div class="tscroll"><table class="tbl"><thead><tr><th class="l">Club</th><th>Payroll</th><th>Room</th></tr></thead><tbody>${L.map(([id,p])=>`<tr class="${id===u?'me':''}"><td class="l">${tdot(id)}<b>${esc(tname(id))}</b></td><td>${ctMoney(p)}</td><td>${ctMoney(Math.max(0,CT_BUDGET-p))}</td></tr>`).join('')}</tbody></table></div></div>`;
   return h;
 }
 function ctAct(a,el){
@@ -7396,9 +7390,9 @@ function rvGame(a,h,ra,rh){ if(!F) return; F.h2h=F.h2h||{}; const k=rvKey(a,h), 
 /* a playoff knockout starts a rivalry, or heats one up */
 function rvKnockout(w,l,s){
   if(!F||!w||!l) return; rvInit(); const k=rvKey(w,l), R=F.rv[k], rd=s&&s.label?s.label:'playoffs';
-  if(!R){ F.rv[k]={a:w,b:l,why:`born when ${tname(w)} knocked out ${tname(l)} in the ${rd}, Season ${F.season}`,since:F.season,heat:2,ko:1};
+  if(!R){ F.rv[k]={a:w,b:l,why:`born when ${tname(w)} knocked out ${tname(l)} in the ${frYear(F.season)} ${rd}`,since:F.season,heat:2,ko:1};
     try{ nwAdd('rival',`A rivalry is born: ${nwN(w)} and ${nwN(l)}`,`${nwT(w)} knocked ${nwT(l)} out of the ${rd}. From now on, every game between these two is Rivalry Night.`,{t:[w,l],pr:w===F.userId||l===F.userId?5:3}); }catch(e){} }
-  else { R.heat=(R.heat||1)+1; R.ko=(R.ko||0)+1; R.last=`${tname(w)} knocked out ${tname(l)} in the ${rd}, Season ${F.season}`;
+  else { R.heat=(R.heat||1)+1; R.ko=(R.ko||0)+1; R.last=`${tname(w)} knocked out ${tname(l)} in the ${frYear(F.season)} ${rd}`;
     try{ nwAdd('rival',`${nwN(w)} beat their rivals in the ${rd}`,`${nwT(w)} knocked ${nwT(l)} out again. The rivalry has never been hotter.`,{t:[w,l],pr:w===F.userId||l===F.userId?5:3}); }catch(e){} }
 }
 /* the pregame line: "Rivalry night: the Lone Star rivalry. Texas lead the all-time series 6-4." */
@@ -7407,7 +7401,7 @@ function rvLine(a,b){
   return `It's Rivalry Night: ${R.why.startsWith('born')?'a rivalry '+R.why:R.why}. ${x+y?(lead?`${TheTeam(tname(lead))} lead the all-time series ${Math.max(x,y)}–${Math.min(x,y)}.`:`The all-time series is tied ${x}–${y}.`):'Their first meeting.'}`;
 }
 function rvChip(a,b){ const R=rvOn(a,b); if(!R) return ''; const [x,y]=rvRec(a,b);
-  return `<p class="rvchip"><span>Rivalry Night</span>${esc(R.why.startsWith('born')?'A rivalry '+R.why:R.why[0].toUpperCase()+R.why.slice(1))} · All-time: ${esc(F.teams[a].abbr)} ${x}, ${esc(F.teams[b].abbr)} ${y}</p>`; }
+  return `<p class="rvchip"><span>Rivalry Night</span>${esc(frYrText(R.why.startsWith('born')?'A rivalry '+R.why:R.why[0].toUpperCase()+R.why.slice(1)))} · All-time: ${esc(F.teams[a].abbr)} ${x}, ${esc(F.teams[b].abbr)} ${y}</p>`; }
 /* the Teams tab: every rivalry in the league */
 function rvCardHTML(){
   rvInit(); const L=Object.values(F.rv).sort((p,q)=>(q.heat||1)-(p.heat||1)||(p.geo?1:0)-(q.geo?1:0)); if(!L.length) return '';
@@ -7430,7 +7424,7 @@ function evStart(nx){
   G.opening=F.phase==='reg'&&F.day===0;
   G.rival=!!rvOn(G.teams[0].id,G.teams[1].id);
   G.poRound=nx&&nx.series?poRoundOf(nx.series):'';
-  if(G.opening){ G.frLabel=`Opening Day · Season ${F.season}`; if(FR) FR.label=G.frLabel; }
+  if(G.opening){ G.frLabel=`Opening Day · ${frYear(F.season)}`; if(FR) FR.label=G.frLabel; }
 }
 /* the ballpark dresses up for the occasion */
 function evPark(G2,P){
@@ -7453,15 +7447,15 @@ const evStrength=id=>F.teams[id].lineup.reduce((t,n)=>t+ctWorth(n,F.teams[id].ro
 function evPreviewSegs(){
   const u=F.userId, nm=id=>tname(id), pr=F.ids.slice().sort((a,b)=>evStrength(b)-evStrength(a)), segs=[];
   const prev=F.history[F.history.length-1], champ=prev&&F.teams[prev.champ]?prev.champ:null, ui=pr.indexOf(u)+1;
-  segs.push({tag:'Season preview',title:`Season ${F.season} preview`,html:`<div class="tvopen"><span class="tvk">Opening Day · Season ${F.season}</span><b class="tvbig">Play ball!</b><div class="tvstats"><div><span>Clubs</span><b>${F.ids.length}</b><small>${confOn()?`${F.ids.length/2} West · ${F.ids.length/2} East`:''}</small></div><div><span>Schedule</span><b>${SEASON_GAMES} games</b><small>All-Star break after game ${ASG_DAY}</small></div>${champ?`<div><span>Defending champions</span><b>${tdot(champ)}${esc(nm(champ))}</b><small>Beat ${esc(prev.runnerName)} ${esc(prev.score)}</small></div>`:''}</div></div>`,
-    say:`Welcome to Floodlight Tonight, and happy Opening Day! Season ${F.season} starts right now, with ${F.ids.length} clubs chasing the Floodlight Series.${champ?` ${TheTeam(nm(champ))} are the defending champions.`:''} Here's what to watch for.`});
+  segs.push({tag:'Season preview',title:`${frYear(F.season)} season preview`,html:`<div class="tvopen"><span class="tvk">Opening Day · ${frYear(F.season)}</span><b class="tvbig">Play ball!</b><div class="tvstats"><div><span>Clubs</span><b>${F.ids.length}</b><small>${confOn()?`${F.ids.length/2} West · ${F.ids.length/2} East`:''}</small></div><div><span>Schedule</span><b>${SEASON_GAMES} games</b><small>All-Star break after game ${ASG_DAY}</small></div>${champ?`<div><span>Defending champions</span><b>${tdot(champ)}${esc(nm(champ))}</b><small>Beat ${esc(prev.runnerName)} ${esc(prev.score)}</small></div>`:''}</div></div>`,
+    say:`Welcome to Floodlight Tonight, and happy Opening Day! The ${frYear(F.season)} season starts right now, with ${F.ids.length} clubs chasing the Floodlight Series.${champ?` ${TheTeam(nm(champ))} are the defending champions.`:''} Here's what to watch for.`});
   const top=pr.slice(0,8);
   segs.push({tag:'Power rankings',title:'Preseason power rankings',html:`<ol class="tvpr">${top.map((id,i)=>`<li class="${id===u?'me':''}"><i>${i+1}</i>${tdot(id)}<b>${esc(nm(id))}</b><small>${confOn()?CONF_NAME[confOf(id)]:''}</small></li>`).join('')}</ol>${ui>8?`<p class="tvnote">Your club: No. ${ui} of ${F.ids.length}.</p>`:''}`,
     say:`Our preseason power rankings: ${TheTeam(nm(top[0]))} at number one, ${theTeam(nm(top[1]))} second, and ${theTeam(nm(top[2]))} third.${ui===1?` That's you on top. No pressure!`:ui<=8?` ${TheTeam(nm(u))} come in at number ${ui}.`:` ${TheTeam(nm(u))} start the year at number ${ui}, with something to prove.`}`});
   // new faces: last winter's big signings and draft picks
-  const D=F.fa&&F.fa.s===F.season-1?F.fa:null, sg=D?D.signed.slice().sort((a,b)=>b.s-a.s).slice(0,4):[], dp=F.draft&&F.draft.s===F.season-1?F.draft.picks.filter(x=>!x.pass).slice(0,2):[];
-  if(sg.length||dp.length) segs.push({tag:'New faces',title:'New faces',html:`<ul class="tvlist">${sg.map(x=>`<li>${tdot(x.tid)}${esc(x.name)} signs with ${esc(nm(x.tid))}: ${x.y} yr${x.y===1?'':'s'}, ${ctMoney(x.s)} a year</li>`).join('')}${dp.map(x=>`<li>${tdot(x.tid)}Rookie ${esc(x.name)} (${ABIL[x.ab].name}) drafted by ${esc(nm(x.tid))}</li>`).join('')}</ul>`,
-    say:[sg[0]?`The biggest signing of the winter: ${sg[0].name} to ${theTeam(nm(sg[0].tid))}, at ${Math.round(sg[0].s)} million a year.`:'',sg[1]?`${sg[1].name} joins ${theTeam(nm(sg[1].tid))}.`:'',dp[0]?`And keep an eye on top draft pick ${dp[0].name} of ${theTeam(nm(dp[0].tid))}.`:''].filter(Boolean).join(' ')});
+  const D=F.fa&&F.fa.s===F.season-1?F.fa:null, sg=D?D.signed.map(x=>Object.assign({},x,{w:x.w!=null?x.w:ctWorth(x.name)})).sort((a,b)=>b.w-a.w).slice(0,4):[], dp=F.draft&&F.draft.s===F.season-1?F.draft.picks.filter(x=>!x.pass).slice(0,2):[];
+  if(sg.length||dp.length) segs.push({tag:'New faces',title:'New faces',html:`<ul class="tvlist">${sg.map(x=>`<li>${tdot(x.tid)}${esc(x.name)} signs with ${esc(nm(x.tid))} for ${ctYrs(x.y)}</li>`).join('')}${dp.map(x=>`<li>${tdot(x.tid)}Rookie ${esc(x.name)} (${ABIL[x.ab].name}) drafted by ${esc(nm(x.tid))}</li>`).join('')}</ul>`,
+    say:[sg[0]?`The biggest signing of the winter: ${sg[0].name} to ${theTeam(nm(sg[0].tid))}, on a ${sg[0].y}-season deal.`:'',sg[1]?`${sg[1].name} joins ${theTeam(nm(sg[1].tid))}.`:'',dp[0]?`And keep an eye on top draft pick ${dp[0].name} of ${theTeam(nm(dp[0].tid))}.`:''].filter(Boolean).join(' ')});
   // rivalries to watch
   rvInit(); const R=Object.values(F.rv||{}).sort((p,q)=>((q.a===u||q.b===u)?9:0)+(q.heat||1)-(((p.a===u||p.b===u)?9:0)+(p.heat||1))).slice(0,4);
   if(R.length) segs.push({tag:'Rivalries',title:'Rivalries to watch',html:`<ul class="tvlist">${R.map(x=>{ const [a,b]=rvRec(x.a,x.b); return `<li>${tdot(x.a)}${esc(nm(x.a))} vs ${tdot(x.b)}${esc(nm(x.b))}: ${esc(x.why.startsWith('born')?'a rivalry '+x.why:x.why)}${a+b?` (all-time ${a}–${b})`:''}</li>`; }).join('')}</ul>`,
@@ -7480,13 +7474,12 @@ function dlRun(){
   if(!F||F.phase!=='reg'||F.day!==DL_DAY||(F.dl&&F.dl.s===F.season)||F.ids.length<4) return null;
   const u=F.userId, lg=lgOps(), cpuIds=F.ids.filter(id=>id!==u), race=id=>trRace(id);
   const buyers=shuffle(cpuIds.filter(id=>race(id)>0)), sellers=shuffle(cpuIds.filter(id=>race(id)<0)), busy=new Set(), trades=[];
-  const okPay=(a,x,b,y)=>!F.ct||ctTradeOK(a,[x],b,[y]).ok;
   for(const a of buyers){ if(trades.length>=7) break;
     for(const b of sellers){ if(busy.has(a)||busy.has(b)) continue; let best=null;
       for(const y of F.teams[b].lineup){ const yi=F.teams[b].roster[y]; if(DR_KEEP.has(y)) continue;
         for(const x of F.teams[a].lineup){ const xi=F.teams[a].roster[x]; if(!!xi.f!==!!yi.f||DR_KEEP.has(x)) continue;
           const ga=trGain(a,trPack(a,[x]),trPack(b,[y]),lg), gb=trGain(b,trPack(b,[y]),trPack(a,[x]),lg);
-          if(ga>=.3&&gb>=0&&okPay(a,x,b,y)&&(!best||ga+gb>best.v)) best={x,y,v:ga+gb}; } }
+          if(ga>=.3&&gb>=0&&(!best||ga+gb>best.v)) best={x,y,v:ga+gb}; } }
       if(best){ trDo(a,b,[best.x],[best.y],false); trades.push({a,b,x:best.x,y:best.y}); busy.add(a); busy.add(b); break; } } }
   // offers for you: they send y, you send x
   const offers=[];
@@ -7494,7 +7487,7 @@ function dlRun(){
     for(const y of F.teams[tid].lineup){ const yi=F.teams[tid].roster[y]; if(DR_KEEP.has(y)) continue;
       for(const x of F.teams[u].lineup){ const xi=F.teams[u].roster[x]; if(!!xi.f!==!!yi.f||xi.ab===yi.ab) continue;
         const gt=trGain(tid,trPack(tid,[y]),trPack(u,[x]),lg), gu=trGain(u,trPack(u,[x]),trPack(tid,[y]),lg);
-        if(gt>=.3&&gu>=-.4&&okPay(u,x,tid,y)&&(!best||gu>best.gu)) best={tid,give:y,get:x,gu}; } }
+        if(gt>=.3&&gu>=-.4&&(!best||gu>best.gu)) best={tid,give:y,get:x,gu}; } }
     if(best) offers.push(best); }
   F.dl={s:F.season,trades,offers,ans:{}};
   try{ nwAdd('deadline',`Deadline Day: ${trades.length} trade${trades.length===1?'':'s'} around the league`,trades.length?trades.map(t=>`${nwT(t.a)} get ${t.y} from ${nwT(t.b)} for ${t.x}.`).join('\n')+`\nThe trade window closes after today's games.`:`A quiet deadline: nobody found a deal. The trade window closes after today's games.`,{t:[...new Set(trades.flatMap(t=>[t.a,t.b]))],pr:4}); }catch(e){}
@@ -7503,7 +7496,7 @@ function dlRun(){
 function dlGet(){ if(!F||F.phase!=='reg'||F.day!==DL_DAY) return null; return F.dl&&F.dl.s===F.season?F.dl:dlRun(); }
 function dlCardHTML(){
   const D=dlGet(); if(!D||F.live) return ''; const u=F.userId;
-  const line=n=>{ const s=F.stats[n], c=(F.ct||{})[n]; return `${s&&s.PA?f3(avg(s))+', '+s.HR+' HR':'no at-bats'}${c?' · '+ctMoney(c.s):''}`; };
+  const line=n=>{ const s=F.stats[n]; return s&&s.PA?f3(avg(s))+', '+s.HR+' HR':'no at-bats'; };
   const offers=D.offers.filter(o=>!D.ans[o.tid]&&F.teams[o.tid].roster[o.give]&&F.teams[u].roster[o.get]);
   return `<div class="hcard dlcard"><h4>Trade Deadline Day</h4><p>${D.trades.length?`${D.trades.length} deal${D.trades.length===1?'':'s'} already went down around the league.`:'It\'s been quiet around the league so far.'} The trade window closes after today's game.</p>
 ${offers.length?offers.map(o=>`<div class="dloffer">${tdot(o.tid)}<div><b>The ${esc(nickOf(F.teams[o.tid]))} offer ${esc(o.give)}</b> ${abChip(F.teams[o.tid].roster[o.give].ab)} <small>${esc(line(o.give))}</small><br><span>for your ${esc(o.get)}</span> ${abChip(F.teams[u].roster[o.get].ab)} <small>${esc(line(o.get))}</small></div><span class="dlb"><button class="btn small primary" type="button" data-act="dlyes" data-t="${o.tid}">Accept</button><button class="btn small" type="button" data-act="dlno" data-t="${o.tid}">Decline</button></span></div>`).join(''):`<p class="empty2">No offers on the table${D.offers.length?' anymore':''}. You can still make your own in Trades &amp; Draft.</p>`}
@@ -7515,7 +7508,6 @@ function dlAct(a,el){
   if(!o) return;
   if(a==='dlno'){ D.ans[tid]='no'; frSave(); renderHub(); return; }
   if(a==='dlyes'){ const u=F.userId; if(!F.teams[tid].roster[o.give]||!F.teams[u].roster[o.get]){ D.ans[tid]='gone'; renderHub(); return; }
-    if(F.ct&&!ctTradeOK(u,[o.get],tid,[o.give]).ok){ hubMsg='That deal no longer fits under the budget.'; D.ans[tid]='no'; renderHub(); return; }
     askYes(`Send ${o.get} to the ${tname(tid)} for ${o.give}?`,'Make the trade').then(ok=>{ if(!ok) return;
       trDo(u,tid,[o.get],[o.give],true); D.ans[tid]='yes'; hubMsg=`Done! ${o.give} joins your club. Set your batting order before your next game.`; renderHub(); renderFbar(); }); }
 }
@@ -7548,7 +7540,7 @@ function dbCardHTML(){
   const D=dbGet(); if(!D) return ''; const mine=confOf(F.userId), you=D[mine], them=D[mine==='W'?'E':'W'];
   const who=p=>`<div class="dbwho"><img src="${cardSrc(p.name,F.teams[p.team])}" alt=""><div><b>${esc(p.name)}</b><span>${tdot(p.team)}${esc(tname(p.team))} · ${p.hr} HR, ${f3(p.slg)} SLG</span></div></div>`;
   if(D.done){ const P=D[D.winner], L=D[D.winner==='W'?'E':'W'];
-    return `<div class="hcard dbcard"><h4>Home Run Derby · Season ${F.season}</h4><p><b>${esc(P.name)}</b> won it with <b>${P.n}</b> home run${P.n===1?'':'s'}; ${esc(L.name)} hit ${L.n}.${D.winner===mine?' Your conference wins the Derby!':''}</p></div>`; }
+    return `<div class="hcard dbcard"><h4>Home Run Derby · ${frYear(F.season)}</h4><p><b>${esc(P.name)}</b> won it with <b>${P.n}</b> home run${P.n===1?'':'s'}; ${esc(L.name)} hit ${L.n}.${D.winner===mine?' Your conference wins the Derby!':''}</p></div>`; }
   return `<div class="hcard dbcard"><h4>Home Run Derby · All-Star break</h4><p>The best slugger in each conference gets ten rolls of the Derby die. Most home runs wins. You roll for the ${CONF_NAME[mine]}.</p><div class="dbvs">${who(them)}<span class="vs">vs</span>${who(you)}</div>
 <div class="hbtns"><button class="btn primary" type="button" data-act="dbplay">Roll in the Derby</button><button class="btn" type="button" data-act="dbsim">Sim it</button></div></div>`;
 }
@@ -7557,7 +7549,7 @@ function dbOpen(){
   const D=dbGet(); if(!D||D.done) return; const mine=confOf(F.userId), Y=D[mine], T=D[mine==='W'?'E':'W'];
   Y.rolls=[]; T.rolls=[]; Y.n=0; T.n=0; prepCards([F.teams[Y.team],F.teams[T.team]]);
   const col=(p,id)=>`<div class="dbp" id="${id}"><img src="${cardSrc(p.name,F.teams[p.team])}" alt=""><b>${esc(p.name)}</b><span>${tdot(p.team)}${esc(F.teams[p.team].abbr)} · ${CONF_NAME[confOf(p.team)]}</span><em class="dbn">0</em><div class="dbdots">${'<i></i>'.repeat(10)}</div></div>`;
-  openX(`<div class="xpanel derby" role="dialog" aria-modal="true" aria-labelledby="dbT">${xHead('<span id="dbT">Home Run Derby</span>',`All-Star break · Season ${F.season} · ten rolls each`)}
+  openX(`<div class="xpanel derby" role="dialog" aria-modal="true" aria-labelledby="dbT">${xHead('<span id="dbT">Home Run Derby</span>',`All-Star break · ${frYear(F.season)} · ten rolls each`)}
 <div class="dbgrid">${col(T,'dbT0')}<div class="dbdie"><div class="dbface" id="dbFace"><span>DERBY</span></div><small id="dbFt"></small></div>${col(Y,'dbY0')}</div>
 <p class="dbmsg" id="dbMsg">${esc(T.name)} swings first for the ${CONF_NAME[confOf(T.team)]}.</p>
 <div class="ovbtns"><button class="btn primary" type="button" id="dbGo" disabled>Roll</button></div></div>`,{onClose:()=>{ if(!D.done) dbSim(); renderHub(); }});
@@ -7581,7 +7573,36 @@ function dbOpen(){
 }
 function dbAct(a){ if(a==='dbplay') dbOpen(); else if(a==='dbsim'){ dbSim(); renderHub(); } }
 
-window.__fdl={addon:{ACHD:()=>ACHD,CHD:()=>CHD,DAYD:()=>DAYD,FSET:()=>FSET,start:id=>startChallenge(id==='daily'?dailyFor(today()):CH_BY[id]),achUnlock,openSettings,openAchievements,openChallenges,litActions,padPress,layerRoot,chFinal,buildChallenge,CHALL,ACHS,dailyFor,badgeSVG,exitChallenge,startTutorial,TUT:()=>TUT,FIELD:()=>FIELD,VO:()=>VO,voSay,voPick,voName,voBatter,fieldCheck,sfx:()=>sfx,parkSync,parkFor,PARK:()=>PARK_CUR,FR_CLUBS:()=>FR_CLUBS,trGain,plValue,drGet,lgOps,TR:()=>TR,stretchScene:()=>stretchScene(),crowdCanvas,asgSim,asgPending,asgStart,confOf,drOrder,genLogoKey,poWatch,poIn,potwList,seedTag,tvSegments:m=>tvSegments(m),activeSeries:()=>activeSeries(),poAllSeries:()=>poAllSeries(),faGet,faSign,faDecide,faResolve,ctPay,ctEnsure,ctWorth,rvOn,rvRec,dbGet,dbSim,dbOpen,dlGet,evPreviewSegs,frNextSeason:()=>frNextSeason()}, get G(){return G}, get F(){return F}, get busy(){return busy}, setOpp:o=>setOpp(o,true), cpuPick:()=>cpuPick(), showFinal:()=>showFinal(), playWhole, MODES, ACTIONS, ABIL, DHS, P, render:()=>renderGame(),
+/* ---------- franchise years (Oct 2026) ----------
+   Seasons read as calendar years: the first season of every franchise is 2026, the next 2027, and so on, in the hub,
+   stats, records, champions, awards, news, TV, playoffs and saves. Inside the save a franchise still counts seasons
+   1, 2, 3 (stats, history and schedules keep those numbers); only the words change.
+   Franchises saved before this had "Season 3" written into their news, rivalries and game labels, and trophy case
+   entries say "Franchise 1 · Season 3". frYearsMig rewrites a save's text as years when it loads (it runs inside
+   frRenameClubs, which every load path goes through), and the trophy case converts its entries as it draws them.
+   Plain functions with only local data, so they are safe while the game is still starting up. */
+function frYear(s){ const n=parseInt(s,10); return n>0?2025+n:''; }
+function frYrText(t){
+  if(typeof t!=='string'||!/Season \d/.test(t)) return t;
+  const y=n=>frYear(n);
+  return t.replace(/in the ([^,."\\]+), Season (\d+)/g,(x,r,n)=>`in the ${y(n)} ${r}`)
+    .replace(/Opening Day of Season (\d+)/g,(x,n)=>`Opening Day of the ${y(n)} season`)
+    .replace(/Class of Season (\d+)/g,(x,n)=>`Class of ${y(n)}`)
+    .replace(/from Season (\d+)/g,(x,n)=>`from ${y(n)}`)
+    .replace(/Season (\d+) goes up/g,(x,n)=>`${y(n)} goes up`)
+    .replace(/Season (\d+) · Game/g,(x,n)=>`${y(n)} · Game`)
+    .replace(/Opening Day · Season (\d+)/g,(x,n)=>`Opening Day · ${y(n)}`)
+    .replace(/\bSeason (\d+)\b/g,(x,n)=>`${y(n)} season`);
+}
+function frYearsMig(o){
+  if(!o||typeof o!=='object'||!o.teams||o.yrs) return o;
+  let s; try{ s=JSON.stringify(o); }catch(e){ return o; }
+  let n=o;
+  if(/Season \d/.test(s)){ try{ n=JSON.parse(frYrText(s)); }catch(e){ n=o; } }
+  n.yrs=1; return n;
+}
+
+window.__fdl={addon:{ACHD:()=>ACHD,CHD:()=>CHD,DAYD:()=>DAYD,FSET:()=>FSET,start:id=>startChallenge(id==='daily'?dailyFor(today()):CH_BY[id]),achUnlock,openSettings,openAchievements,openChallenges,litActions,padPress,layerRoot,chFinal,buildChallenge,CHALL,ACHS,dailyFor,badgeSVG,exitChallenge,startTutorial,TUT:()=>TUT,FIELD:()=>FIELD,VO:()=>VO,voSay,voPick,voName,voBatter,fieldCheck,sfx:()=>sfx,parkSync,parkFor,PARK:()=>PARK_CUR,FR_CLUBS:()=>FR_CLUBS,trGain,plValue,drGet,lgOps,TR:()=>TR,stretchScene:()=>stretchScene(),crowdCanvas,asgSim,asgPending,asgStart,confOf,drOrder,genLogoKey,poWatch,poIn,potwList,seedTag,tvSegments:m=>tvSegments(m),activeSeries:()=>activeSeries(),poAllSeries:()=>poAllSeries(),faGet,faSign,faDecide,faResolve,ctEnsure,ctWorth,rvOn,rvRec,dbGet,dbSim,dbOpen,dlGet,evPreviewSegs,frNextSeason:()=>frNextSeason()}, get G(){return G}, get F(){return F}, get busy(){return busy}, setOpp:o=>setOpp(o,true), cpuPick:()=>cpuPick(), showFinal:()=>showFinal(), playWhole, MODES, ACTIONS, ABIL, DHS, P, render:()=>renderGame(),
   setHand:(t,ids)=>{ G.hands[t]=ids.slice(); renderGame(); }, setBases:b=>{ G.bases=b.slice(); renderGame(); }, setOuts:n=>{ G.outs=n; renderGame(); },
   setInning:(i,h)=>{ G.inning=i; G.half=h; G.halfPA=0; while(G.line[0].length<i) G.line[0].push(0); while(G.line[1].length<i-(h?0:1)) G.line[1].push(0); renderGame(); },
   setIdx:(t,i)=>{ G.idx[t]=i; renderGame(); }, activeAbils:t=>activeAbils(t), runAbility:(t,i)=>runAbility(t,activeAbils(t)[i]), newGame, openHub, frCreate:(n,a,z)=>{ frCreate(n,a,z); setFrUI(); }, frPregame, frSimToPlayoffs, frSimPlayoffs, frSimUser, frNextSeason, frResume, frExit, genPlayerCard, cardSrc, snapshot, applySnap, toCode, fromCode, openSaves, editQuickNames, frEditNames, quickGame, get tipsOn(){return tipsOn}};
