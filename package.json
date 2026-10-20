@@ -1,7 +1,7 @@
 {
   "name": "floodlight-baseball",
   "private": true,
-  "description": "Floodlight Baseball. The game is index.html; this file only exists for the server functions (save codes and the Daily Challenge leaderboard).",
+  "description": "Floodlight Baseball. The game is index.html; this file only exists for the server functions (save codes, the Daily Challenge leaderboard and online games).",
   "type": "module",
   "dependencies": {
     "@netlify/blobs": "^10.7.13"

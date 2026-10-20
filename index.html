@@ -1240,6 +1240,99 @@ html.app .mver{left:calc(16px + var(--sa-l))}
 @keyframes dbpop{0%{transform:scale(.7)}60%{transform:scale(1.12)}100%{transform:scale(1)}}
 .dbdie small{font-family:var(--f-num);color:#ffd77e;min-height:1.2em}
 .dbmsg{text-align:center;margin:10px 0 0}
+/* ---------- online games ---------- */
+.netbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:6px 12px;border-radius:12px;background:linear-gradient(90deg,rgba(94,200,140,.16),rgba(94,200,140,.03));border:1px solid rgba(94,200,140,.4);font-size:14px;position:relative}
+.netbar[hidden]{display:none}
+.netbar .tagx{font-family:var(--f-head);font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:#7fe0a6}
+.netbar .nwho{display:inline-flex;align-items:center;gap:5px}
+.netbar .nwho small{color:var(--muted);font-size:12px}
+.netbar .nwho .tlogo{width:18px;height:18px}
+.netbar .nat{color:var(--muted);font-size:12px}
+.netbar .nst{font-size:12px;color:#9fdcb7}
+.netbar .nst::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:currentColor;margin-right:5px;vertical-align:1px}
+.netbar .nst.warn{color:#ffc861}.netbar .nst.bad{color:#ff8a7a}
+.netbar .sp{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.netsay{position:absolute;right:8px;top:calc(100% + 6px);z-index:30;display:flex;flex-direction:column;gap:4px;padding:8px;border-radius:12px;background:var(--navy-2);border:1px solid var(--line);box-shadow:0 18px 40px -12px rgba(0,0,0,.8)}
+.netsay button{background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--cream);border-radius:9px;padding:7px 12px;font:600 14px var(--f-body,inherit);text-align:left;cursor:pointer}
+.netsay button:hover{background:rgba(255,255,255,.12)}
+.netwait,.netcatch{position:fixed;left:50%;bottom:calc(18px + var(--sa-b,0px));transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:999px;background:rgba(10,18,40,.94);border:1px solid rgba(127,224,166,.5);color:var(--cream);font-size:14px;box-shadow:0 16px 40px -14px rgba(0,0,0,.9);pointer-events:none}
+.netwait[hidden],.netcatch[hidden]{display:none}
+.netwait i,.netcatch i,.nwaiting i{width:14px;height:14px;border-radius:50%;border:2px solid rgba(127,224,166,.35);border-top-color:#7fe0a6;animation:netspin .9s linear infinite;flex:none;display:inline-block}
+@keyframes netspin{to{transform:rotate(360deg)}}
+.netp .nrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.netp .nrow>span{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);min-width:88px}
+.netp .nrow input{flex:1;min-width:160px;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:10px;color:var(--cream);font-size:16px;padding:9px 12px}
+.netp .ngrid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:560px){.netp .ngrid2{grid-template-columns:1fr}}
+.netp .ncard{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:rgba(255,255,255,.03);display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.netp .ncard.hot{border-color:rgba(127,224,166,.55);background:rgba(94,200,140,.08)}
+.netp .ncard h4,.netp .nh{margin:0;font-family:var(--f-head);letter-spacing:.12em;text-transform:uppercase;font-size:13px;color:var(--flood)}
+.netp .ncard p{margin:0;font-size:14px;color:#c4ccdb}
+.netp .ncode{display:flex;gap:8px;width:100%}
+.netp .ncode input{width:7.5em;flex:none;text-align:center;font:700 22px/1 var(--f-num,monospace);letter-spacing:.3em;text-transform:uppercase;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:10px;color:var(--cream);padding:8px 6px}
+.netp .nbtns{display:flex;gap:8px;flex-wrap:wrap}
+.netp .nerr{margin:0;color:#ff9a8a;font-size:14px}
+.netp .bigcode{font:800 clamp(44px,12vw,72px)/1 var(--f-num,monospace);letter-spacing:.22em;text-align:center;color:#ffe9b0;text-shadow:0 0 28px rgba(255,200,97,.45);padding:6px 0 0 .22em}
+.netp .nlink{margin:0;text-align:center;font-size:13px;color:var(--muted);word-break:break-all;user-select:all}
+.netp .nwaiting{display:flex;align-items:center;justify-content:center;gap:10px;margin:0;font-size:14px;color:#9fdcb7;text-align:center}
+.nteamc{border:1px solid color-mix(in srgb,var(--tc) 55%,transparent);border-radius:14px;padding:10px 12px;background:color-mix(in srgb,var(--tc) 9%,transparent);display:flex;flex-direction:column;gap:8px}
+.nteamc .ntop{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.nteamc .ntop b{font-size:18px}
+.nteamc .ntop .abbr{font:700 12px var(--f-num,monospace);letter-spacing:.12em;padding:2px 6px;border-radius:6px;background:rgba(255,255,255,.08)}
+.nteamc .ntop .deck{margin-left:auto;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.nteamc .nlu{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:4px 10px;counter-reset:nl}
+@media (max-width:560px){.nteamc .nlu{grid-template-columns:repeat(2,1fr)}}
+.nteamc .nlu li{display:flex;align-items:center;gap:5px;font-size:13px;min-width:0;counter-increment:nl}
+.nteamc .nlu li::before{content:counter(nl);font:700 11px var(--f-num,monospace);color:var(--muted);width:12px}
+.nteamc .nlu li span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nteamc .nlu .abi{width:15px;height:15px;flex:none}
+.tab[data-net] .livedot{position:relative}
+/* the online record */
+.netbar .nser{font:700 12px var(--f-num,monospace);letter-spacing:.06em;padding:3px 8px;border-radius:999px;background:rgba(255,200,97,.14);border:1px solid rgba(255,200,97,.4);color:#ffd77a}
+.netp .nrec{gap:10px;align-items:stretch}
+.nrtop{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.nrtop.big{justify-content:space-between}
+.nrbig{display:flex;flex-direction:column;line-height:1}
+.nrbig b{font:800 40px/1 var(--f-num,monospace);color:#ffe9b0;letter-spacing:.02em}
+.nrtop.big .nrbig b{font-size:56px}
+.nrbig small{font:600 13px var(--f-num,monospace);color:var(--muted);margin-top:4px}
+.nrchips{display:flex;gap:6px;flex-wrap:wrap}
+.nrchips span{font-size:12px;color:#c4ccdb;padding:4px 9px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line)}
+.nrchips b{color:var(--cream);font-family:var(--f-num,monospace)}
+.nrform{display:flex;gap:4px;flex-wrap:wrap}
+.nrform i{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:700 11px var(--f-num,monospace);font-style:normal}
+.nrform i.w{background:rgba(94,200,140,.22);color:#8fe7b0;border:1px solid rgba(94,200,140,.5)}
+.nrform i.l{background:rgba(229,83,61,.16);color:#ff9a8a;border:1px solid rgba(229,83,61,.45)}
+.nrh2h{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;width:100%}
+.nrh2h li{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:7px 10px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
+.nrh2h .nrn{display:flex;align-items:center;gap:6px;min-width:0}
+.nrh2h .nrn b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nrh2h .nrr{font:700 16px var(--f-num,monospace);color:#ffe9b0;text-align:right}
+.nrh2h small{grid-column:1/-1;color:var(--muted);font-size:12px}
+.nrtag{font-style:normal;font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:2px 6px;border-radius:999px;background:rgba(229,83,61,.18);color:#ffb3a6;border:1px solid rgba(229,83,61,.45)}
+.nrhl{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media (max-width:560px){.nrhl{grid-template-columns:repeat(2,1fr)}}
+.nrhl div{display:flex;flex-direction:column;gap:2px;padding:9px 10px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid var(--line);min-width:0}
+.nrhl span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.nrhl b{font:800 22px var(--f-num,monospace);color:var(--cream);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nrhl small{font-size:12px;color:#aab3c5}
+.nrgames{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.nrgames li{display:flex;align-items:center;gap:10px;padding:6px 10px;border-radius:9px;background:rgba(255,255,255,.03);font-size:14px}
+.nrgames li i{font:700 12px var(--f-num,monospace);font-style:normal;width:20px;text-align:center}
+.nrgames li.w i{color:#8fe7b0}.nrgames li.l i{color:#ff9a8a}
+.nrgames li b{font-family:var(--f-num,monospace);min-width:44px}
+.nrgames li span{flex:1;min-width:0}
+.nrgames .nrd{color:var(--muted)}
+button.nser{cursor:pointer}
+.nrlead{display:flex;gap:6px;flex-wrap:wrap}
+.nrlead span{display:flex;flex-direction:column;padding:6px 10px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--line);font-size:13px;color:#ffe9b0;font-family:var(--f-num,monospace)}
+.nrlead small{font:600 10px var(--f-body,inherit);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.nrlead b{font-family:var(--f-body,inherit);color:var(--cream);font-size:13px}
+.tbl.nrbat tfoot td{font-weight:700;border-top:1px solid var(--line)}
+.netmsg{position:fixed;left:50%;top:calc(86px + var(--sa-t,0px));transform:translate(-50%,-12px);z-index:70;display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:18px 18px 18px 4px;background:#fff6dc;color:#1a2238;font-size:15px;box-shadow:0 14px 40px -12px rgba(0,0,0,.8);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
+.netmsg.show{opacity:1;transform:translate(-50%,0)}
+.netmsg .tlogo{width:20px;height:20px}
+.netmsg b{font-weight:800}
 </style>
 </head>
 <body>
@@ -1344,7 +1437,7 @@ html.app .mver{left:calc(16px + var(--sa-l))}
 
 <section class="guide" aria-labelledby="guideTitle">
 <h2 class="big" id="guideTitle">How to play</h2>
-<p>Floodlight Baseball is a dice baseball game played on a lit-up mini stadium, the digital edition of the tabletop game. Each at-bat is one roll of a word die, the meeples run the bases, and the LED scoreboard keeps the game. In Simulation mode, each team also draws action cards, gets one designated hitter, and every player has an <b>ability</b> they can use once a game. Play <b>vs Computer</b> (you're RED, pick home or away before each game) or <b>2 Players</b> to pass and play with a friend. Want a whole season? Hit <b>Franchise</b>: 32 games in a 24-club league, playoffs, and the <b>Floodlight Series</b>, with every stat saved. Short on time? <b>Clutch Challenges</b> drop you into the late innings of a close game, with a new Daily Challenge every day.</p>
+<p>Floodlight Baseball is a dice baseball game played on a lit-up mini stadium, the digital edition of the tabletop game. Each at-bat is one roll of a word die, the meeples run the bases, and the LED scoreboard keeps the game. In Simulation mode, each team also draws action cards, gets one designated hitter, and every player has an <b>ability</b> they can use once a game. Play <b>vs Computer</b> (you're RED, pick home or away before each game) or <b>2 Players</b> to pass and play with a friend, or <b>Online</b> to play a friend over the internet: one of you starts a game and sends the other a code. Want a whole season? Hit <b>Franchise</b>: 32 games in a 24-club league, playoffs, and the <b>Floodlight Series</b>, with every stat saved. Short on time? <b>Clutch Challenges</b> drop you into the late innings of a close game, with a new Daily Challenge every day.</p>
 <div class="guidegrid">
 <section class="card wide">
 <h2>Player abilities</h2>
@@ -1517,7 +1610,7 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function ordinal(n){ const s=['th','st','nd','rd'], v=n%100; return n+(s[(v-20)%10]||s[v]||s[0]); }
 const sleep = ms => new Promise(r=>setTimeout(r,ms*spd()));
-function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor((ADDON_READY?gameRand():Math.random())*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 const pick = a => a[Math.floor(Math.random()*a.length)];
 const lastName = n => n.split(' ').slice(-1)[0];
 const runsText = n => n ? ` ${n} run${n>1?'s score':' scores'}.` : '';
@@ -1662,7 +1755,7 @@ function newState(m,teams,cpuFlags){ return {mode:m,teams,cpu:cpuFlags||[false,f
   deck:shuffle(DECK),dhPile:shuffle(DHS),hands:[[],[]],dhUse:[[false,false],[false,false]],injured:[[],[]],rally:[false,false],hitRun:false,halfPA:0,drawn:{},dhOn:[null,null],pinch:null}; }
 const total = (G,t) => G.line[t].reduce((a,v)=>a+(typeof v==='number'?v:0),0);
 function boxOf(G,name,team){ return G.box[name]||(G.box[name]={team,PA:0,AB:0,R:0,H:0,'2B':0,'3B':0,HR:0,RBI:0,BB:0,K:0,GDP:0,SB:0}); }
-function rollFace(m){ const f=MODES[m].faces; return f[Math.floor(Math.random()*f.length)]; }
+function rollFace(m){ const f=MODES[m].faces; return f[Math.floor((ADDON_READY?gameRand():Math.random())*f.length)]; }
 const rig = () => window.__fdlRig && window.__fdlRig.length ? window.__fdlRig.shift() : null; // lets a demo script line up the rolls
 function rollAB(m){ const o=rig()||rollFace(m); return [o, isRoll(o)?(rig()||rollFace(m)):null]; }
 const curSlot = G => G.idx[G.half]%9;
@@ -2487,8 +2580,8 @@ const CASE_KEY='fdl-case', CASE_KINDS={pg:['Perfect game','💎'],nh:['No-hitter
 function caseGet(){ try{ const L=JSON.parse(localStorage.getItem(CASE_KEY)); return Array.isArray(L)?L:[]; }catch(e){ return []; } }
 function caseAdd(e){ const L=caseGet(); L.push(Object.assign({d:Date.now()},e)); while(L.length>400) L.shift(); try{ localStorage.setItem(CASE_KEY,JSON.stringify(L)); }catch(x){} }
 /* your side: your club in a franchise, the team you manage against the computer, both teams in a two-player game */
-function mySides(){ if(G.isFr&&F) return [0,1].filter(i=>G.teams[i].id===F.userId); const me=G.cpu[0]!==G.cpu[1]?(G.cpu[0]?1:0):-1; return me>=0?[me]:[0,1]; }
-const caseWhere=()=>G.challenge?(G.challenge.asg?'All-Star Game':'Clutch Challenge · '+G.challenge.title):G.isFr&&F?`Franchise ${frSlot} · ${frYear(F.season)} season`:'Exhibition';
+function mySides(){ if(G.isFr&&F) return [0,1].filter(i=>G.teams[i].id===F.userId); const me=userSide(); return me>=0?[me]:[0,1]; }
+const caseWhere=()=>G.challenge?(G.challenge.asg?'All-Star Game':'Clutch Challenge · '+G.challenge.title):G.isFr&&F?`Franchise ${frSlot} · ${frYear(F.season)} season`:ADDON_READY&&G.net&&NET?`Online vs ${netOpp()}`:'Exhibition';
 function caseNote(t,list){ if(list.length) setTimeout(()=>toast(t,`Trophy case: <b>${list.map(e=>CASE_KINDS[e.k][0]+(e.who?` by ${esc(e.who)}`:'')).join(', ')}</b>`,'abil'),1300); }
 function casePlay(){
   if(ADDON_READY&&G&&G.challenge&&G.challenge.watch) return; // nothing from a game you only watched goes in your trophy case
@@ -2579,12 +2672,12 @@ function renderHands(){
   if(!cardsOn()){ box.innerHTML='<p class="note">Action cards, designated hitters and player abilities are part of <b>Simulation</b> mode. Arcade is just the dice.</p>'; tp.innerHTML=''; return; }
   const nextDraw=t=>{ const n=DRAW_INNINGS.find(i=>i>=G.inning && !G.drawn[i+'-'+t]); return n?`next card: ${ordinal(n)} inn.`:'no more draws'; };
   box.innerHTML=[0,1].map(t=>{
-    const T=G.teams[t], up=!G.over&&t===G.half, n=dhLeft(t), ok=canDH(t), w=dhWindow(), c=cpu(t);
+    const T=G.teams[t], up=!G.over&&t===G.half, n=dhLeft(t), ok=canDH(t), w=dhWindow(), c=cpu(t)||(ADDON_READY&&netHide(t));
     const dh=`<button type="button" class="dhmini${ok?' go':''}${n?'':' empty'}" ${c?'tabindex="-1" data-ro="1"':`data-dh="${t}"`} aria-disabled="${!ok}" title="${w<0?'Designated hitters are for innings 1–8.':`Designated hitter: ${n?'one left':'used'} (one per game, innings 1–8).${c?'':' Tap to send one up. Most reach base, but not all.'}`}"><span class="mstk${n>1?' two':''}"><b>DH</b></span><span class="mcnt">${n?'×'+n:'—'}</span></button>`;
     const cards = c ? (G.hands[t].length?`<span class="mback"><span class="mstk${G.hands[t].length>1?' two':''}"><b>?</b></span><span class="mcnt">×${G.hands[t].length}</span></span>`:'')
       : G.hands[t].map(id=>{ const A=ACTIONS[id], go=legal(t,id);
         return `<button type="button" class="acbtn ${A.side}${go?' go':''}" data-card="${id}" data-team="${t}" aria-disabled="${!go}" title="${esc(A.name)}. ${esc(A.when)} ${esc(A.text)}"><img src="${ACARD[id]}" alt=""><span>${esc(A.short)}${go?'<em>play</em>':A.react?'<small>auto</small>':A.side==='def'?'<small>def</small>':''}</span></button>`; }).join('');
-    return `<div class="hand${up?' up':''}"><span class="who">${teamMark(T)}${esc(T.abbr)}<small>${up?'batting':'in field'}</small></span><span class="pile"><span class="plbl">DH pile</span>${dh}</span><span class="pile grow"><span class="plbl">Action cards</span>${cards||`<span class="none">${nextDraw(t)}</span>`}</span>${c?'<span class="cpu-tag">CPU</span>':''}</div>`;
+    return `<div class="hand${up?' up':''}"><span class="who">${teamMark(T)}${esc(T.abbr)}<small>${up?'batting':'in field'}</small></span><span class="pile"><span class="plbl">DH pile</span>${dh}</span><span class="pile grow"><span class="plbl">Action cards</span>${cards||`<span class="none">${nextDraw(t)}</span>`}</span>${c?`<span class="cpu-tag">${ADDON_READY&&netHide(t)?esc(netName(t)):'CPU'}</span>`:''}</div>`;
   }).join('');
   // a little pile on the table for the team you're managing (or the team at bat in a 2-player game)
   const me=userSide()>=0?userSide():G.half, T=G.teams[me], n=dhLeft(me), k=G.hands[me].length, ok=canDH(me), anyGo=G.hands[me].some(id=>legal(me,id));
@@ -2594,9 +2687,10 @@ function renderHands(){
 /* ---------- tips: one plain-language hint about what you can do right now ---------- */
 let tipsOn=true; try{ tipsOn=localStorage.getItem('fdl-tips')!=='off'; }catch(e){}
 function tipText(){
+  if(ADDON_READY&&netOn()){ const nt=netTip(); if(nt!=null) return nt; }
   if(ADDON_READY&&G&&G.challenge&&G.challenge.watch) return '';
   if(!G||G.over) return G&&G.over?'Game over. Hit <b>New game</b> (or <b>Franchise hub</b>) to play again.':'';
-  const t=G.half, f=1-t, human=!cpu(t), fieldHuman=!cpu(f), bat=curBatter(G), k=cardsOn()&&abOf(G,t,bat), T=G.teams[t];
+  const t=G.half, f=1-t, human=!cpu(t)&&!(ADDON_READY&&netHide(t)), fieldHuman=!cpu(f)&&!(ADDON_READY&&netHide(f)), bat=curBatter(G), k=cardsOn()&&abOf(G,t,bat), T=G.teams[t];
   if(G.event==null && freshGame()) return `Each roll of the die is one at-bat. Press <b>Roll the dice</b> (or the space bar). Before the first pitch you can still <b>set the batting order</b>.`;
   if(!cardsOn()) return `Arcade is just the dice: roll for every batter. Switch to <b>Simulation</b> for action cards, designated hitters and abilities.`;
   if(human && mustInjure()) return `${esc(T.name)} is holding <b>Injured</b> in the 9th, so it has to be played now on <b>${esc(bat)}</b>.`;
@@ -2637,7 +2731,7 @@ function renderAbar(){
   if(!cardsOn()||G.over){ el.innerHTML=''; el.hidden=true; return; }
   el.hidden=false;
   const t=G.half, f=1-t; let h='';
-  if(!cpu(t)) h+=activeAbils(t).map((a,i)=>`<button type="button" class="abtn" style="--c:${ABIL[a.k].color}" data-ab="${i}" title="${esc(ABIL[a.k].name)}: ${esc(ABIL[a.k].text)} Once a game.">${abIcon(a.k)}${esc(a.label)}</button>`).join('');
+  if(!cpu(t)&&!(ADDON_READY&&netHide(t))) h+=activeAbils(t).map((a,i)=>`<button type="button" class="abtn" style="--c:${ABIL[a.k].color}" data-ab="${i}" title="${esc(ABIL[a.k].name)}: ${esc(ABIL[a.k].text)} Once a game.">${abIcon(a.k)}${esc(a.label)}</button>`).join('');
   const pinch=G.pinch&&G.pinch.team===t, bat=pinch?null:curBatter(G), k=bat&&abOf(G,t,bat);
   if(k) h+=`<span class="lbl">${esc(lastName(bat))}'s ability</span>${abChip(k,ABIL[k].type!=='passive'&&G.abUsed[t][bat])}${ABIL[k].type!=='passive'&&G.abUsed[t][bat]?'<span style="font-size:11px">used</span>':''}`;
   const gm=gloveMan(f); if(gm) h+=`<span class="lbl">${esc(G.teams[f].abbr)} glove</span><span title="${esc(gm)} can rob a Single or Double once">${abIcon('GLV')} <b>${esc(lastName(gm))}</b></span>`;
@@ -2660,6 +2754,7 @@ function abCardHTML(t,k,name){
   return `<div class="abcard" style="--c:${A.color}">${abIcon(k,'big')}<div class="acopy"><span class="aside">${teamMark(G.teams[t])}${esc(TN(t))} · Player ability</span><b>${esc(A.name)}</b><span class="who2">${esc(name)}</span><span class="txt">${esc(A.text)} Once a game.</span></div></div>`;
 }
 function ask(t,id,q){
+  if(ADDON_READY&&netOn()) return netAsk(t,'card',id,q);
   if(cpu(t)){ toast(t,`The computer plays <b>${esc(ACTIONS[id].name)}</b>.`,ACTIONS[id].side); flashCard(t,id); return Promise.resolve(true); }
   return new Promise(res=>{
     const A=ACTIONS[id], ov=$('ov'); ov.onclick=null; sfx.flip();
@@ -2672,6 +2767,7 @@ function ask(t,id,q){
 /* a reactive ability: the computer decides on its own, a person gets asked */
 function askAb(t,k,name,q,ctx){
   const mark=v=>{ if(v){ G.abUsed[t][name]=true; abToast(t,k,name); } return v; };
+  if(ADDON_READY&&netOn()) return netAsk(t,'ab',k,q,name).then(mark);
   if(cpu(t)) return Promise.resolve(mark(cpuAb(t,k,ctx||{})));
   return new Promise(res=>{
     const A=ABIL[k], ov=$('ov'); ov.onclick=null; sfx.flip();
@@ -2687,7 +2783,7 @@ function showDH(t,card,sub){
     ov.innerHTML=`<div class="dhcard" role="dialog" aria-label="Designated hitter"><span class="aside">${teamMark(G.teams[t])}${esc(TN(t))} · Designated hitter</span><b>${esc(card.name)}</b><span class="res ${kind(card.o)}">${LABEL[card.o]}</span><span class="sub">Batting for ${esc(sub)}.</span></div>`;
     ov.hidden=false;
     let gone=false; const done=()=>{ if(gone) return; gone=true; ov.onclick=null; ov.hidden=true; ov.innerHTML=''; res(); };
-    ov.onclick=done; setTimeout(done, reduce?700:2100);
+    ov.onclick=done; setTimeout(done, ADDON_READY&&netFF()?0:reduce?700:2100);
   });
 }
 function explain(t,id){
@@ -2715,6 +2811,7 @@ function checkDraw(){
   const key=G.inning+'-'+G.half; if(G.drawn[key]) return; G.drawn[key]=true;
   const c=G.deck.shift(); if(!c) return;
   G.hands[G.half].push(c);
+  if(ADDON_READY&&netOn()){ netDraw(c); return; }
   if(cpu(G.half)){ G.log.push({sys:`${TN(G.half)} draws an action card.`}); toast(G.half,'The computer drew an action card.',''); return; }
   G.log.push({sys:`${TN(G.half)} draws an action card: ${ACTIONS[c].name}.`});
   toast(G.half, c==='INJ' ? `${esc(TN(G.half))} drew <b>Injured</b>. It has to be played.` : `${esc(TN(G.half))} drew <b>${esc(ACTIONS[c].name)}</b>.`, c==='INJ'?'curse':'');
@@ -2761,7 +2858,8 @@ function cardIBB(t){
   const bat=curBatter(G); G.dice=[];
   applyPA(G,'BB',{title:'Intentional walk',cls:'walk',big:null,text:`${esc(TN(t))} puts <b>${esc(bat)}</b> on first on purpose.`,logText:`Intentional walk · ${bat}`});
 }
-async function playCard(t,id){
+async function playCard(t,id,net){
+  if(ADDON_READY&&netWant('card',net,t,id)) return;
   if(!legal(t,id)){ explain(t,id); return; }
   busy=true; take(t,id); achCard(t); toast(t,`${cpu(t)?'The computer':esc(TN(t))} plays <b>${esc(ACTIONS[id].name)}</b>.`,ACTIONS[id].side); flashCard(t,id); renderGame();
   if(id==='SB') await cardSteal(t);
@@ -2774,7 +2872,8 @@ async function playCard(t,id){
   else if(id==='INJ') cardInjured(t,false);
   post();
 }
-async function sendDH(t){
+async function sendDH(t,net){
+  if(ADDON_READY&&netWant('dh',net,t)) return;
   if(!canDH(t)){ explainDH(t); return; }
   busy=true; const {card,sub}=dhCore(t);
   renderGame();
@@ -2807,7 +2906,8 @@ function abBunt(t,bat){
   setEvent(G,'Drag bunt','hit',`Small Ball! <b>${esc(bat)}</b> drops a perfect bunt and beats it out. Every runner moves up.`+runsText(sc.length)); G.big='Bunt Hit!';
   logCard(t,`Bunt single (Small Ball) · ${bat}`,sc.length); afterPlay(G,true);
 }
-async function runAbility(t,a){
+async function runAbility(t,a,net){
+  if(ADDON_READY&&netWant('ab',net,t,a)) return;
   if(!a||busy||G.over) return;
   busy=true; G.abUsed[t][a.name]=true; abToast(t,a.k,a.name); renderGame();
   abilityCore(t,a);
@@ -2884,9 +2984,9 @@ function tossP(slot,final){
 function toss(slot,final,cb){
   const box=$('dice'); if(slot===0) box.innerHTML='';
   sfx.dice();
-  const el=dieNode(slot,rollFace(mode)); el.classList.add('toss'); if(slot) el.classList.add('r'); box.appendChild(el);
+  const el=dieNode(slot,ADDON_READY?rollFaceC(mode):rollFace(mode)); el.classList.add('toss'); if(slot) el.classList.add('r'); box.appendChild(el);
   const body=el.querySelector('.dbody');
-  const t=setInterval(()=>{ body.innerHTML=dieSVG(rollFace(mode)); },90);
+  const t=setInterval(()=>{ body.innerHTML=dieSVG(ADDON_READY?rollFaceC(mode):rollFace(mode)); },90);
   setTimeout(()=>{ clearInterval(t); body.innerHTML=dieSVG(final); cb(); },Math.round(800*spd()));
 }
 /* one live roll for the batter, including the second roll on Roll for Triple / Roll for Home Run (a Slugger can skip it) */
@@ -2904,7 +3004,8 @@ async function liveRoll(t,batter){
   }
   const r=resolveFaces(o,o2); return {o,eff:r.eff,info:{tri:r.tri,hrr:r.hrr}};
 }
-async function doRoll(){
+async function doRoll(net){
+  if(ADDON_READY&&netWant('roll',net)) return;
   if(G.over||busy) return;
   sfx.unlock();
   const t=G.half, f=1-t;
@@ -2962,13 +3063,14 @@ async function doRoll(){
 function post(){
   checkDH(); checkDraw(); busy=false;
   if(G.over) G.big = G.walkoff ? (G.last&&G.last.o==='HR'&&G.last.team===1 ? (G.last.runs===4?'Walk-off Grand Slam!':'Walk-off Home Run!') : 'Walk-off!') : (G.big||'Final');
-  casePlay(); addonPost(); renderGame(); celebrate(); playFx(); maybeStretch();
+  if(!(ADDON_READY&&netQuiet())) casePlay(); addonPost(); renderGame(); celebrate(); playFx(); maybeStretch();
   autoSave();
-  if(G.over && !G.shownFinal){ G.shownFinal=true; caseFinal(); gameOver(); setTimeout(showFinal, reduce?250:Math.round(1900*spd())); }
+  if(G.over && !G.shownFinal){ G.shownFinal=true; if(!(ADDON_READY&&netQuiet())) caseFinal(); gameOver(); setTimeout(showFinal, reduce?250:Math.round(1900*spd())); }
 }
 /* the seventh-inning stretch: once a game, as the top of the 7th ends */
 function maybeStretch(){
   if(!G||G.over||G.stretched||G.inning!==7||G.half!==1||G.halfPA!==0||G.outs!==0) return;
+  if(ADDON_READY&&netFF()){ G.stretched=true; return; }
   G.stretched=true; let tries=0;
   const go=()=>{ if(!crowdLive()) return; if((busy||!$('ov').hidden||document.querySelector('.cutsc,.stretch'))&&tries++<20){ setTimeout(go,700); return; } stretchScene(); };
   setTimeout(go,1400);
@@ -3103,13 +3205,13 @@ function renderGame(){
   $('outs').querySelectorAll('i').forEach((d,i)=>d.classList.toggle('on',!G.over&&i<G.outs));
   const res=$('result'), det=$('detail'), E=G.event;
   if(!E){ res.className='result idle'; res.textContent='Ready';
-    det.innerHTML = G.challenge ? `${esc(TN(G.half))} at bat: <b>${esc(curBatter(G))}</b>. ${cpu(G.half)?'Press Roll for the computer.':'Press Roll to swing, or play a card first.'}` : `${esc(G.teams[0].name)} bats first. Press Roll to start the game${freshGame()?`, or <button type="button" class="linkish" id="setLU">set the batting order</button> first`:''}.`; }
+    det.innerHTML = G.challenge ? `${esc(TN(G.half))} at bat: <b>${esc(curBatter(G))}</b>. ${cpu(G.half)?'Press Roll for the computer.':'Press Roll to swing, or play a card first.'}` : `${esc(G.teams[0].name)} bats first. Press Roll to start the game${freshGame()&&!(ADDON_READY&&netOn())?`, or <button type="button" class="linkish" id="setLU">set the batting order</button> first`:''}.`; }
   else { res.className='result '+E.cls; res.textContent=E.title; det.innerHTML=E.html+(G.over?' <b>'+esc(G.final)+'</b>':''); }
   const rb=$('roll'), hurt=!G.over && isInjured(G,G.half,curBatter(G));
-  rb.disabled=G.over||busy;
-  rb.textContent = G.over ? 'Game over' : mustInjure() ? 'Play Injured (must play now)' : hurt ? 'Injured batter: take the out' : cpu(G.half) ? 'Roll for '+G.teams[G.half].abbr : 'Roll the dice';
+  rb.disabled=G.over||busy||(ADDON_READY&&netLock());
+  rb.textContent = (ADDON_READY&&netRollLabel()) || (G.over ? 'Game over' : mustInjure() ? 'Play Injured (must play now)' : hurt ? 'Injured batter: take the out' : cpu(G.half) ? 'Roll for '+G.teams[G.half].abbr : 'Roll the dice');
   rb.classList.toggle('curse', !G.over && (mustInjure()||hurt));
-  $('finish').disabled=G.over||busy;
+  $('finish').disabled=G.over||busy||(ADDON_READY&&netOn());
   const items=G.log.slice(-80).reverse();
   $('log').innerHTML = items.length ? items.map(e=> e.sys ? `<li><span class="inn"></span><span class="sys">${esc(e.sys)}</span></li>`
     : `<li><span class="inn" style="color:${ink(G.teams[e.team].color)}">${e.tag}</span><span>${esc(e.text)}${e.runs?` <span class="runs">+${e.runs}</span>`:''}${e.out!=null?` <span class="inn">${e.out} out</span>`:''}</span></li>`).join('')
@@ -3223,7 +3325,7 @@ function flashCard(t,id){
 const pscore = b => b.H + b['2B'] + 2*b['3B'] + 3*b.HR + 1.2*b.RBI + b.R + .4*b.BB - .2*b.K + .5*(b.SB||0);
 function potg(){ const w=total(G,0)>total(G,1)?0:1; let best=null; for(const [name,b] of Object.entries(G.box)){ if(b.team!==w||!b.PA) continue; const sc=pscore(b); if(!best||sc>best.s) best={name,b,s:sc,t:w}; } return best; }
 function statLine(b){ const p=[`${b.H}-for-${b.AB}`]; if(b.HR) p.push(b.HR>1?`${b.HR} homers`:'a homer'); if(b['3B']) p.push(b['3B']>1?`${b['3B']} triples`:'a triple'); if(b['2B']) p.push(b['2B']>1?`${b['2B']} doubles`:'a double'); if(b.RBI) p.push(`${b.RBI} RBI`); if(b.BB) p.push(b.BB>1?`${b.BB} walks`:'a walk'); if(b.SB) p.push(b.SB>1?`${b.SB} steals`:'a steal'); return p.join(', '); }
-const userSide = () => G.cpu[0]!==G.cpu[1] ? (G.cpu[0]?1:0) : -1;
+const userSide = () => ADDON_READY&&netOn() ? netMe() : G.cpu[0]!==G.cpu[1] ? (G.cpu[0]?1:0) : -1;
 function finalWords(){
   const a=total(G,0), h=total(G,1), w=a>h?0:1, hi=Math.max(a,h), lo=Math.min(a,h), x=G.inning>9?` in ${G.inning}`:'', u=userSide();
   if(u>=0){ const them=G.isFr?G.teams[1-u].name:'the computer';
@@ -3249,7 +3351,7 @@ function showFinal(){
 ${best?`<div class="potg"><img src="${cardSrc(best.name,G.teams[best.t])}" alt=""><div><span class="aside">Player of the game</span><b>${esc(best.name)}</b><span>${esc(statLine(best.b))}</span></div></div>`:''}
 ${tops?`<ul class="tops">${tops}</ul>`:''}
 ${fr?`<p class="frnote">${fr}</p>`:''}
-<div class="ovbtns">${G.isFr?`<button class="btn primary" type="button" id="fHub">Franchise hub</button><button class="btn" type="button" id="fShare">Share result</button>`:`<button class="btn primary" type="button" id="fShare">Share result</button><button class="btn" type="button" id="fAgain">Play again</button>`}</div>
+<div class="ovbtns">${G.isFr?`<button class="btn primary" type="button" id="fHub">Franchise hub</button><button class="btn" type="button" id="fShare">Share result</button>`:`<button class="btn primary" type="button" id="fShare">Share result</button><button class="btn" type="button" id="fAgain">${ADDON_READY&&netOn()?'Rematch':'Play again'}</button>${ADDON_READY&&netOn()&&netMe()>=0?'<button class="btn" type="button" id="fNetRec">Online record</button>':''}`}</div>
 <p class="fnote" id="fNote" hidden></p>
 ${ADDON_READY?ksLine():""}
 </div>`;
@@ -3257,7 +3359,8 @@ ${ADDON_READY?ksLine():""}
   if(!G.annEnd){ G.annEnd=true; ann.say(annPostgame(),true); }
   const close=()=>{ ov.hidden=true; ov.innerHTML=''; ov.onclick=null; if(G.trophy && frNow()){ G.trophy=false; showTrophy(frNow().history[frNow().history.length-1]); return true; } return false; };
   $('fClose').onclick=close;
-  if($('fAgain')) $('fAgain').onclick=()=>{ close(); newGame(); };
+  if($('fNetRec')) $('fNetRec').onclick=()=>{ close(); netOpen('record'); };
+  if($('fAgain')) $('fAgain').onclick=()=>{ close(); if(ADDON_READY&&netOn()){ netRematch(); return; } newGame(); };
   if($('fHub')) $('fHub').onclick=()=>{ if(!close()) openHub(); };
   ov.onclick=e=>{ if(e.target===ov) close(); };
   $('fShare').onclick=()=>{
@@ -4138,7 +4241,7 @@ const lsGet=k=>{ try{ return localStorage.getItem(k); }catch(e){ return null; } 
 const lsSet=(k,v)=>{ try{ localStorage.setItem(k,v); return true; }catch(e){ return false; } };
 const lsDel=k=>{ try{ localStorage.removeItem(k); }catch(e){} };
 const jparse=s=>{ try{ return s?JSON.parse(s):null; }catch(e){ return null; } };
-function quickSave(){ if(!G||G.isFr||G.challenge||G.tutorial) return; lsSet(QKEY,JSON.stringify({G,mode:G.mode,opp,exhHome})); }
+function quickSave(){ if(!G||G.isFr||G.challenge||G.tutorial||G.net) return; lsSet(QKEY,JSON.stringify({G,mode:G.mode,opp,exhHome})); }
 function setWhere(w){ lsSet(WKEY,w); }
 function autoSave(){ if(!G) return; if(G.isFr){ if(FR) frSaveLive(); } else quickSave(); }
 document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden' && !busy) autoSave(); });
@@ -4400,7 +4503,7 @@ function openPregame(o){
 ${o.venue?`<div class="prerow"><span class="lbl">Ballpark</span><span class="venue">${esc(o.venue)}</span></div>`:''}${o.homeLabel?`<div class="prerow"><span class="lbl">${esc(o.homeLabel)}</span><div class="seg" role="group"><button type="button" data-home="0" aria-pressed="${!st.home}">Away · bats first</button><button type="button" data-home="1" aria-pressed="${st.home}">Home · bats last</button></div></div>`:''}
 <div class="lcols" style="--cols:${o.cols.length}">${o.cols.map(colHTML).join('')}</div>
 <p class="hint">Tap two players to swap them, or use the arrows. Every ability can be used once a game.</p>
-<div class="ovbtns"><button class="btn primary" type="button" id="preGo">Play ball!</button>${o.extra?`<button class="btn" type="button" id="preExtra">${esc(o.extra.label)}</button>`:''}<button class="btn" type="button" id="preNo">Cancel</button></div></div>`;
+<div class="ovbtns"><button class="btn primary" type="button" id="preGo">${esc(o.goLabel||'Play ball!')}</button>${o.extra?`<button class="btn" type="button" id="preExtra">${esc(o.extra.label)}</button>`:''}<button class="btn" type="button" id="preNo">Cancel</button></div></div>`;
     ov.hidden=false;
   };
   const close=()=>{ ov.hidden=true; ov.innerHTML=''; ov.onclick=null; };
@@ -4467,7 +4570,7 @@ $('hands').addEventListener('click',e=>{
 $('abar').addEventListener('click',e=>{ const b=e.target.closest('[data-ab]'); if(b) runAbility(G.half, activeAbils(G.half)[+b.dataset.ab]); });
 $('detail').addEventListener('click',e=>{ if(e.target.id==='setLU'){ if(frMode) frPregame(); else newGame(); } });
 $('finish').addEventListener('click',()=>{
-  if(busy||G.over) return;
+  if(busy||G.over||(ADDON_READY&&netOn())) return;
   G.fin=1;
   if(cardsOn()) smartRun(G); else { let g=0; while(!G.over && g++<4000){ const [o,o2]=rollAB(G.mode); atBat(G,o,true,o2); } }
   G.dice=[]; G.pinch=null; checkDH(); G.big=G.walkoff?'Walk-off!':'Final'; renderGame(); celebrate();
@@ -4619,7 +4722,7 @@ const IS_DESKTOP = !!(NATIVE && NATIVE.isDesktop);
 const CAP = (typeof window!=='undefined' && window.Capacitor && typeof window.Capacitor.isNativePlatform==='function' && window.Capacitor.isNativePlatform()) ? window.Capacitor : null;
 const IS_APP = !!CAP;
 const APP_OS = CAP ? String(CAP.getPlatform()) : '';
-const GAME_VERSION = '1.7.3';
+const GAME_VERSION = '1.8.0';
 const FULL_GAME = true; /*@edition*/ // the website is the free demo; build.py turns this on for the Steam game
 
 /* ---------- a shared add-on dialog layer (sits above the menu, never touches the game's own pop-ups) ---------- */
@@ -6083,8 +6186,9 @@ function addonRender(){
   try{ parkSync(); }catch(e){}
   if(G&&!G.over&&G.inning>=6) try{ crowdPrep(); }catch(e){} // paint the stretch crowd before the 7th
   renderDuel(); paintHotkeys();
-  if(G && !busy){ VO.pre={runs:total(G,0)+total(G,1), outs:G.outs, half:G.half, inning:G.inning}; voBatter(); }
-  const ch=!!(G&&G.challenge); document.querySelectorAll('.exh').forEach(el=>el.hidden=frMode||ch);
+  if(G && !busy && !netFF()){ VO.pre={runs:total(G,0)+total(G,1), outs:G.outs, half:G.half, inning:G.inning}; voBatter(); }
+  const ch=!!(G&&G.challenge), nt=netOn(); document.querySelectorAll('.exh').forEach(el=>el.hidden=frMode||ch||(nt&&!el.classList.contains('opp'))); // online: the rules are set for the whole game
+  try{ netPaint(); }catch(e){}
   if((FSET.autoCpu||watchOn()) && G && !G.over && !busy && cpu(G.half) && !G.tutorial) autoCpuKick(); // in the guided game you press for the computer, so the coach can explain
   if(TUT) setTimeout(tutTick,0); // the coach moves on the moment the play is done
 }
@@ -6092,15 +6196,16 @@ function addonRender(){
 function addonPost(){
   if(!ADDON_READY) return; duelPick=null;
   try{
+    if(netFF()) return; // catching up on an online game: no fielding animation or calls
     const d=fieldAfterPlay();
     if(duelLast && duelLast.edge && G.event && G.event.html){ const L=duelLast, n=FACE; G.event.html+=` <span class="dnote">${L.edge==='bat'?"Batter's edge":"Pitcher's edge"}: rolled ${esc(n[L.faces[0]])} and ${esc(n[L.faces[1]])}, kept ${esc(n[L.kept])}.</span>`; }
     duelLast=null;
     voPlay(d,VO.pre);
-    achPA();
+    if(!netQuiet()) achPA();
   }catch(e){ console.warn(e); }
 }
 /* at the final out (live, or the rest played out with Finish game) */
-function addonGameOver(){ if(!ADDON_READY) return; try{ achGame(); achFr(); }catch(e){ console.warn(e); } }
+function addonGameOver(){ if(!ADDON_READY||netQuiet()) return; try{ achGame(); achFr(); }catch(e){ console.warn(e); } }
 
 /* the computer rolls its own at-bats when Settings says so (it waits while you have a defense card you could play) */
 let autoT=null;
@@ -6172,8 +6277,7 @@ if(IS_DESKTOP){
 /* the recorded announcer loads after the first tap or key (browsers only play sound after one) */
 const voWarm=()=>{ if(FSET.voice!==false&&ann.on){ voCtx(); voLoad('calls'); voLoad('names'); } };
 document.addEventListener('pointerdown',voWarm,{once:true}); document.addEventListener('keydown',voWarm,{once:true});
-ADDON_READY=true;
-paintDaily(); achProg(); if(F) achFr(); if(G) renderGame();
+ADDON_READY=true; // (the first full draw waits for the last add-on: src/js/99-ready.js)
 /* credits: who made what (needed for the store build too) */
 function openCredits(back){
   openX(`<div class="xpanel" role="dialog" aria-modal="true" aria-labelledby="crdT">${xHead('<span id="crdT">Credits</span>','Floodlight Baseball '+GAME_VERSION)}
@@ -7602,7 +7706,660 @@ function frYearsMig(o){
   n.yrs=1; return n;
 }
 
-window.__fdl={addon:{ACHD:()=>ACHD,CHD:()=>CHD,DAYD:()=>DAYD,FSET:()=>FSET,start:id=>startChallenge(id==='daily'?dailyFor(today()):CH_BY[id]),achUnlock,openSettings,openAchievements,openChallenges,litActions,padPress,layerRoot,chFinal,buildChallenge,CHALL,ACHS,dailyFor,badgeSVG,exitChallenge,startTutorial,TUT:()=>TUT,FIELD:()=>FIELD,VO:()=>VO,voSay,voPick,voName,voBatter,fieldCheck,sfx:()=>sfx,parkSync,parkFor,PARK:()=>PARK_CUR,FR_CLUBS:()=>FR_CLUBS,trGain,plValue,drGet,lgOps,TR:()=>TR,stretchScene:()=>stretchScene(),crowdCanvas,asgSim,asgPending,asgStart,confOf,drOrder,genLogoKey,poWatch,poIn,potwList,seedTag,tvSegments:m=>tvSegments(m),activeSeries:()=>activeSeries(),poAllSeries:()=>poAllSeries(),faGet,faSign,faDecide,faResolve,ctEnsure,ctWorth,rvOn,rvRec,dbGet,dbSim,dbOpen,dlGet,evPreviewSegs,frNextSeason:()=>frNextSeason()}, get G(){return G}, get F(){return F}, get busy(){return busy}, setOpp:o=>setOpp(o,true), cpuPick:()=>cpuPick(), showFinal:()=>showFinal(), playWhole, MODES, ACTIONS, ABIL, DHS, P, render:()=>renderGame(),
+/* ---------- online games: play a friend over the internet (Oct 2026) ----------
+   One player starts a game and gets a 4-character code; the other types it in (or opens the invite link). Whoever
+   invites is the home team and plays the RED deck; the friend is the away team with the BLUE deck. Each player names
+   their own team and players and sets their own batting order before the game.
+
+   How the two screens stay in step (lockstep): the server (netlify/functions/online.mjs) keeps only the ordered list
+   of moves. Both games start from the same dice seed (gameRand() below replaces Math.random for the dice and the
+   card decks while an online game is on screen) and play every move from that list in the same order, so they roll
+   the same dice and reach the same game. A move made on this screen isn't played here right away: it goes to the
+   server and plays out when it comes back, on both screens at once. Questions during a roll ("Use Gold Glove?") are
+   asked only on the screen of the player who owns the card or ability; the answer is a move too. Each move carries
+   the number of moves played before it (`at`), so a move made on a stale screen (the other player rolled first) is
+   dropped on both screens alike. Rejoining (or watching) replays the whole list quickly to catch up.
+   Hidden information stays hidden: the other player's action cards show face down, like the computer's. */
+var NET=null, NETR=0; // the online game (null when there isn't one); the dice seed's running state
+const NET_API=window.__fdlNet||((/\.netlify\.app$/.test(location.hostname)?location.origin:SITE_URL)+'/api/online');
+const NET_KEY='fdl-net', NET_NAME='fdl-net-name';
+function netCid(){ let c=lsGet('fdl-net-id'); if(!c||!/^[a-z0-9]{16}$/.test(c)){ c=[...Array(16)].map(()=>'abcdefghijklmnopqrstuvwxyz0123456789'[Math.floor(Math.random()*36)]).join(''); lsSet('fdl-net-id',c); } return c; }
+const NET_SAY=['Nice hit!','Lucky roll!','Here we go!','Oh no!','Good game!','Your turn!'];
+const nsleep=ms=>new Promise(r=>setTimeout(r,ms)); // real time (the game's sleep() follows the speed setting)
+
+/* ---------- the shared dice ---------- */
+function gameRand(){
+  if(!(NET&&(NET.seeding||(NET.G&&G===NET.G)))) return Math.random();
+  if(window.__netDbg) window.__netDbg.push((new Error().stack||'').split('\n').slice(2,5).map(x=>x.trim().replace(/\(.*\//,'(')).join(' < ')); // tests: who used the shared dice
+  NETR=(NETR+0x6D2B79F5)>>>0; let t=NETR; t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61); return ((t^(t>>>14))>>>0)/4294967296;
+}
+function rollFaceC(m){ const f=MODES[m].faces; return f[Math.floor(Math.random()*f.length)]; } // the faces flashing by while a die tumbles: just for show
+
+/* ---------- state questions the game asks ---------- */
+function netOn(){ return !!(NET&&NET.G&&G===NET.G); }
+function netMe(){ return NET?NET.side:-1; }
+function netFF(){ return !!(NET&&NET.ff&&netOn()); }
+function netQuiet(){ return !!(netOn()&&(NET.ff||NET.side<0)); } // catching up, or watching: no trophies or achievements
+function netHide(t){ return netOn()&&t!==NET.side; } // the other team's cards stay face down
+const netOpp=()=>NET?(NET.p[1-Math.max(0,NET.side)]||{}).name||'Your opponent':'';
+const netName=t=>NET&&NET.p[t]?NET.p[t].name:(t?'Home':'Away');
+const netWho=t=>NET&&t===NET.side?'You':netName(t);
+function netLock(){ if(!netOn()) return false; return NET.side<0||G.half!==NET.side||!!NET.mine||NET.out.length>0||NET.q.length>0||NET.pumping||!!NET.waitAns; }
+function netRollLabel(){
+  if(!netOn()||G.over||busy) return null;
+  if(NET.side<0) return `${netName(G.half)} is up`;
+  if(G.half!==NET.side) return `${netOpp()} is up`;
+  if(NET.mine||NET.out.length) return 'Sending…';
+  return null;
+}
+function netTip(){
+  if(!netOn()||G.over) return null;
+  if(NET.side<0) return `You're watching <b>${esc(netName(0))}</b> and <b>${esc(netName(1))}</b>. Every roll shows up here as it happens.`;
+  if(NET.waitAns&&NET.waitAns.t!==NET.side) return `<b>${esc(netOpp())}</b> is making a call…`;
+  if(G.half!==NET.side){
+    const f=NET.side, d=cardsOn()&&G.hands[f].find(id=>legal(f,id));
+    return d?`<b>${esc(netOpp())}</b> is batting. You can play <b>${ACTIONS[d].name}</b> before the next roll. ${esc(ACTIONS[d].text)}`:`<b>${esc(netOpp())}</b> is batting. Their rolls show up here as they happen.`;
+  }
+  if(freshGame()) return `You bat first. Press <b>Roll the dice</b> to start the game against <b>${esc(netOpp())}</b>.`;
+  return null; // the usual tips
+}
+
+/* ---------- moves made on this screen go to the server ---------- */
+function netWant(kind,net,a,b){
+  if(net===netWant) return false; // the move is being played from the list
+  if(!netOn()) return false;
+  netTry(kind,a,b); return true;
+}
+function netTry(kind,a,b){
+  const t=G.half;
+  if(G.over) return;
+  if(NET.side<0){ toast(t,"You're watching this game.",''); return; }
+  if(busy||NET.mine||NET.out.length||NET.q.length||NET.pumping||NET.waitAns) return; // a move is already on its way
+  const me=NET.side, e={at:NET.tick,g:NET.gameNo};
+  if(kind==='roll'){ if(t!==me){ toast(t,`It's <b>${esc(netOpp())}</b>'s turn to roll.`,''); return; } e.k='roll'; }
+  else if(kind==='card'){ if(a!==me){ toast(a,"That's not your card.",''); return; } if(!legal(a,b)){ explain(a,b); return; } Object.assign(e,{k:'card',t:a,id:b}); }
+  else if(kind==='dh'){ if(a!==me) return; if(!canDH(a)){ explainDH(a); return; } Object.assign(e,{k:'dh',t:a}); }
+  else if(kind==='ab'){ if(a!==me||!b) return; Object.assign(e,{k:'ab',a:{k:b.k,name:b.name,from:b.from}}); }
+  else return;
+  NET.mine={at:e.at,k:e.k}; netSend(e); renderGame();
+}
+/* the outbox: one move at a time, in order, retried until the server has it */
+function netSend(e){ if(!NET) return; NET.out.push(e); netFlush(); }
+async function netFlush(){
+  const my=NET; if(!my||my.flushing) return; my.flushing=true;
+  try{
+    while(NET===my&&my.out.length){
+      try{
+        const r=await netFetch(NET_API,{method:'POST',body:JSON.stringify({op:'send',code:my.code,tok:my.tok,e:my.out[0],since:my.n})});
+        if(r.error){ if(r.status>=400&&r.status<500){ my.out.shift(); my.mine=null; netNote(r.error); if(netOn()) renderGame(); continue; } throw new Error(r.error); }
+        my.out.shift(); my.fail=0; netGot(r);
+      }catch(err){ my.fail=(my.fail||0)+1; netStatus(); await nsleep(Math.min(8000,700*my.fail)); }
+    }
+  } finally{ my.flushing=false; netStatus(); }
+}
+async function netFetch(url,o){
+  const ctl=typeof AbortController==='function'?new AbortController():null, to=setTimeout(()=>ctl&&ctl.abort(),15000);
+  try{
+    const r=await fetch(url,Object.assign({cache:'no-store'},o||{},ctl?{signal:ctl.signal}:{})); // a plain request: the apps skip the CORS preflight
+    let j={}; try{ j=await r.json(); }catch(e){}
+    if(!r.ok) return Object.assign({error:j.error||'The game server is having trouble.',status:r.status},j.full?{full:true}:{});
+    return j;
+  } finally{ clearTimeout(to); }
+}
+
+/* ---------- moves coming in ---------- */
+function netGot(r){
+  const my=NET; if(!my||!r) return;
+  if(r.teams) my.teams=r.teams;
+  if(r.p) my.p=r.p;
+  if(r.seen){ my.seen=r.seen; my.seenAt=Date.now(); }
+  if(r.now) my.skew=Date.now()-r.now;
+  for(const e of r.log||[]){ if(e.i<my.n) continue; if(e.i!==my.n) break; my.n=e.i+1;
+    if(e.k==='say'||e.k==='leave'){ netSide(e); continue; } // no effect on the game: shown the moment it arrives
+    my.q.push(e); }
+  if(my.waitAns) netPumpAns();
+  netPump(); netStatus();
+}
+/* the main loop: ask the server for new moves. While it's the other player's move it waits there for them
+   (a long poll); while it's this player's move it only checks in every few seconds. */
+async function netLoop(){
+  const my=NET; if(!my||my.looping) return; my.looping=true;
+  while(NET===my&&!my.stop){
+    const theirs=netTheirMove(), wait=theirs?6:0;
+    try{
+      const r=await netFetch(`${NET_API}?code=${my.code}&since=${my.n}&wait=${wait}${my.tok?'&tok='+my.tok:''}${my.teams&&my.teams[0]&&my.teams[1]?'':'&full=1'}`);
+      if(NET!==my) break;
+      if(r.error){ if(r.status===404){ my.gone=true; netStatus(); netNote(r.error); break; } throw new Error(r.error); }
+      my.fail=0; netGot(r);
+    }catch(err){ if(NET!==my) break; my.fail=(my.fail||0)+1; netStatus(); await nsleep(Math.min(10000,1000*my.fail)); continue; }
+    if(!wait) await nsleep(document.hidden?8000:2500);
+    else if(document.hidden) await nsleep(1500);
+  }
+  my.looping=false;
+}
+function netTheirMove(){
+  const my=NET; if(!my) return false;
+  if(my.side<0) return true;
+  if(!my.G) return true; // waiting for the game to start
+  if(my.G.over) return true; // a rematch could come
+  if(my.waitAns) return my.waitAns.t!==my.side;
+  return my.G.half!==my.side;
+}
+/* play the moves in order, each one to the end (dice, questions, the call) before the next */
+async function netPump(){
+  const my=NET; if(!my||my.pumping) return; my.pumping=true;
+  try{
+    let hold=0;
+    while(NET===my&&my.q.length){
+      if(my.G&&G!==my.G) break; // the player is looking at another game: catch up when they come back
+      if(busy){ await nsleep(my.ff?40:300); continue; } // a roll still playing out on screen
+      const e=my.q[0];
+      if(!my.ff&&hold<40&&document.querySelector('.cutsc,.stretch')){ hold++; await nsleep(400); continue; } // let the intro or the stretch finish here
+      hold=0; my.q.shift();
+      await netApply(e);
+      if(my.ff&&!my.q.some(x=>x.i<my.liveFrom)) netFFEnd();
+    }
+  } catch(err){ console.warn('online',err); }
+  finally{ my.pumping=false; }
+  if(NET===my){ if(my.ff&&!my.q.length) netFFEnd(); netStatus(); if(netOn()) renderGame(); }
+}
+/* a quick message: its own speech bubble (game toasts can't cover it) */
+function netBubble(s,text){
+  let el=$('netmsg'); if(!el){ el=document.createElement('div'); el.id='netmsg'; el.className='netmsg'; el.setAttribute('role','status'); document.body.appendChild(el); }
+  const T=NET&&NET.teams[s];
+  el.innerHTML=`${T?teamMark(T):''}<b>${esc(netName(s))}</b><span>${esc(text)}</span>`; el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+  try{ sfx.pop(); }catch(e){}
+  clearTimeout(netBubble.t); netBubble.t=setTimeout(()=>el.classList.remove('show'),4200);
+}
+function netNote(msg){ if(G) toast(G.half,esc(msg),''); else console.info(msg); }
+function netSide(e){
+  const my=NET, fresh=e.i>=my.liveFrom;
+  if(e.k==='say'){ if(fresh&&e.s!==my.side) netBubble(e.s,NET_SAY[e.m]||''); return; }
+  if(e.k==='leave'){ my.left=my.left||[false,false]; my.left[e.s]=true; my.leftSeen=my.leftSeen||[0,0]; my.leftSeen[e.s]=(my.seen||[])[e.s]||0; if(fresh&&e.s!==my.side) netNote(`${netName(e.s)} left the game. They can come back with the code ${my.code}.`); netStatus(); }
+}
+async function netApply(e){
+  const my=NET;
+  if(e.k==='join'||e.k==='go'){ if(e.k==='join'?!my.G:(my.G&&my.G.over&&e.g===my.gameNo+1)) netNewGame(e.g||0); return; }
+  if(e.k==='ans') return; // (answers are picked out by netPumpAns; one here was already used, or played on this screen)
+  const dbg=m=>{ if(window.__netDbg) window.__netDbg.push(m); };
+  const mineDone=()=>{ if(e.s===my.side&&my.mine&&my.mine.at===e.at){ my.mine=null; return true; } return false; };
+  if(window.__netDbg) window.__netDbg.push(`apply #${e.i} ${e.k} s${e.s} at${e.at} tick${my.tick} busy${busy}`);
+  if(!my.G||e.g!==my.gameNo||e.at!==my.tick||G!==my.G||my.G.over||busy){ dbg(`  drop #${e.i}`); if(mineDone()&&!my.ff) netNote('Too late: the play had already moved on.'); return; }
+  const t=e.s; let run=null;
+  if(e.k==='roll'){ if(G.half===t) run=()=>doRoll(netWant); }
+  else if(e.k==='card'){ if(e.t===t&&ACTIONS[e.id]&&legal(t,e.id)) run=()=>playCard(t,e.id,netWant); }
+  else if(e.k==='dh'){ if(e.t===t&&canDH(t)) run=()=>sendDH(t,netWant); }
+  else if(e.k==='ab'){ const a=G.half===t&&activeAbils(t).find(x=>x.k===e.a.k&&x.name===e.a.name&&(x.from==null||x.from===e.a.from)); if(a) run=()=>runAbility(t,a,netWant); }
+  mineDone();
+  if(!run){ dbg(`  invalid #${e.i}`); return; }
+  my.tick++;
+  await run();
+  if(my.G&&my.G.over&&G===my.G) try{ netRecord(); }catch(err){ console.warn(err); } // the final out: into the online record (66-netrec.js)
+}
+/* a new game (the first one, or a rematch): both screens build it from the same teams and the same seed */
+function netNewGame(g){
+  const my=NET;
+  my.gameNo=g; my.tick=0; my.qn=0; my.mine=null; my.waitAns=null;
+  NETR=(my.seed+Math.imul(g,0x9E3779B1))>>>0;
+  if(G&&!G.net) try{ autoSave(); }catch(e){} // the game that was on screen is saved first (quick game or franchise)
+  if(frMode){ frMode=false; FR=null; setFrUI(); closeHub(); }
+  const ov=$('ov'); ov.hidden=true; ov.innerHTML=''; ov.onclick=null; closeX(true);
+  mode=my.mode; try{ paintModeTabs(); renderFaces(); renderGuide(); }catch(e){}
+  my.seeding=true;
+  try{ G=newState(my.mode,[netTeam(my.teams[0]),netTeam(my.teams[1])],[false,false]); }
+  finally{ my.seeding=false; }
+  G.net=1; G.frLabel=`Online · ${netName(0)} at ${netName(1)}`; my.G=G;
+  lsSet(NET_KEY,JSON.stringify({code:my.code,tok:my.tok,side:my.side,at:Date.now(),opp:netOpp()}));
+  $('pcard').dataset.nm=''; checkDraw(); annStart(); renderGame();
+  if(!my.ff){ cutscene(); if(g>0) toast(G.half,'Rematch! Same teams, new game.','abil'); setTimeout(()=>{ if(NET===my&&netOn()&&!G.over) netSeriesNote(); },g>0?3200:2600); }
+  netStatus();
+}
+/* a team as it arrived from the server, checked again here (names, abilities, numbers) */
+function netTeam(T){
+  const c=s=>String(s||'').replace(/[<>&"]/g,'').slice(0,28), L=(T.lineup||[]).map(n=>c(n));
+  const ab={}, info={};
+  L.forEach((n,i)=>{ const raw=T.lineup[i], a=(T.ab||{})[raw], r=(T.info||{})[raw]||{}; ab[n]=ABIL[a]?a:null; info[n]=Object.assign({},r,{ab:ABIL[r.ab]?r.ab:ab[n]}); });
+  return {id:T.id==='blue'?'blue':'red',name:c(T.name),abbr:c(T.abbr).slice(0,4),color:/^#[0-9a-f]{6}$/i.test(T.color)?T.color:'#888888',logo:LOGOS[T.logo]&&!/^gen/.test(T.logo)?T.logo:null,lineup:L,ab,info};
+}
+/* the team this player brings: the RED or BLUE deck with the names and batting order saved on this device */
+function netMyTeam(id){ const T=exhTeams()[id]; return gameTeam(T); }
+
+/* ---------- questions during a roll ---------- */
+function netAsk(t,kind,key,q,name){
+  const my=NET, qn=++my.qn; // every question gets a number, the same on every screen
+  if(t===my.side&&!my.ff) return netPrompt(t,kind,key,q,name,qn);
+  return new Promise(res=>{
+    my.waitAns={t,qn,res:v=>{ my.waitAns=null; netWaitShow(false); if(v&&kind==='card'&&!my.ff) toast(t,`${t===my.side?'You play':`<b>${esc(netName(t))}</b> plays`} <b>${esc(ACTIONS[key].name)}</b>.`,ACTIONS[key].side); res(v); },
+      live:()=>{ my.waitAns=null; netPrompt(t,kind,key,q,name,qn).then(res); }};
+    netPumpAns();
+    if(my.waitAns&&!my.ff){ if(t!==my.side) netWaitShow(true); renderTip(); }
+  });
+}
+function netPumpAns(){
+  const my=NET, W=my&&my.waitAns; if(!W) return;
+  const i=my.q.findIndex(e=>e.k==='ans'&&e.s===W.t&&e.q===W.qn&&e.g===my.gameNo);
+  if(i>=0){ const e=my.q.splice(i,1)[0]; if(window.__netDbg) window.__netDbg.push(`  ans #${e.i} s${e.s} ${e.v}`); W.res(!!e.v); return; }
+  if(my.ff){ // caught up to a question nobody has answered yet
+    netFFEnd();
+    if(W.t===my.side) W.live(); else { netWaitShow(true); renderTip(); }
+  }
+}
+function netPrompt(t,kind,key,q,name,qn){
+  return new Promise(res=>{
+    const ov=$('ov'); ov.onclick=null; sfx.flip();
+    const A=kind==='card'?ACTIONS[key]:ABIL[key];
+    ov.innerHTML=`<div class="ovcard" role="dialog" aria-modal="true" aria-labelledby="ovq">${kind==='card'?cardHTML(t,key):abCardHTML(t,key,name)}<p class="q" id="ovq">${q}</p><div class="ovbtns"><button class="btn primary" type="button" id="ovYes">${kind==='card'?'Play':'Use'} ${esc(A.name)}</button><button class="btn" type="button" id="ovNo">${kind==='card'?'No thanks':'Save it'}</button></div></div>`;
+    ov.hidden=false; $('ovYes').focus();
+    const done=v=>{ ov.hidden=true; ov.innerHTML=''; if(window.__netDbg) window.__netDbg.push(`  my ans q${qn} ${kind} ${key} ${v}`); netSend({k:'ans',v,g:NET.gameNo,q:qn}); if(v&&kind==='card') toast(t,`You play <b>${esc(A.name)}</b>.`,A.side); res(v); };
+    $('ovYes').onclick=()=>done(true); $('ovNo').onclick=()=>done(false);
+  });
+}
+function netWaitShow(on){
+  let el=$('netwait');
+  if(!on){ if(el) el.hidden=true; return; }
+  if(!el){ el=document.createElement('div'); el.id='netwait'; el.className='netwait'; document.body.appendChild(el); }
+  el.innerHTML=`<i></i><span><b>${esc(netOpp())}</b> is making a call…</span>`; el.hidden=false;
+}
+/* the other team's card draws: the drawing player sees the card, everyone else just sees that a card was drawn */
+function netDraw(c){
+  const t=G.half; G.log.push({sys:`${TN(t)} draws an action card.`});
+  if(NET.ff) return;
+  if(t===NET.side) toast(t, c==='INJ'?`You drew <b>Injured</b>. It has to be played.`:`You drew <b>${esc(ACTIONS[c].name)}</b>.`, c==='INJ'?'curse':'');
+  else toast(t,`<b>${esc(netName(t))}</b> drew an action card.`,'');
+}
+
+/* ---------- catching up (rejoining, or watching a game already under way) ---------- */
+const NET_SFX=['dice','crack','pop','flip','power','organ','whoosh','tvOpen'];
+function netFFStart(){
+  const my=NET; if(my.ff) return; my.ff=true; my.keep={reduce, sfx:{}, say:ann.say};
+  reduce=true; for(const k of NET_SFX){ my.keep.sfx[k]=sfx[k]; sfx[k]=()=>{}; } ann.say=()=>{};
+  let el=$('netcatch'); if(!el){ el=document.createElement('div'); el.id='netcatch'; el.className='netcatch'; document.body.appendChild(el); }
+  el.innerHTML='<i></i><span>Catching up on the game…</span>'; el.hidden=false;
+}
+function netFFEnd(){
+  const my=NET; if(!my||!my.ff) return; my.ff=false;
+  reduce=my.keep.reduce; for(const k of NET_SFX) sfx[k]=my.keep.sfx[k]; ann.say=my.keep.say; my.keep=null;
+  const el=$('netcatch'); if(el) el.hidden=true;
+  if(netOn()){ renderGame(); if(G.over&&$('ov').hidden) setTimeout(showFinal,300); }
+}
+
+/* ---------- starting, joining, watching, rejoining ---------- */
+function netBegin(o){
+  netStop(true);
+  NET=Object.assign({code:'',tok:'',side:-1,seed:0,mode:'sim',p:[null,null],teams:[null,null],q:[],out:[],n:0,tick:0,gameNo:0,qn:0,G:null,liveFrom:0,ff:false,mine:null,waitAns:null},o);
+  netPaint(); netLoop();
+}
+function netStop(quiet){
+  if(!NET) return; const my=NET; my.stop=true; if(my.ff) netFFEnd(); NET=null;
+  netWaitShow(false); const el=$('netcatch'); if(el) el.hidden=true;
+  if(!quiet) netPaint();
+}
+async function netCreate(name,modeV){
+  const r=await netFetch(NET_API,{method:'POST',body:JSON.stringify({op:'create',name,pid:netPid(),mode:modeV,team:netMyTeam('red')})});
+  if(r.error) return r.error;
+  netBegin({code:r.code,tok:r.tok,side:1,seed:r.seed,mode:r.mode,p:[null,{name}],teams:[null,null]});
+  lsSet(NET_KEY,JSON.stringify({code:r.code,tok:r.tok,side:1,at:Date.now()}));
+  return '';
+}
+async function netPeek(code){ return netFetch(`${NET_API}?code=${encodeURIComponent(code)}&since=0&full=1`); }
+async function netJoin(code,name){
+  const r=await netFetch(NET_API,{method:'POST',body:JSON.stringify({op:'join',code,name,cid:netCid(),pid:netPid(),team:netMyTeam('blue')})});
+  if(r.error) return r;
+  if(r.full) return r;
+  netStartFrom(r,{code,tok:r.tok,side:0});
+  return r;
+}
+/* rejoin or watch: replay everything so far quickly, then play on live */
+function netStartFrom(r,o){
+  netBegin(Object.assign({seed:r.seed,mode:r.mode,p:r.p,teams:r.teams||[null,null],seen:r.seen,liveFrom:r.n||0},o));
+  if((r.log||[]).some(e=>e.k!=='join'&&e.k!=='say')) netFFStart();
+  netGot(Object.assign({},r,{teams:r.teams}));
+}
+async function netRejoin(){
+  const s=jparse(lsGet(NET_KEY)); if(!s||!s.code) return 'Nothing to rejoin.';
+  const r=await netFetch(`${NET_API}?code=${s.code}&since=0&full=1&tok=${s.tok}`);
+  if(r.error){ if(r.status===404) lsDel(NET_KEY); return r.error; }
+  netStartFrom(r,{code:s.code,tok:s.tok,side:s.side});
+  return '';
+}
+async function netWatch(code){
+  const r=await netPeek(code); if(r.error) return r.error;
+  netStartFrom(r,{code,tok:'',side:-1}); return '';
+}
+function netLeave(){
+  if(!NET) return;
+  const over=!NET.G||NET.G.over, my=NET;
+  if(my.side>=0&&my.G) netSend({k:'leave',g:my.gameNo});
+  setTimeout(()=>{ if(NET===my) netStop(); },my.side>=0?1500:0);
+  if(over||my.side<0) lsDel(NET_KEY);
+  if(G&&G.net){ if(!resumeQuick(jparse(lsGet(QKEY)))||!G||G.over||G.net) startExhibition(); } // back to the quick game from before
+  netPaint();
+}
+function netBack(){ if(!NET||!NET.G) return; if(G&&!G.net) try{ autoSave(); }catch(e){} if(frMode){ frMode=false; FR=null; setFrUI(); } G=NET.G; mode=NET.mode; try{ paintModeTabs(); renderFaces(); }catch(e){} $('pcard').dataset.nm=''; closeHub(); renderGame(); netPump(); netPaint(); }
+function netRematch(){
+  if(!netOn()) return;
+  if(NET.side<0){ toast(G.half,'Only the players can start a rematch.',''); return; }
+  netSend({k:'go',g:NET.gameNo+1});
+}
+
+/* ---------- the online bar (above the field) and the header tab ---------- */
+function netStatus(){
+  const el=$('netbar'); if(!el) return;
+  if(!NET){ el.hidden=true; return; }
+  const my=NET, st=el.querySelector('.nst'); if(!st){ netPaint(); return; }
+  let txt, cls='';
+  if(my.gone){ txt='This game has ended'; cls='bad'; }
+  else if(my.fail>1){ txt='Reconnecting…'; cls='bad'; }
+  else if(!my.G){ txt=`Waiting for someone to join · code ${my.code}`; }
+  else if(my.side<0){ txt='Watching live'; }
+  else { const o=1-my.side, last=(my.seen||[])[o], age=last?Date.now()-(my.skew||0)-last:1e9;
+    if(my.left&&my.left[o]&&last>((my.leftSeen||[])[o]||0)+2000) my.left[o]=false; // they came back
+    txt=my.left&&my.left[o]?`${netOpp()} left`:age<50000?`${netOpp()} is connected`:`${netOpp()} isn't connected right now`; if(age>=50000||(my.left&&my.left[o])) cls='warn'; }
+  st.textContent=txt; st.className='nst '+cls;
+}
+function netPaint(){
+  let el=$('netbar');
+  if(!el){ el=document.createElement('div'); el.id='netbar'; el.className='netbar'; el.hidden=true; $('fbar').after(el);
+    el.addEventListener('click',e=>{ const b=e.target.closest('[data-n]'); if(!b) return; const a=b.dataset.n;
+      if(a==='back') netBack(); else if(a==='rec') netOpen('record'); else if(a==='leave') netAskLeave(); else if(a==='invite') netOpen('wait'); else if(a==='say') netSayMenu(b);
+      else if(a.startsWith('s')){ netSend({k:'say',m:+a.slice(1),g:NET?NET.gameNo:0}); const m=$('netsay'); if(m) m.remove(); netBubble(NET.side,NET_SAY[+a.slice(1)]); } }); }
+  const tab=document.querySelector('.tab[data-net]');
+  const on=netOn(), away=!!(NET&&NET.G&&!on), my=NET;
+  const ser=on?netSeriesChip():'', sig=my?[on,away,!!my.G,my.side,my.code,my.p.map(x=>x&&x.name).join('|'),my.teams.map(x=>x&&x.name).join('|'),ser].join('~'):'';
+  if(!NET){ el.hidden=true; el.dataset.sig=''; }
+  else if(el.dataset.sig===sig){ el.hidden=false; netStatus(); }
+  else { el.dataset.sig=sig;
+    el.hidden=false;
+    const who=s=>`<span class="nwho">${my.teams[s]?teamMark(my.teams[s]):''}<b>${esc(netName(s))}</b>${my.teams[s]?`<small>${esc(my.teams[s].name)}</small>`:''}</span>`;
+    el.innerHTML=`<span class="tagx">Online${my.code?' · '+esc(my.code):''}</span>${my.G?`${who(0)}<span class="nat">at</span>${who(1)}`:''}${ser}<span class="nst"></span><span class="sp">${away?'<button class="btn small primary" type="button" data-n="back">Back to the online game</button>':''}${on&&my.side>=0?'<button class="btn small" type="button" data-n="say">Say</button>':''}${my.side>=0?'<button class="btn small" type="button" data-n="rec">Record</button>':''}${!my.G?'<button class="btn small" type="button" data-n="invite">Invite</button>':''}<button class="btn small" type="button" data-n="leave">${my.side<0?'Stop watching':'Leave'}</button></span>`;
+    netStatus();
+  }
+  if(tab){ tab.setAttribute('aria-selected',on); tab.querySelector('.livedot').hidden=!(NET&&!on); }
+  document.querySelectorAll('.tab[data-opp]').forEach(b=>b.setAttribute('aria-selected',!on&&b.dataset.opp===opp));
+  const fin=$('finish'); if(on){ $('newgame').hidden=true; if(!fin.hidden){ fin.hidden=true; fin.dataset.nethid='1'; } } else if(fin.dataset.nethid){ fin.hidden=false; delete fin.dataset.nethid; }
+  const lv=$('lvlNav'); if(on){ if(!lv.hidden){ lv.hidden=true; lv.dataset.nethid='1'; } } else if(lv.dataset.nethid){ delete lv.dataset.nethid; try{ paintLvl(); }catch(e){} }
+}
+function netSayMenu(btn){
+  let m=$('netsay'); if(m){ m.remove(); return; }
+  m=document.createElement('div'); m.id='netsay'; m.className='netsay';
+  m.innerHTML=NET_SAY.map((s,i)=>`<button type="button" data-n="s${i}">${esc(s)}</button>`).join('');
+  btn.closest('.netbar').appendChild(m);
+}
+function netAskLeave(){
+  if(!NET) return;
+  const playing=NET.G&&!NET.G.over&&NET.side>=0;
+  if(!playing){ netLeave(); return; }
+  askYes(`Leave the game with ${netOpp()}? You can come back to it any time in the next few days with the code ${NET.code}.`,'Leave game').then(ok=>{ if(ok) netLeave(); });
+}
+
+/* ---------- the Play online panel ---------- */
+let NETV={view:'home',err:'',busy:false,code:'',peek:null};
+const netNameNow=()=>clean(lsGet(NET_NAME)||'',16);
+function netOpen(view,o){
+  if(view==='game'&&netOn()) view='wait';
+  NETV=Object.assign({view:view||'home',err:'',busy:false,code:NETV.code||'',peek:null,mode:G&&G.mode||mode||'sim'},o||{});
+  netDraw2();
+}
+function netTeamCard(id){
+  const T=exhTeams()[id], dk=id==='red'?'RED':'BLUE';
+  return `<div class="nteamc" style="--tc:${T.color}"><div class="ntop">${teamMark(T)}<b>${esc(T.name)}</b><span class="abbr">${esc(T.abbr)}</span><span class="deck">${dk} deck</span></div>
+<ol class="nlu">${T.lineup.map(n=>`<li>${abIcon(T.roster[n].ab)}<span>${esc(n)}</span></li>`).join('')}</ol>
+<div class="nbtns"><button class="btn small" type="button" data-nv="names" data-id="${id}">Team &amp; player names</button><button class="btn small" type="button" data-nv="order" data-id="${id}">Batting order</button></div></div>`;
+}
+function netDraw2(){
+  const V=NETV, nm=netNameNow(), saved=jparse(lsGet(NET_KEY)), err=V.err?`<p class="nerr">${esc(V.err)}</p>`:'';
+  const nameRow=`<label class="nrow"><span>Your name</span><input type="text" id="netName" maxlength="16" value="${esc(nm)}" placeholder="What the other player sees" autocomplete="nickname"></label>`;
+  let h='';
+  if(V.view==='home'){
+    const back=NET&&NET.G&&!netOn(), again=!NET&&saved&&saved.code&&Date.now()-saved.at<4*24*3600*1000;
+    h=`${xHead('Play online','Play a friend over the internet. One of you starts a game and sends the other a code. Each of you manages your own team: your rolls, cards, abilities and designated hitter.')}
+${back?`<div class="ncard hot"><b>Your online game is still going.</b><div class="nbtns"><button class="btn primary" type="button" data-nv="back">Back to it</button></div></div>`:''}
+${again?`<div class="ncard hot"><b>Your last online game${saved.opp?' with '+esc(saved.opp):''}</b> (code ${esc(saved.code)})<div class="nbtns"><button class="btn primary" type="button" data-nv="rejoin">Rejoin</button></div></div>`:''}
+${nameRow}${nrCardHTML()}
+<div class="ngrid2"><div class="ncard"><h4>Start a game</h4><p>You'll be the <b>home team</b> and bat last. You get a code to send your opponent.</p><button class="btn primary" type="button" data-nv="create">Start a game</button></div>
+<div class="ncard"><h4>Join a game</h4><p>Got a code? Type it here.</p><div class="ncode"><input type="text" id="netCode" maxlength="4" value="${esc(V.code)}" placeholder="CODE" autocapitalize="characters" autocomplete="off" spellcheck="false"><button class="btn primary" type="button" data-nv="peek">Join</button></div></div></div>${err}`;
+  }
+  else if(V.view==='create'){
+    h=`${xHead('Start an online game','You\'re the home team (you bat last) with the RED deck. Your opponent plays the BLUE deck.')}
+${nameRow}<div class="nrow"><span>Rules</span>${segHTML('nmode',[['sim','Simulation · cards &amp; abilities'],['arcade','Arcade · just the dice']],V.mode)}</div>
+<h4 class="nh">Your team</h4>${netTeamCard('red')}${err}
+<div class="ovbtns"><button class="btn primary" type="button" data-nv="go"${V.busy?' disabled':''}>${V.busy?'Starting…':'Get a game code'}</button><button class="btn" type="button" data-nv="home">Back</button></div>`;
+  }
+  else if(V.view==='wait'){
+    const my=NET, link=`${SITE_URL}/#join=${my?my.code:''}`;
+    h=`${xHead(my&&my.G?'Your online game':'Waiting for your opponent', my&&my.G?'Send the code to anyone who wants to watch.':'Send this code to the person you\'re playing. The game starts the moment they join.')}
+<div class="bigcode" aria-label="Game code">${esc(my?my.code:'')}</div>
+<p class="nlink">${esc(link)}</p>
+<div class="ovbtns"><button class="btn primary" type="button" data-nv="share">Send the invite</button><button class="btn" type="button" data-nv="copy">Copy link</button></div>
+${my&&!my.G?'<p class="nwaiting"><i></i>Waiting for them to join… You can close this; the game starts here when they do.</p>':''}
+${my&&!my.G&&my.side===1?`<h4 class="nh">Your team</h4>${netTeamCard('red')}<p class="nlink">You can change your team name, player names and batting order until they join.</p>`:''}
+${my&&my.side>=0?(nrCardHTML()||'<p class="nlink">Your online record (overall and against each person) shows up here after your first finished game.</p>'):''}
+${err}<div class="ovbtns"><button class="btn" type="button" data-x>Close</button>${my&&!my.G?'<button class="btn" type="button" data-nv="cancel">Cancel the game</button>':''}</div>`;
+  }
+  else if(V.view==='join'){
+    const P=V.peek, host=P&&P.p&&P.p[1]?P.p[1].name:'Your opponent', HT=P&&P.teams&&P.teams[1];
+    h=`${xHead(`Join ${esc(host)}'s game`,`${P&&P.mode==='arcade'?'Arcade rules: just the dice.':'Simulation rules: action cards, designated hitters and player abilities.'} ${HT?`${esc(host)} is the home team, the <b>${esc(HT.name)}</b>. `:''}You're the away team and bat first, with the BLUE deck.`)}
+${nameRow}<h4 class="nh">Your team</h4>${netTeamCard('blue')}${err}
+<div class="ovbtns"><button class="btn primary" type="button" data-nv="join"${V.busy?' disabled':''}>${V.busy?'Joining…':'Play ball!'}</button><button class="btn" type="button" data-nv="home">Back</button></div>`;
+  }
+  else if(V.view==='record'){ h=nrPageHTML(); }
+  else if(V.view==='full'){
+    const P=V.peek;
+    h=`${xHead('This game already has two players',`${esc(P.p[0].name)} and ${esc(P.p[1].name)} are playing. You can watch every roll live.`)}${err}
+<div class="ovbtns"><button class="btn primary" type="button" data-nv="watch">Watch the game</button><button class="btn" type="button" data-nv="home">Back</button></div>`;
+  }
+  const done=openX(`<div class="xpanel netp" role="dialog" aria-modal="true" aria-label="Play online">${h}</div>`);
+  const nmIn=$('netName'); if(nmIn) nmIn.oninput=()=>lsSet(NET_NAME,clean(nmIn.value,16));
+  const cd=$('netCode'); if(cd){ cd.oninput=()=>{ cd.value=cd.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4); NETV.code=cd.value; }; cd.onkeydown=e=>{ if(e.key==='Enter') netAct('peek'); }; }
+  ov2.querySelectorAll('[data-set="nmode"] [data-v]').forEach(b=>b.onclick=()=>{ NETV.mode=b.dataset.v; netDraw2(); });
+  ov2.querySelectorAll('[data-nv]').forEach(b=>b.onclick=()=>netAct(b.dataset.nv,b));
+  return done;
+}
+/* the host changed their team while waiting: the server keeps the new names for when the other player joins */
+async function netPushTeam(){
+  const my=NET; if(!my||my.G||my.side!==1) return '';
+  const c=netClash('red',null); if(c) return c;
+  try{ const r=await netFetch(NET_API,{method:'POST',body:JSON.stringify({op:'team',code:my.code,tok:my.tok,team:netMyTeam('red')})}); return r.error||''; }
+  catch(e){ return 'Couldn\'t reach the game server. Try again.'; }
+}
+function netNeedName(){ const inp=$('netName'); if(inp) lsSet(NET_NAME,clean(inp.value,16)); const n=netNameNow(); if(n.length<1){ NETV.err='Type your name first, so the other player knows who they\'re playing.'; netDraw2(); const i=$('netName'); if(i) i.focus(); return ''; } return n; }
+/* names on both teams must all be different (the box score keys on them), and none can match a designated hitter */
+function netClash(mine,theirs){
+  const T=netMyTeam(mine), names=new Set((theirs?theirs.lineup:[]).map(n=>n.toLowerCase())), dh=new Set(DHS.map(d=>d.name.toLowerCase()));
+  const a=T.lineup.find(n=>names.has(n.toLowerCase())); if(a) return `Both teams have a player named ${a}. Change yours under Team & player names.`;
+  const b=T.lineup.find(n=>dh.has(n.toLowerCase())); if(b) return `${b} is also the name of a designated hitter. Pick a different name under Team & player names.`;
+  if(theirs&&T.name.toLowerCase()===String(theirs.name).toLowerCase()) return `Both teams are called ${T.name}. Rename yours under Team & player names.`;
+  return '';
+}
+async function netAct(a,el){
+  const V=NETV, ci=$('netCode'); if(ci) V.code=ci.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4); // what's in the boxes now (autofill doesn't always say)
+  if(a==='home'){ netOpen('home'); return; }
+  if(a==='record'){ netOpen('record'); return; }
+  if(a==='recreset'){ closeX(true); askYes('Reset your online record on this device? Your wins, losses and head-to-head records start over.','Reset record',true).then(ok=>{ if(ok) lsDel(NETREC_KEY); netOpen('record'); }); return; }
+  if(a==='back'){ closeX(true); netBack(); return; }
+  if(a==='rejoin'){ V.busy=true; const e=await netRejoin(); if(e){ netOpen('home',{err:e}); return; } closeX(true); if(NET&&!NET.G) netOpen('wait'); return; }
+  if(a==='create'){ if(!netNeedName()) return; netOpen('create',{mode:V.mode}); return; }
+  if(a==='names'||a==='order'){ const id=el.dataset.id, waiting=V.view==='wait'&&NET&&!NET.G&&NET.side===1;
+    const back=()=>{ if(waiting) netPushTeam().then(e=>netOpen('wait',{err:e})); else netOpen(V.view,{peek:V.peek,mode:V.mode,code:V.code}); }; closeX(true); if(a==='names') netEditNames(id,back); else netEditOrder(id,back); return; }
+  if(a==='go'){ const n=netNeedName(); if(!n) return; const c=netClash('red',null); if(c){ V.err=c; netDraw2(); return; }
+    V.busy=true; V.err=''; netDraw2(); const e=await netCreate(n,V.mode); if(e){ V.busy=false; V.err=e; netDraw2(); return; } netOpen('wait'); return; }
+  if(a==='peek'){ const n=netNeedName(); if(!n) return; const code=(V.code||'').toUpperCase(); if(!/^[A-Z0-9]{4}$/.test(code)){ V.err='The code is 4 letters and numbers.'; netDraw2(); return; }
+    if(NET&&NET.code===code&&NET.side>=0){ closeX(true); if(NET.G) netBack(); return; }
+    V.err=''; const r=await netPeek(code); if(r.error){ V.err=r.error; netDraw2(); return; }
+    if(r.p&&r.p[0]){ netOpen('full',{peek:r,code}); return; }
+    netOpen('join',{peek:r,code}); return; }
+  if(a==='join'){ const n=netNeedName(); if(!n) return; const c=netClash('blue',V.peek&&V.peek.teams&&V.peek.teams[1]); if(c){ V.err=c; netDraw2(); return; }
+    V.busy=true; V.err=''; netDraw2(); const r=await netJoin(V.code,n);
+    if(r.error){ V.busy=false; V.err=r.error; netDraw2(); return; }
+    if(r.full){ netOpen('full',{peek:r,code:V.code}); return; }
+    closeX(true); return; }
+  if(a==='watch'){ const e=await netWatch(V.code); if(e){ V.err=e; netDraw2(); return; } closeX(true); return; }
+  if(a==='share'||a==='copy'){ const my=NET; if(!my) return; const link=`${SITE_URL}/#join=${my.code}`, text=`Play me in Floodlight Baseball! Game code: ${my.code}`;
+    if(a==='share'&&navigator.share){ navigator.share({title:'Floodlight Baseball',text,url:link}).catch(()=>{}); return; }
+    try{ await navigator.clipboard.writeText(`${text} ${link}`); V.err=''; const p=ov2.querySelector('.nlink'); if(p) p.textContent='Copied! Paste it in a text or email.'; }catch(e){ const p=ov2.querySelector('.nlink'); if(p){ const r=document.createRange(); r.selectNodeContents(p); const s=getSelection(); s.removeAllRanges(); s.addRange(r); } }
+    return; }
+  if(a==='cancel'){ const my=NET; if(my&&my.tok) netFetch(NET_API,{method:'POST',body:JSON.stringify({op:'cancel',code:my.code,tok:my.tok})}).catch(()=>{}); netStop(); lsDel(NET_KEY); closeX(true); return; }
+}
+/* names and batting order: the same editors as quick games, for this player's deck only (saved on this device) */
+function netEditNames(id,back){
+  const N=loadNames(), B=BASE_TEAMS[id], t=N.teams[id]||{};
+  openNameEditor({kicker:'Online game', title:'Your team & player names', sub:'Name your team and your players. Your opponent sees these names. Abilities and jersey numbers stay with each player.',
+    teams:[{id,name:t.name||B.name,abbr:t.abbr||B.abbr,color:B.color,players:B.lineup.map(n=>({key:n,name:N.players[n]||n,ab:ROSTER[n].ab}))}],
+    onSave:out=>{ const before=snapNames(), n=loadNames(), o=out[0]; n.teams[id]={name:o.name,abbr:o.abbr}; for(const p of o.players){ if(p.name!==p.key) n.players[p.key]=p.name; else delete n.players[p.key]; } saveNames(n);
+      if(!(G&&G.net)) applyQuickRename(before); back(); },
+    onReset:()=>{ const n=loadNames(); delete n.teams[id]; for(const k of B.lineup) delete n.players[k]; saveNames(n); back(); },
+    onCancel:back});
+}
+function netEditOrder(id,back){
+  const T=exhTeams()[id];
+  openPregame({kicker:'Online game', title:'Your batting order', sub:'Set your lineup for the online game. It\'s saved for next time, too.', goLabel:'Save batting order',
+    cols:[{T,editable:true,reset:namedTeam(id).lineup}],
+    onPlay:({lineups})=>{ const l=loadLineups(); l[id]=lineups[0].map(n=>T.orig[n]||n); saveLineups(l); back(); }, cancel:back});
+}
+
+/* ---------- wiring: the header tab, the menu, invite links ---------- */
+(()=>{
+  const two=document.querySelector('.tab[data-opp="two"]');
+  const b=document.createElement('button'); b.className='tab'; b.type='button'; b.setAttribute('role','tab'); b.dataset.net='1'; b.title='Play someone over the internet: each of you manages your own team';
+  b.innerHTML='<b>Online</b><i class="livedot" hidden title="Your online game is still going"></i>';
+  if(two) two.after(b);
+  b.addEventListener('click',()=>{ if(busy) return; if(NET&&NET.G&&!netOn()){ netBack(); return; } netOpen(netOn()||(NET&&!NET.G&&NET.side>=0)?'wait':'home'); });
+  const nav=document.querySelector('.mlinks'), first=nav&&nav.querySelector('[data-m="fr"]');
+  if(nav){ const m=document.createElement('button'); m.type='button'; m.dataset.mx='net'; m.textContent='Play online'; m.className='hot'; nav.insertBefore(m, first?first.nextSibling:null);
+    m.addEventListener('click',()=>{ closeMenu(); setTimeout(()=>netOpen(NET&&NET.G&&!netOn()?'home':netOn()?'wait':'home'),60); }); }
+  // an invite link: floodlight…/#join=ABCD (opened fresh, or pasted into a tab that already has the game)
+  const invite=ms=>{ const m=/^#join=([A-Za-z0-9]{4})$/.exec(location.hash||''); if(!m) return false;
+    try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){}
+    setTimeout(()=>{ closeMenu(); NETV.code=m[1].toUpperCase(); netOpen('home',{code:m[1].toUpperCase()}); },ms); return true; };
+  window.addEventListener('hashchange',()=>invite(50));
+  if(invite(900)){}
+  // an online game that was going when the page closed: offer to rejoin
+  else { const s=jparse(lsGet(NET_KEY)); if(s&&s.code&&Date.now()-s.at<4*24*3600*1000) setTimeout(()=>{ if(!NET&&G) toast(G.half,`Your online game${s.opp?' with <b>'+esc(s.opp)+'</b>':''} is waiting. Tap <b>Online</b> to rejoin.`,'abil'); },2500); }
+})();
+
+/* ---------- the online record (Oct 2026) ----------
+   Every finished online game goes into this device's online record: the overall record, streaks, form, runs, walk-off
+   wins, shutouts and the biggest win, plus a head-to-head series against each person played. People are told apart
+   by a public player id each device sends with its games (so the record follows Dad even if he types "Pops" next
+   time), or by name for games from before the ids. Kept on this device (localStorage), like the trophy case.
+   Shown in the Play online panel (a record card and a full record page), in the online bar during a game (the series),
+   in a note when a game starts, and on the final score. Watchers don't record anything. */
+const NETREC_KEY='fdl-net-rec';
+function netPid(){ let c=lsGet('fdl-net-pid'); if(!c||!/^[a-z0-9]{16}$/.test(c)){ c=[...Array(16)].map(()=>'abcdefghijklmnopqrstuvwxyz0123456789'[Math.floor(Math.random()*36)]).join(''); lsSet('fdl-net-pid',c); } return c; }
+function nrGet(){
+  const o=jparse(lsGet(NETREC_KEY));
+  if(o&&o.v===1&&o.tot&&o.opp&&Array.isArray(o.games)) return o;
+  return {v:1,tot:{w:0,l:0,rs:0,ra:0,st:0,bestW:0,wo:0,so:0,big:null},opp:{},games:[],seen:[]};
+}
+const nrKey=p=>p&&p.pid?p.pid:'n:'+String(p&&p.name||'?').toLowerCase();
+const nrRec=(w,l)=>`${w}–${l}`;
+const nrPct=(w,l)=>w+l?(w/(w+l)).toFixed(3).replace(/^0/,''):'.000';
+const nrStreak=st=>st>0?`W${st}`:st<0?`L${-st}`:'–';
+/* "You lead the series 4–2", "Dad leads the series 4–2", "The series is tied 3–3" */
+function nrSeries(O,name){
+  if(!O||!(O.w+O.l)) return `First game against ${name}`;
+  const a=Math.max(O.w,O.l), b=Math.min(O.w,O.l);
+  return O.w===O.l?`The series is tied ${a}–${b}`:O.w>O.l?`You lead the series ${a}–${b}`:`${name} leads the series ${a}–${b}`;
+}
+/* a finished game goes into the record once (rejoining or catching up never counts it twice) */
+function netRecord(){
+  const my=NET; if(!my||my.side<0||!my.G||!my.G.over) return;
+  const id=`${my.code}:${my.seed}:${my.gameNo}`, R=nrGet();
+  const G=my.G, me=my.side, o=1-me, rs=total(G,me), ra=total(G,o), win=rs>ra, P=my.p[o]||{name:'Your opponent'}, k=nrKey(P);
+  if(R.seen.includes(id)){ const O=R.opp[k]; if(O) G.frNote=`<b>Online record ${nrRec(R.tot.w,R.tot.l)}</b>. Against ${esc(P.name)}: <b>${nrRec(O.w,O.l)}</b>. ${esc(nrSeries(O,P.name))}.`; return; } // (already counted: a rejoin)
+  const g={id,at:Date.now(),k,name:P.name,team:G.teams[o].name,mine:G.teams[me].name,home:me===1,rs,ra,win,inn:G.inning,wo:!!(G.walkoff&&win&&me===1),lostWo:!!(G.walkoff&&!win&&me===0),mode:G.mode};
+  const T=R.tot, O=R.opp[k]||(R.opp[k]={name:P.name,w:0,l:0,rs:0,ra:0,st:0,bestW:0,first:g.at,last:0});
+  const before={w:O.w,l:O.l,st:O.st,tw:T.w,tst:T.st};
+  for(const X of [T,O]){ if(win){ X.w++; X.st=X.st>0?X.st+1:1; X.bestW=Math.max(X.bestW||0,X.st); } else { X.l++; X.st=X.st<0?X.st-1:-1; } X.rs+=rs; X.ra+=ra; }
+  O.name=P.name; O.last=g.at; O.lastG={rs,ra,win,at:g.at};
+  if(g.wo) T.wo=(T.wo||0)+1;
+  if(win&&ra===0) T.so=(T.so||0)+1;
+  if(win&&(!T.big||rs-ra>T.big.rs-T.big.ra||(rs-ra===T.big.rs-T.big.ra&&rs>T.big.rs))) T.big={rs,ra,name:P.name,at:g.at};
+  const B=R.bat||(R.bat={}); // your hitters' online stats
+  for(const n of G.teams[me].lineup){ const b=G.box[n]; if(!b||b.team!==me) continue; const X=B[n]||(B[n]={G:0,PA:0,AB:0,H:0,'2B':0,'3B':0,HR:0,RBI:0,BB:0,K:0,SB:0,R:0}); X.G++; for(const st of ['PA','AB','H','2B','3B','HR','RBI','BB','K','SB','R']) X[st]+=b[st]||0; X.team=G.teams[me].name; X.at=g.at; }
+  R.myTeam=G.teams[me].name;
+  R.games.unshift(g); R.games=R.games.slice(0,40);
+  R.seen.push(id); R.seen=R.seen.slice(-300);
+  lsSet(NETREC_KEY,JSON.stringify(R));
+  // the line on the final score
+  const nm=esc(P.name), notes=[];
+  if(win&&before.w===0&&before.l>0) notes.push(`Your first win over ${nm}!`);
+  else if(win&&O.st>=3) notes.push(`That's ${O.st} straight wins over ${nm}.`);
+  else if(!win&&before.st>=3) notes.push(`${nm} snapped your ${before.st}-game win streak against them.`);
+  if(win&&T.st>=3&&T.st===T.bestW&&T.st>((before.tst>0?before.tst:0))) notes.push(`A new best online win streak: ${T.st}.`);
+  if(win&&ra===0) notes.push('A shutout.');
+  G.frNote=`<b>Online record ${nrRec(T.w,T.l)}</b> (${nrStreak(T.st)}). Against ${nm}: <b>${nrRec(O.w,O.l)}</b>. ${esc(nrSeries(O,P.name))}.${notes.length?' '+notes.join(' '):''}`;
+  try{ netPaint(); }catch(e){}
+}
+/* when a game starts: where the series stands */
+function netSeriesNote(){
+  const my=NET; if(!my||my.side<0||!my.G) return;
+  const P=my.p[1-my.side]||{}, O=nrGet().opp[nrKey(P)];
+  toast(my.G.half, O&&O.w+O.l?`Your series with <b>${esc(P.name)}</b>: ${esc(nrSeries(O,P.name).replace(/^The series is/,'it\'s').replace(/^You lead the series/,'you lead').replace(/ leads the series/,' leads'))}.`:`Your first online game against <b>${esc(P.name||'them')}</b>. Make it count!`,'abil');
+}
+/* the series in the online bar: "Series 4–2" (this player's wins first) */
+function netSeriesChip(){
+  const my=NET; if(!my||my.side<0||!my.G) return '';
+  const P=my.p[1-my.side]||{}, O=nrGet().opp[nrKey(P)];
+  return O&&O.w+O.l?`<button type="button" class="nser" data-n="rec" title="${esc(nrSeries(O,P.name))}. Tap for your online record.">Series ${nrRec(O.w,O.l)}</button>`:'';
+}
+
+/* ---------- the record card (Play online panel) and the full record page ---------- */
+function nrFormHTML(games,n){
+  return `<div class="nrform" aria-label="Last ${n} online games">${games.slice(0,n).reverse().map(g=>`<i class="${g.win?'w':'l'}" title="${g.win?'Won':'Lost'} ${g.rs}–${g.ra} vs ${esc(g.name)}">${g.win?'W':'L'}</i>`).join('')}</div>`;
+}
+function nrOppRows(R,limit){
+  const L=Object.entries(R.opp).map(([k,O])=>Object.assign({k},O)).sort((a,b)=>(b.w+b.l)-(a.w+a.l)||b.last-a.last).slice(0,limit||99);
+  const most=L[0]&&L[0].w+L[0].l>=3?L[0].k:null;
+  return L.map(O=>{ const tag=O.k===most?'<em class="nrtag">Rival</em>':''; const lg=O.lastG;
+    return `<li><span class="nrn"><b>${esc(O.name)}</b>${tag}</span><span class="nrr">${nrRec(O.w,O.l)}</span><small>${esc(nrSeries(O,O.name))}${lg?` · last game ${lg.win?'won':'lost'} ${lg.rs}–${lg.ra}`:''}${O.st>=2||O.st<=-2?` · ${nrStreak(O.st)}`:''}</small></li>`; }).join('');
+}
+function nrCardHTML(){
+  const R=nrGet(), T=R.tot; if(!(T.w+T.l)) return '';
+  return `<div class="ncard nrec"><h4>Your online record</h4>
+<div class="nrtop"><div class="nrbig"><b>${nrRec(T.w,T.l)}</b><small>${nrPct(T.w,T.l)}</small></div>
+<div class="nrchips"><span>Streak <b>${nrStreak(T.st)}</b></span><span>Best <b>W${T.bestW||0}</b></span><span>Runs <b>${T.rs}–${T.ra}</b></span></div></div>
+${nrFormHTML(R.games,10)}${nrLeadersHTML(R)}<ol class="nrh2h">${nrOppRows(R,4)}</ol>
+<div class="nbtns"><button class="btn small" type="button" data-nv="record">Full record</button></div></div>`;
+}
+function nrPageHTML(){
+  const R=nrGet(), T=R.tot, n=T.w+T.l, when=t=>new Date(t).toLocaleDateString(undefined,{month:'short',day:'numeric'});
+  if(!n) return `${xHead('Your online record','Finish an online game and it shows up here: your overall record and how you stand against each person you play.')}<div class="ovbtns"><button class="btn" type="button" data-nv="home">Back</button></div>`;
+  const opps=Object.values(R.opp), tough=opps.filter(O=>O.w+O.l>=3).sort((a,b)=>a.w/(a.w+a.l)-b.w/(b.w+b.l))[0];
+  const hl=[T.big?`<div><span>Biggest win</span><b>${T.big.rs}–${T.big.ra}</b><small>vs ${esc(T.big.name)} · ${when(T.big.at)}</small></div>`:'',
+    `<div><span>Longest win streak</span><b>${T.bestW||0}</b><small>${T.st>0?`on a ${T.st}-game streak now`:T.st<0?`lost the last ${-T.st}`:''}</small></div>`,
+    `<div><span>Walk-off wins</span><b>${T.wo||0}</b><small>won it in your last at-bat</small></div>`,
+    `<div><span>Shutouts</span><b>${T.so||0}</b><small>held them scoreless</small></div>`,
+    `<div><span>Runs per game</span><b>${(T.rs/n).toFixed(1)}</b><small>allowed ${(T.ra/n).toFixed(1)}</small></div>`,
+    tough&&tough.w<tough.l?`<div><span>Toughest opponent</span><b>${esc(tough.name)}</b><small>${nrRec(tough.w,tough.l)} against them</small></div>`:''].join('');
+  return `${xHead('Your online record',`${n} online game${n===1?'':'s'} on this device.`)}
+<div class="nrtop big"><div class="nrbig"><b>${nrRec(T.w,T.l)}</b><small>${nrPct(T.w,T.l)} · ${nrStreak(T.st)}</small></div>${nrFormHTML(R.games,15)}</div>
+<div class="nrhl">${hl}</div>
+<h4 class="nh">Head to head</h4><ol class="nrh2h">${nrOppRows(R)}</ol>
+${nrBatHTML(R)}<h4 class="nh">Recent games</h4><ol class="nrgames">${R.games.slice(0,15).map(g=>`<li class="${g.win?'w':'l'}"><i>${g.win?'W':'L'}</i><b>${g.rs}–${g.ra}</b><span>${g.home?'vs':'at'} ${esc(g.name)} <small>(${esc(g.team)})</small>${g.inn>9?` <small>· ${g.inn} inn.</small>`:''}${g.wo?' <small>· walk-off</small>':g.lostWo?' <small>· walked off on</small>':''}</span><small class="nrd">${when(g.at)}</small></li>`).join('')}</ol>
+<div class="ovbtns"><button class="btn" type="button" data-nv="home">Back</button><button class="btn" type="button" data-nv="recreset">Reset record</button></div>`;
+}
+
+/* your players online: leaders on the card, the full table on the record page */
+const nrAvg=b=>b.AB?(b.H/b.AB).toFixed(3).replace(/^0/,''):'.000';
+function nrLeadersHTML(R){
+  const L=Object.entries(R.bat||{}); if(!L.length) return '';
+  const hr=L.slice().sort((a,b)=>b[1].HR-a[1].HR||b[1].RBI-a[1].RBI)[0], q=L.filter(([,b])=>b.AB>=Math.max(3,2*Math.max(...L.map(([,x])=>x.G)))), av=(q.length?q:L).slice().sort((a,b)=>b[1].H/(b[1].AB||1)-a[1].H/(a[1].AB||1))[0], rbi=L.slice().sort((a,b)=>b[1].RBI-a[1].RBI)[0];
+  const chip=(lbl,[n,b],v)=>`<span><small>${lbl}</small><b>${esc(n)}</b> ${v(b)}</span>`;
+  return `<div class="nrlead">${chip('Average',av,b=>nrAvg(b))}${hr[1].HR?chip('Home runs',hr,b=>b.HR):''}${rbi[1].RBI?chip('RBI',rbi,b=>b.RBI):''}</div>`;
+}
+function nrBatHTML(R){
+  const L=Object.entries(R.bat||{}).sort((a,b)=>b[1].G-a[1].G||b[1].H/(b[1].AB||1)-a[1].H/(a[1].AB||1)); if(!L.length) return '';
+  const T=L.reduce((t,[,b])=>{ for(const k of ['AB','H','HR','RBI','BB','K','SB']) t[k]=(t[k]||0)+b[k]; return t; },{});
+  return `<h4 class="nh">Your players online</h4><div class="tscroll"><table class="tbl nrbat"><thead><tr><th class="l">Player</th><th>G</th><th>AB</th><th>H</th><th>HR</th><th>RBI</th><th>BB</th><th>SB</th><th>AVG</th></tr></thead><tbody>${L.map(([n,b])=>`<tr><td class="l"><b>${esc(n)}</b></td><td>${b.G}</td><td>${b.AB}</td><td>${b.H}</td><td>${b.HR}</td><td>${b.RBI}</td><td>${b.BB}</td><td>${b.SB}</td><td>${nrAvg(b)}</td></tr>`).join('')}</tbody><tfoot><tr><td class="l">Team</td><td></td><td>${T.AB}</td><td>${T.H}</td><td>${T.HR}</td><td>${T.RBI}</td><td>${T.BB}</td><td>${T.SB}</td><td>${nrAvg(T)}</td></tr></tfoot></table></div>`;
+}
+
+/* ---------- start-up: the first full draw ----------
+   Runs after every add-on has loaded, so a quick-game team with a custom name (whose logo is drawn by 57-logos.js)
+   can be drawn on the first screen. (Before Oct 2026 this ran in 50-glue.js, too early for a renamed team.) */
+paintDaily(); achProg(); if(F) achFr(); if(G) renderGame();
+
+window.__fdl={addon:{ACHD:()=>ACHD,CHD:()=>CHD,DAYD:()=>DAYD,FSET:()=>FSET,start:id=>startChallenge(id==='daily'?dailyFor(today()):CH_BY[id]),achUnlock,openSettings,openAchievements,openChallenges,litActions,padPress,layerRoot,chFinal,buildChallenge,CHALL,ACHS,dailyFor,badgeSVG,exitChallenge,startTutorial,TUT:()=>TUT,FIELD:()=>FIELD,VO:()=>VO,voSay,voPick,voName,voBatter,fieldCheck,sfx:()=>sfx,parkSync,parkFor,PARK:()=>PARK_CUR,FR_CLUBS:()=>FR_CLUBS,trGain,plValue,drGet,lgOps,TR:()=>TR,stretchScene:()=>stretchScene(),crowdCanvas,asgSim,asgPending,asgStart,confOf,drOrder,genLogoKey,poWatch,poIn,potwList,seedTag,tvSegments:m=>tvSegments(m),activeSeries:()=>activeSeries(),poAllSeries:()=>poAllSeries(),faGet,faSign,faDecide,faResolve,ctEnsure,ctWorth,NET:()=>NET,netOpen,netCreate,netJoin,netPeek,netWatch,netRejoin,netLeave,netBack,netRematch,netSend,netOn,rvOn,rvRec,dbGet,dbSim,dbOpen,dlGet,evPreviewSegs,frNextSeason:()=>frNextSeason()}, get G(){return G}, get F(){return F}, get busy(){return busy}, setOpp:o=>setOpp(o,true), cpuPick:()=>cpuPick(), showFinal:()=>showFinal(), playWhole, MODES, ACTIONS, ABIL, DHS, P, render:()=>renderGame(),
   setHand:(t,ids)=>{ G.hands[t]=ids.slice(); renderGame(); }, setBases:b=>{ G.bases=b.slice(); renderGame(); }, setOuts:n=>{ G.outs=n; renderGame(); },
   setInning:(i,h)=>{ G.inning=i; G.half=h; G.halfPA=0; while(G.line[0].length<i) G.line[0].push(0); while(G.line[1].length<i-(h?0:1)) G.line[1].push(0); renderGame(); },
   setIdx:(t,i)=>{ G.idx[t]=i; renderGame(); }, activeAbils:t=>activeAbils(t), runAbility:(t,i)=>runAbility(t,activeAbils(t)[i]), newGame, openHub, frCreate:(n,a,z)=>{ frCreate(n,a,z); setFrUI(); }, frPregame, frSimToPlayoffs, frSimPlayoffs, frSimUser, frNextSeason, frResume, frExit, genPlayerCard, cardSrc, snapshot, applySnap, toCode, fromCode, openSaves, editQuickNames, frEditNames, quickGame, get tipsOn(){return tipsOn}};
