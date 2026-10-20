@@ -20,7 +20,7 @@
 <meta property="og:title" content="Floodlight Baseball">
 <meta property="og:description" content="Play Floodlight Baseball in your browser: roll the D12 simulation or D8 arcade word dice, play action cards, use player abilities, take on Clutch Challenges and run a franchise on a lit-up mini stadium, with an announcer calling every play.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:site" content="@Floodlightbb">
+<meta name="twitter:site" content="@WoodStudiosHQ">
 <meta property="og:image" content="https://floodlight-baseball-dice-lab.netlify.app/share.jpg">
 <meta name="twitter:image" content="https://floodlight-baseball-dice-lab.netlify.app/share.jpg">
 <meta property="og:url" content="https://floodlight-baseball-dice-lab.netlify.app/">
@@ -1415,8 +1415,8 @@ html.app .mver{left:calc(16px + var(--sa-l))}
 <p><b>Floodlight Baseball</b> is also a tabletop game: the same dice and cards with a lit-up mini stadium for your table, coming to Kickstarter.</p>
 <nav aria-label="Floodlight Baseball links">
 <a class="main" href="https://eepurl.com/J59uhGXqR0" target="_blank" rel="noopener">Get launch updates</a>
-<a href="https://discord.gg/9GAWTtvnt" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.3 4.4A19.6 19.6 0 0 0 15.4 3l-.6 1.3a18 18 0 0 0-5.6 0L8.6 3a19.5 19.5 0 0 0-4.9 1.5C.6 9.1-.3 13.6.2 18.1a19.8 19.8 0 0 0 6 3l1.3-2.1-2-1 .5-.4a14 14 0 0 0 12 0l.5.4-2 1 1.3 2.1a19.7 19.7 0 0 0 6-3c.5-5.2-.9-9.7-3.5-13.7ZM8 15.3c-1.2 0-2.1-1.1-2.1-2.4S6.8 10.5 8 10.5s2.2 1.1 2.1 2.4c0 1.3-.9 2.4-2.1 2.4Zm8 0c-1.2 0-2.1-1.1-2.1-2.4s.9-2.4 2.1-2.4 2.2 1.1 2.1 2.4c0 1.3-.9 2.4-2.1 2.4Z"/></svg>Join the Discord</a>
-<a href="https://x.com/Floodlightbb" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.8 2.5h3.3l-7.2 8.2 8.4 11.1h-6.6l-5.2-6.8-5.9 6.8H1.3l7.7-8.8L1 2.5h6.8l4.7 6.2 5.3-6.2Zm-1.2 17.3h1.8L6.6 4.4H4.6l12 15.4Z"/></svg>Follow on X</a>
+<a href="https://discord.gg/Wdgh4aJZmK" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.3 4.4A19.6 19.6 0 0 0 15.4 3l-.6 1.3a18 18 0 0 0-5.6 0L8.6 3a19.5 19.5 0 0 0-4.9 1.5C.6 9.1-.3 13.6.2 18.1a19.8 19.8 0 0 0 6 3l1.3-2.1-2-1 .5-.4a14 14 0 0 0 12 0l.5.4-2 1 1.3 2.1a19.7 19.7 0 0 0 6-3c.5-5.2-.9-9.7-3.5-13.7ZM8 15.3c-1.2 0-2.1-1.1-2.1-2.4S6.8 10.5 8 10.5s2.2 1.1 2.1 2.4c0 1.3-.9 2.4-2.1 2.4Zm8 0c-1.2 0-2.1-1.1-2.1-2.4s.9-2.4 2.1-2.4 2.2 1.1 2.1 2.4c0 1.3-.9 2.4-2.1 2.4Z"/></svg>Join the Discord</a>
+<a href="https://x.com/WoodStudiosHQ" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.8 2.5h3.3l-7.2 8.2 8.4 11.1h-6.6l-5.2-6.8-5.9 6.8H1.3l7.7-8.8L1 2.5h6.8l4.7 6.2 5.3-6.2Zm-1.2 17.3h1.8L6.6 4.4H4.6l12 15.4Z"/></svg>Follow on X</a>
 </nav>
 <p class="credit">Crowd sounds made with the Piper LibriTTS voice model (LibriTTS corpus by Zen et al., <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>).</p>
 </footer>
@@ -4619,7 +4619,7 @@ const IS_DESKTOP = !!(NATIVE && NATIVE.isDesktop);
 const CAP = (typeof window!=='undefined' && window.Capacitor && typeof window.Capacitor.isNativePlatform==='function' && window.Capacitor.isNativePlatform()) ? window.Capacitor : null;
 const IS_APP = !!CAP;
 const APP_OS = CAP ? String(CAP.getPlatform()) : '';
-const GAME_VERSION = '1.7.2';
+const GAME_VERSION = '1.7.3';
 const FULL_GAME = true; /*@edition*/ // the website is the free demo; build.py turns this on for the Steam game
 
 /* ---------- a shared add-on dialog layer (sits above the menu, never touches the game's own pop-ups) ---------- */
