@@ -14,7 +14,7 @@ jobs:
         run: |
           B=https://floodlight-baseball-dice-lab.netlify.app
           mkdir -p audio netlify/functions dl
-          for f in index.html share.jpg manifest.webmanifest package.json audio/voice-calls.mp3 netlify/functions/leaderboard.mjs netlify/functions/save.mjs netlify/functions/online.mjs dl/floodlight-ios-src.zip; do
+          for f in index.html share.jpg manifest.webmanifest package.json audio/voice-calls.mp3 netlify/functions/leaderboard.mjs netlify/functions/save.mjs netlify/functions/online.mjs dl/floodlight-ios-src.zip audio/voice-names.mp3 audio/voice-tv.mp3 audio/crowd-bed.mp3 audio/CREDITS.txt; do
             curl -fsSL "$B/$f?sync=$GITHUB_RUN_ID" -o "$f"
           done
           ls -la . audio netlify/functions dl
