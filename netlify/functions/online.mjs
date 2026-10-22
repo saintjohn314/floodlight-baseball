@@ -55,7 +55,9 @@ function cleanTeam(t, league) {
     if (r.pic) { const p = cleanStr(r.pic, 30); if (p) o.pic = p; }
     info[n] = o;
   });
-  return { id, name, abbr, color, logo, lineup, ab, info };
+  const lr = {}; // lr: a franchise that plays without action cards or designated hitters (its league settings)
+  if (t.lr && typeof t.lr === "object") for (const k of ["cards", "dh"]) if (t.lr[k] === false) lr[k] = false;
+  return Object.assign({ id, name, abbr, color, logo, lineup, ab, info }, Object.keys(lr).length ? { lr } : {});
 }
 // one move from a player: only the fields each kind needs, small
 function cleanMove(e) {
