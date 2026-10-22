@@ -24,9 +24,7 @@
 <meta property="og:image" content="https://floodlight-baseball-dice-lab.netlify.app/share.jpg">
 <meta name="twitter:image" content="https://floodlight-baseball-dice-lab.netlify.app/share.jpg">
 <meta property="og:url" content="https://floodlight-baseball-dice-lab.netlify.app/">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=DM+Mono:wght@400;500&family=DotGothic16&family=Yellowtail&display=swap">
+<link rel="stylesheet" href="fonts/fonts.css">
 <style>
 /* Layout: one screen. The mini stadium (wood table, navy backdrop, like the box photo) fills the left; the game console with the roll button, both teams' cards, line score, play-by-play and batting order sits on the right. Single committed night-game look. */
 :root{
@@ -1269,6 +1267,8 @@ html.app .mver{left:calc(16px + var(--sa-l))}
 @media (max-width:560px){.netp .ngrid2{grid-template-columns:1fr}}
 .netp .ncard{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:rgba(255,255,255,.03);display:flex;flex-direction:column;gap:8px;align-items:flex-start}
 .netp .ncard.hot{border-color:rgba(127,224,166,.55);background:rgba(94,200,140,.08)}
+.netp .ncard.nrest{border-color:rgba(240,170,90,.55);background:rgba(240,170,90,.08)}
+.netp .ncard.nrest h4{color:#f0b46a}
 .netp .ncard h4,.netp .nh{margin:0;font-family:var(--f-head);letter-spacing:.12em;text-transform:uppercase;font-size:13px;color:var(--flood)}
 .netp .ncard p{margin:0;font-size:14px;color:#c4ccdb}
 .netp .ncode{display:flex;gap:8px;width:100%}
@@ -1636,6 +1636,7 @@ html.rm .scn *{animation-duration:.01s!important;animation-iteration-count:1!imp
 <a href="https://discord.gg/Wdgh4aJZmK" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.3 4.4A19.6 19.6 0 0 0 15.4 3l-.6 1.3a18 18 0 0 0-5.6 0L8.6 3a19.5 19.5 0 0 0-4.9 1.5C.6 9.1-.3 13.6.2 18.1a19.8 19.8 0 0 0 6 3l1.3-2.1-2-1 .5-.4a14 14 0 0 0 12 0l.5.4-2 1 1.3 2.1a19.7 19.7 0 0 0 6-3c.5-5.2-.9-9.7-3.5-13.7ZM8 15.3c-1.2 0-2.1-1.1-2.1-2.4S6.8 10.5 8 10.5s2.2 1.1 2.1 2.4c0 1.3-.9 2.4-2.1 2.4Zm8 0c-1.2 0-2.1-1.1-2.1-2.4s.9-2.4 2.1-2.4 2.2 1.1 2.1 2.4c0 1.3-.9 2.4-2.1 2.4Z"/></svg>Join the Discord</a>
 <a href="https://x.com/WoodStudiosHQ" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.8 2.5h3.3l-7.2 8.2 8.4 11.1h-6.6l-5.2-6.8-5.9 6.8H1.3l7.7-8.8L1 2.5h6.8l4.7 6.2 5.3-6.2Zm-1.2 17.3h1.8L6.6 4.4H4.6l12 15.4Z"/></svg>Follow on X</a>
 </nav>
+<p class="credit"><a href="https://floodlight-baseball-dice-lab.netlify.app/privacy/" target="_blank" rel="noopener">Privacy policy</a> · <a href="https://floodlight-baseball-dice-lab.netlify.app/support/" target="_blank" rel="noopener">Support</a></p>
 <p class="credit">Crowd sounds made with the Piper LibriTTS voice model (LibriTTS corpus by Zen et al., <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>).</p>
 </footer>
 </div>
@@ -3950,7 +3951,7 @@ function renderFbar(){
 function frExit(){ if(ADDON_READY&&F&&F.online) olExitView(); autoSave(); frMode=false; FR=null; setFrUI(); closeHub(); setWhere('quick'); if(!resumeQuick(jparse(lsGet(QKEY)))||G.over) startExhibition(); }
 
 /* ---------- the hub ---------- */
-function openHub(){ if(busy) return; const h=$('hub'); h.hidden=false; h.classList.add('anim'); renderHub(); setTimeout(()=>h.classList.remove('anim'),300); document.body.style.overflow='hidden'; if(F){ tvMaybe(); if(ADDON_READY) champMaybe(900); } }
+function openHub(){ if(busy) return; const h=$('hub'); h.hidden=false; h.classList.add('anim'); renderHub(); setTimeout(()=>h.classList.remove('anim'),300); document.body.style.overflow='hidden'; if(F){ tvMaybe(); if(ADDON_READY) champMaybe(900); if(ADDON_READY&&F.online) olHubOpened(); } }
 function closeHub(){ $('hub').hidden=true; document.body.style.overflow=''; }
 const TABS=[['home','Home'],['news','News'],['standings','Standings'],['schedule','Schedule'],['stats','Player stats'],['records','Records'],['hof','Hall of Fame'],['champs','Champions'],['teams','Teams'],['settings','Settings']];
 function renderHub(){
@@ -4922,7 +4923,7 @@ const IS_DESKTOP = !!(NATIVE && NATIVE.isDesktop);
 const CAP = (typeof window!=='undefined' && window.Capacitor && typeof window.Capacitor.isNativePlatform==='function' && window.Capacitor.isNativePlatform()) ? window.Capacitor : null;
 const IS_APP = !!CAP;
 const APP_OS = CAP ? String(CAP.getPlatform()) : '';
-const GAME_VERSION = '1.11.1';
+const GAME_VERSION = '1.11.2';
 const FULL_GAME = true; /*@edition*/ // the website is the free demo; build.py turns this on for the Steam game
 
 /* ---------- a shared add-on dialog layer (sits above the menu, never touches the game's own pop-ups) ---------- */
@@ -4994,7 +4995,7 @@ ${IS_DESKTOP?`<div class="srow"><span class="sl"><b>Interface size</b><small>Big
 <section class="xsec"><h4>Controls</h4>${controlsHTML()}</section>
 <section class="xsec"><h4>More</h4>
 <div class="ovbtns"><button class="btn" type="button" id="setAch">Achievements</button><button class="btn" type="button" id="setCh">Clutch Challenges</button><button class="btn" type="button" id="setTut">Guided first game</button><button class="btn" type="button" id="setCred">Credits</button>${IS_DESKTOP?'':'<button class="btn" type="button" id="setGuide">How to play</button>'}</div>
-<p class="xsub" style="margin:0;color:var(--muted);font-size:12px">Floodlight Baseball ${GAME_VERSION}${IS_DESKTOP?' · desktop':IS_APP?(APP_OS==='ios'?' · iPhone':' · Android'):''}</p>
+<p class="xsub" style="margin:0;color:var(--muted);font-size:12px">Floodlight Baseball ${GAME_VERSION}${IS_DESKTOP?' · desktop':IS_APP?(APP_OS==='ios'?' · iPhone':' · Android'):''} · <a href="${SITE_URL}/privacy/" target="_blank" rel="noopener">Privacy policy</a> · <a href="${SITE_URL}/support/" target="_blank" rel="noopener">Support</a></p>
 </section></div>`;
   openX(html, {back});
   ov2.querySelectorAll('[data-set]').forEach(g=>g.addEventListener('click',e=>{
@@ -8141,6 +8142,7 @@ function netTry(kind,a,b){
   const t=G.half;
   if(G.over) return;
   if(NET.side<0){ toast(t,"You're watching this game.",''); return; }
+  if(netResting()){ toast(t,esc(netRestMsg()),''); return; } // the server's allowance is running low
   if(busy||NET.mine||NET.out.length||NET.q.length||NET.pumping||NET.waitAns) return; // a move is already on its way
   const me=NET.side, e={at:NET.tick,g:NET.gameNo};
   if(kind==='roll'){ if(t!==me&&!cpu(t)){ toast(t,`It's <b>${esc(netOpp())}</b>'s turn to roll.`,''); return; } e.k='roll'; if(t!==me) e.as=t; } // (a league game against a computer club: this player rolls for the computer too)
@@ -8158,8 +8160,9 @@ async function netFlush(){
     while(NET===my&&my.out.length){
       try{
         const r=await netFetch(NET_API,{method:'POST',body:JSON.stringify({op:'send',code:my.code,tok:my.tok,e:my.out[0],since:my.n})});
+        if(r.paused){ my.out.length=0; my.mine=null; netRestStop(my); if(netOn()) renderGame(); break; }
         if(r.error){ if(r.status>=400&&r.status<500){ my.out.shift(); my.mine=null; netNote(r.error); if(netOn()) renderGame(); continue; } throw new Error(r.error); }
-        my.out.shift(); my.fail=0; netGot(r);
+        my.out.shift(); my.fail=0; my.sentAt=my.polled=my.act=Date.now(); netGot(r); netWake();
       }catch(err){ my.fail=(my.fail||0)+1; netStatus(); await nsleep(Math.min(8000,700*my.fail)); }
     }
   } finally{ my.flushing=false; netStatus(); }
@@ -8169,7 +8172,8 @@ async function netFetch(url,o){
   try{
     const r=await fetch(url,Object.assign({cache:'no-store'},o||{},ctl?{signal:ctl.signal}:{})); // a plain request: the apps skip the CORS preflight
     let j={}; try{ j=await r.json(); }catch(e){}
-    if(!r.ok) return Object.assign({error:j.error||'The game server is having trouble.',status:r.status},j.full?{full:true}:{});
+    if(j&&j.paused) netRestSet(j); // the server's allowance is running low: online play rests for a while
+    if(!r.ok) return Object.assign({error:j.error||'The game server is having trouble.',status:r.status},j.full?{full:true}:{},j.paused?{paused:true}:{});
     return j;
   } finally{ clearTimeout(to); }
 }
@@ -8181,29 +8185,81 @@ function netGot(r){
   if(r.p) my.p=r.p;
   if(r.seen){ my.seen=r.seen; my.seenAt=Date.now(); }
   if(r.now) my.skew=Date.now()-r.now;
-  for(const e of r.log||[]){ if(e.i<my.n) continue; if(e.i!==my.n) break; my.n=e.i+1;
+  for(const e of r.log||[]){ if(e.i<my.n) continue; if(e.i!==my.n) break; my.n=e.i+1; my.act=Date.now();
     if(e.k==='say'||e.k==='leave'){ netSide(e); continue; } // no effect on the game: shown the moment it arrives
     my.q.push(e); }
   if(my.waitAns) netPumpAns();
   netPump(); netStatus();
 }
-/* the main loop: ask the server for new moves. While it's the other player's move it waits there for them
-   (a long poll); while it's this player's move it only checks in every few seconds. */
-async function netLoop(){
-  const my=NET; if(!my||my.looping) return; my.looping=true;
-  while(NET===my&&!my.stop){
-    const theirs=netTheirMove(), wait=theirs?6:0;
-    try{
-      const r=await netFetch(`${NET_API}?code=${my.code}&since=${my.n}&wait=${wait}${my.tok?'&tok='+my.tok:''}${my.teams&&my.teams[0]&&my.teams[1]?'':'&full=1'}`);
-      if(NET!==my) break;
-      if(r.error){ if(r.status===404){ my.gone=true; netStatus(); netNote(r.error); break; } throw new Error(r.error); }
-      my.fail=0; netGot(r);
-    }catch(err){ if(NET!==my) break; my.fail=(my.fail||0)+1; netStatus(); await nsleep(Math.min(10000,1000*my.fail)); continue; }
-    if(!wait) await nsleep(my.solo&&my.G?30000:document.hidden?8000:2500); // (against the computer, the replies to this screen's own moves bring everything)
-    else if(document.hidden) await nsleep(1500);
+/* the main loop: ask the server for new moves, no more often than keeps the game feeling live. (The server has a
+   monthly allowance of requests and of time spent answering them, shared by everyone who plays: see
+   netlify/lib/usage.mjs. When it runs low, online play rests for a few hours: netResting() below.)
+   - waiting for the other player's move: the server holds the check-in open until a move comes (a long poll), so
+     their moves show up the moment they're made
+   - your move: your own moves bring back anything new, so in between only a quick check every few seconds (the other
+     player can play a card or send a message during your turn)
+   - nothing happening for a while (the game is over, someone stepped away, waiting for a friend to join, the page is
+     in the background): checks less and less often, and after a long quiet spell stops until you're back (a tap, a
+     key, or coming back to the page checks right away) */
+const NET_HOLD=7; // seconds the server holds a check-in open
+var NET_TOUCH=Date.now(); // the last time the player did anything on this page
+function netPlan(my){
+  const now=Date.now(), quiet=now-(my.act||0), away=now-NET_TOUCH, hid=document.hidden, over=!!(my.G&&my.G.over);
+  const slow=q=>q<5*60000?10000:q<15*60000?20000:30000;
+  if(my.solo&&my.G&&my.side>=0) return {wait:0,after:hid?60000:30000}; // playing a computer club: every move is made here, so a check-in now and then just says you're here (someone watching waits for the moves like any watcher)
+  if(netTheirMove()){
+    const doze=over?15*60000:!my.G&&my.side>=0?60*60000:30*60000; // (waiting for a friend to join: an hour)
+    if(quiet>doze&&away>doze) return null;
+    if(!hid&&quiet<(over?45000:my.G?120000:90000)) return {wait:NET_HOLD,after:0};
+    return {wait:0,after:hid?Math.max(slow(quiet),30000):slow(quiet)};
   }
-  my.looping=false;
+  const last=Math.max(my.sentAt||0,my.polled||0), every=hid?30000:(away<60000||quiet<60000)?4000:away<5*60000?10000:20000;
+  return {wait:0,before:Math.max(0,last+every-now),after:0};
 }
+async function netLoop(){
+  const my=NET; if(!my||my.looping) return; my.looping=true; my.dozing=false; if(!my.act) my.act=Date.now();
+  try{
+    while(NET===my&&!my.stop){
+      if(netResting()){ netRestStop(my); break; }
+      const P=netPlan(my);
+      if(!P){ my.dozing=true; break; } // (netWake() starts it again)
+      if(P.before>0){ await netNap(my,P.before); continue; } // then plan again: things may have changed meanwhile
+      try{
+        const r=await netFetch(`${NET_API}?code=${my.code}&since=${my.n}&wait=${P.wait}${my.tok?'&tok='+my.tok:''}${my.teams&&my.teams[0]&&my.teams[1]?'':'&full=1'}`);
+        if(NET!==my) break;
+        if(r.paused){ netRestStop(my); break; }
+        if(r.error){ if(r.status===404){ my.gone=true; netStatus(); netNote(r.error); break; } throw new Error(r.error); }
+        my.fail=0; my.polled=Date.now(); netGot(r);
+      }catch(err){ if(NET!==my) break; my.fail=(my.fail||0)+1; netStatus(); await netNap(my,Math.min(10000,1000*my.fail)); continue; }
+      if(P.after>0) await netNap(my,P.after);
+      else if(P.wait&&document.hidden) await netNap(my,1500);
+    }
+  } finally{ my.looping=false; }
+}
+function netNap(my,ms){ return new Promise(res=>{ const t=setTimeout(()=>{ my.wake=null; res(); },ms); my.napLong=ms>=8000; my.wake=()=>{ clearTimeout(t); my.wake=null; res(); }; }); }
+/* something changed here (a move came in or went out, the page came back, a tap): plan the next check-in again now.
+   A tap only cuts a long wait short, and not more than once every few seconds. */
+function netWake(touch,back){
+  const now=Date.now(); if(touch) NET_TOUCH=now;
+  const my=NET; if(!my||my.stop) return;
+  if(my.dozing){ my.dozing=false; netLoop(); return; }
+  if(!my.wake) return;
+  if(touch&&!back){ if(!my.napLong||now-(my.touchWake||0)<8000) return; my.touchWake=now; }
+  my.wake();
+}
+(()=>{ let t=0; const touch=()=>{ const n=Date.now(); if(n-t<1000) return; t=n; netWake(true); };
+  for(const ev of ['pointerdown','keydown']) window.addEventListener(ev,touch,{capture:true,passive:true});
+  document.addEventListener('visibilitychange',()=>{ if(!document.hidden) netWake(true,true); }); // back to the page: check right away
+  window.addEventListener('online',()=>netWake(true,true)); })();
+/* resting: the server's allowance is running low (it answered {paused:true, retry}). No online requests from this
+   device until then; everything else in the game works as usual. */
+const NET_REST_KEY='fdl-net-rest';
+function netRestInfo(){ const s=jparse(lsGet(NET_REST_KEY)); return s&&s.until>Date.now()?s:null; }
+function netResting(){ return !!netRestInfo(); }
+function netRestSet(r){ const ms=Math.max(10*60000,Math.min(24*3600000,+(r&&r.retry)||6*3600000)); lsSet(NET_REST_KEY,JSON.stringify({until:Date.now()+ms,msg:String(r&&r.error||'')})); }
+function netRestMsg(){ const s=netRestInfo(); return (s&&s.msg)||'Online play is taking a break for a few hours, to stay within the game server\'s monthly allowance. Everything else in the game works as usual.'; }
+function netRestWhen(){ const s=netRestInfo(); if(!s) return ''; const d=new Date(s.until); return d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})+(d.toDateString()!==new Date().toDateString()?' tomorrow':''); }
+function netRestStop(my){ if(!my||my.resting) return; my.resting=true; my.stop=true; netStatus(); netNote(netRestMsg()); }
 function netTheirMove(){
   const my=NET; if(!my) return false;
   if(my.side<0) return true;
@@ -8229,7 +8285,7 @@ async function netPump(){
     }
   } catch(err){ console.warn('online',err); }
   finally{ my.pumping=false; }
-  if(NET===my){ if(my.ff&&!my.q.length) netFFEnd(); netStatus(); if(netOn()) renderGame(); }
+  if(NET===my){ if(my.ff&&!my.q.length) netFFEnd(); netStatus(); if(netOn()) renderGame(); netWake(); }
 }
 /* a quick message: its own speech bubble (game toasts can't cover it) */
 function netBubble(s,text){
@@ -8357,7 +8413,7 @@ function netFFEnd(){
 function netBegin(o){
   if(QM&&!(o&&o.qm)) qmCancel();
   netStop(true);
-  NET=Object.assign({code:'',tok:'',side:-1,seed:0,mode:'sim',p:[null,null],teams:[null,null],q:[],out:[],n:0,tick:0,gameNo:0,qn:0,G:null,liveFrom:0,ff:false,mine:null,waitAns:null,kind:'',cpu:[false,false],solo:false},o);
+  NET=Object.assign({code:'',tok:'',side:-1,seed:0,mode:'sim',p:[null,null],teams:[null,null],q:[],out:[],n:0,tick:0,gameNo:0,qn:0,G:null,liveFrom:0,ff:false,mine:null,waitAns:null,kind:'',cpu:[false,false],solo:false,act:Date.now()},o);
   netPaint(); netLoop();
 }
 function netStop(quiet){
@@ -8424,7 +8480,8 @@ function netStatus(){
   if(!NET){ el.hidden=true; return; }
   const my=NET, st=el.querySelector('.nst'); if(!st){ netPaint(); return; }
   let txt, cls='';
-  if(my.gone){ txt='This game has ended'; cls='bad'; }
+  if(my.resting){ txt='Online play is taking a break'; cls='bad'; }
+  else if(my.gone){ txt='This game has ended'; cls='bad'; }
   else if(my.fail>1){ txt='Reconnecting…'; cls='bad'; }
   else if(!my.G){ txt=my.kind?`Waiting for ${netOpp()} to come to the ballpark`:`Waiting for someone to join · code ${my.code}`; }
   else if(my.side<0){ txt='Watching live'; }
@@ -8489,7 +8546,12 @@ function netDraw2(){
   const V=NETV, nm=netNameNow(), saved=jparse(lsGet(NET_KEY)), err=V.err?`<p class="nerr">${esc(V.err)}</p>`:'';
   const nameRow=`<label class="nrow"><span>Your name</span><input type="text" id="netName" maxlength="16" value="${esc(nm)}" placeholder="What the other player sees" autocomplete="nickname"></label>`;
   let h='';
-  if(V.view==='home'){
+  if(V.view==='home'&&netResting()){ // the server's allowance is running low: nothing online for a few hours
+    h=`${xHead('Play online','Play someone over the internet: find a game right now, or play a friend with a code.')}
+<div class="ncard nrest"><h4>Online play is taking a break</h4><p>${esc(netRestMsg())}</p><p class="nlink">Check back after about <b>${esc(netRestWhen())}</b>.</p></div>
+${nrCardHTML()}<div class="ovbtns"><button class="btn primary" type="button" data-x>Close</button></div>`;
+  }
+  else if(V.view==='home'){
     const back=NET&&NET.G&&!netOn(), again=!NET&&saved&&saved.code&&Date.now()-saved.at<4*24*3600*1000;
     h=`${xHead('Play online','Play someone over the internet: find a game right now, or play a friend with a code. Each of you manages your own team: your rolls, cards, abilities and designated hitter.')}
 ${back?`<div class="ncard hot"><b>Your online game is still going.</b><div class="nbtns"><button class="btn primary" type="button" data-nv="back">Back to it</button></div></div>`:''}
@@ -8536,7 +8598,7 @@ ${nameRow}<h4 class="nh">Your team</h4>${netTeamCard('blue')}${err}
   ov2.querySelectorAll('[data-set="nmode"] [data-v]').forEach(b=>b.onclick=()=>{ NETV.mode=b.dataset.v; netDraw2(); });
   ov2.querySelectorAll('[data-nv]').forEach(b=>b.onclick=()=>netAct(b.dataset.nv,b));
   if(/^lg/.test(V.view)) olViewWire();
-  if(V.view==='home') qmCountHome();
+  if(V.view==='home'&&!netResting()) qmCountHome();
   return done;
 }
 /* the host changed their team while waiting: the server keeps the new names for when the other player joins */
@@ -8559,6 +8621,7 @@ async function netAct(a,el){
   if(/^lg/.test(a)){ olAct(a,el); return; }
   const V=NETV, ci=$('netCode'); if(ci) V.code=ci.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4); // what's in the boxes now (autofill doesn't always say)
   if(a==='home'){ netOpen('home'); return; }
+  if(netResting()&&/^(qfind|qswitch|rejoin|create|go|peek|join|watch)$/.test(a)){ netOpen('home'); return; } // (resting: the panel says so)
   if(a==='qfind'){ qmStart(V.mode); return; }
   if(a==='qcancel'){ qmCancel(); return; }
   if(a==='qswitch'){ const m=QM&&QM.mode==='sim'?'arcade':'sim'; qmCancel(); NETV.mode=m; qmStart(m); return; }
@@ -8622,7 +8685,7 @@ function netEditOrder(id,back){
   window.addEventListener('hashchange',()=>invite(50));
   if(invite(900)){}
   // an online game that was going when the page closed: offer to rejoin
-  else { const s=jparse(lsGet(NET_KEY)); if(s&&s.code&&Date.now()-s.at<4*24*3600*1000) setTimeout(()=>{ if(!NET&&G) toast(G.half,`Your online game${s.opp?' with <b>'+esc(s.opp)+'</b>':''} is waiting. Tap <b>Online</b> to rejoin.`,'abil'); },2500); }
+  else { const s=jparse(lsGet(NET_KEY)); if(s&&s.code&&Date.now()-s.at<4*24*3600*1000&&!netResting()) setTimeout(()=>{ if(!NET&&G) toast(G.half,`Your online game${s.opp?' with <b>'+esc(s.opp)+'</b>':''} is waiting. Tap <b>Online</b> to rejoin.`,'abil'); },2500); }
 })();
 
 /* ---------- the online record (Oct 2026) ----------
@@ -8851,7 +8914,9 @@ function olAdopt(str,ver){
 let olCardSig='';
 function olCardsMaybe(){ if(!F) return; const sig=F.ids.map(id=>F.teams[id].lineup.join(',')).join('|'); if(sig!==olCardSig){ olCardSig=sig; try{ prepCards(F.ids.map(id=>F.teams[id])); }catch(e){} } }
 async function olFetch(full){
-  const my=OL; const r=await netFetch(`${NET_API}?lg=${my.code}&ver=${full?0:my.ver}&mver=${full?0:my.mver}&tok=${my.tok}`);
+  const my=OL; if(netResting()) throw Object.assign(new Error(netRestMsg()),{paused:true}); // (the server's allowance is running low)
+  const r=await netFetch(`${NET_API}?lg=${my.code}&ver=${full?0:my.ver}&mver=${full?0:my.mver}&tok=${my.tok}`);
+  if(r.paused) throw Object.assign(new Error(r.error),{paused:true}); // resting, not gone: the franchise is still there
   if(r.error){ if(r.status===404||r.status===403) my.gone=r.error; throw Object.assign(new Error(r.error),{status:r.status}); }
   return r;
 }
@@ -8860,22 +8925,31 @@ async function olLoop(){
   const my=OL; if(!my||my.looping) return; my.looping=true;
   while(OL===my&&!my.gone){
     try{ const r=await olFetch(false); if(OL!==my) break; my.fail=0; await olGot(r); }
-    catch(e){ if(OL!==my) break; my.fail=(my.fail||0)+1; if(my.gone){ olRefreshView(); break; } }
+    catch(e){ if(OL!==my) break; if(e.paused){ if(!my.rested){ my.rested=true; hubMsg=esc(e.message); olRefreshView(); } } else my.fail=(my.fail||0)+1; if(my.gone){ olRefreshView(); break; } }
     await new Promise(res=>{ my.wake=res; setTimeout(res,olPace()); }); my.wake=null;
   }
   my.looping=false;
 }
 function olKick(){ if(OL&&OL.wake) OL.wake(); else if(OL) olLoop(); }
+function olHubOpened(){ const my=OL; if(!my) return; my.opened=Date.now(); olKick(); } // (then quick check-ins for a couple of minutes: see olPace)
+/* how long until the next check-in: often while the hub is open and a game with a person is coming up, rarely when
+   nobody is looking (the server has a monthly allowance shared by everyone who plays: see netlify/lib/usage.mjs).
+   Opening the hub, or coming back to the page, checks in right away. */
 function olPace(){
   const my=OL; if(!my) return 60000;
-  if(document.hidden) return 60000;
-  if(netOn()&&G&&G.lg&&NET.side>=0&&!G.over) return 25000; // playing: a check-in now and then says you're here
-  if(!(F&&F.online)) return 60000; // looking at your own franchises: a check-in a minute
+  const away=Date.now()-NET_TOUCH, idle=away>5*60000, rest=netRestInfo();
+  if(rest) return Math.max(60000,rest.until-Date.now()+5000); // resting: not until it's over
+  my.rested=false;
+  if(document.hidden) return away>10*60000?600000:120000; // in the background
+  if(netOn()&&G&&G.lg&&NET.side>=0&&!G.over) return 60000; // playing: a check-in now and then says you're here
+  if(!(F&&F.online)) return away>30*60000?900000:300000; // looking at something else
   const hub=!$('hub').hidden, since=Date.now()-Math.max(my.lastChange||0,my.opened||0); // (just opened: quick, so friends joining show up right away)
   if(my.fail) return Math.min(30000,2000*my.fail);
-  if(!hub) return 25000;
-  const g=olWaiting()&&olMine(); if(g&&!my.res[g.key]&&frHuman(g.a===F.userId?g.h:g.a)) return 4000; // today's game is against a person: they could be at the ballpark any moment
-  return olWaiting()?(since<120000?5000:since<600000?12000:30000):15000; // quick while things are moving, then easing off
+  if(G&&G.lg&&G.over&&NET&&Date.now()-(NET.act||0)<120000) return 6000; // a league game just ended (played or watched): the day may finish any moment
+  if(!hub) return idle?180000:45000;
+  const g=olWaiting()&&olMine(); if(g&&!my.res[g.key]&&frHuman(g.a===F.userId?g.h:g.a)) return idle?60000:since<120000?4000:since<600000?10000:20000; // today's game is against a person: they could be at the ballpark any moment
+  if(olWaiting()) return idle?60000:since<120000?5000:since<600000?12000:30000; // quick while things are moving, then easing off
+  return idle?120000:20000;
 }
 document.addEventListener('visibilitychange',()=>{ if(!document.hidden) olKick(); });
 
@@ -9596,9 +9670,14 @@ function faNewcomers(pool){
    for the next person who looks. You can close the panel and keep playing while you wait: a bar at the bottom shows
    the search, and the game starts the moment someone's found. Whoever was waiting is the home team (RED deck), the
    newcomer the away team (BLUE deck), each with the team names and batting order saved on their own device. The game
-   itself is an ordinary online game (65-online.js): the same lockstep, quick messages, rematch and online record. */
+   itself is an ordinary online game (65-online.js): the same lockstep, quick messages, rematch and online record.
+   While you wait, the game checks in with the server every few seconds (more often at first), and each answer says how
+   many others are looking. After 20 minutes with nobody to play, it stops looking (the server has a monthly allowance;
+   see netlify/lib/usage.mjs). */
 var QM=null; // the search (null when not looking)
-const QM_NOSHOW=15000; // an opponent who hasn't arrived this long after the match isn't coming
+const QM_NOSHOW=35000; // an opponent who hasn't arrived this long after the match isn't coming (they check in every few seconds while they wait)
+const QM_GIVEUP=20*60000; // looking this long with nobody to play: stop
+const qmEvery=age=>age<30000?3000:age<120000?5000:age<300000?8000:12000; // time between check-ins while waiting
 const qmMode=m=>m==='arcade'?'Arcade':'Simulation';
 const qmTeams=()=>({red:netMyTeam('red'),blue:netMyTeam('blue')});
 function qmTime(){ const s=Math.max(0,Math.floor((Date.now()-(QM?QM.since:Date.now()))/1000)); return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`; }
@@ -9610,6 +9689,7 @@ const qmPost=b=>netFetch(NET_API,{method:'POST',body:JSON.stringify(Object.assig
 /* start looking (from the Play online panel), or look again after a game */
 function qmStart(modeV,quiet){
   if(QM){ if(!quiet) netOpen('qm'); return; }
+  if(netResting()){ if(quiet&&G) toast(G.half,esc(netRestMsg()),''); else netOpen('home'); return; } // the server's allowance is running low
   if(NET&&NET.G&&!NET.G.over&&NET.side>=0){ netOpen('home',{err:'Finish (or leave) your online game first.'}); return; }
   if(NET&&!NET.G&&NET.side===1&&!NET.kind){ netOpen('home',{err:`Your friend can still join your game with the code ${NET.code}. Cancel that game first (Online, then Cancel the game).`}); return; }
   const n=quiet?netNameNow():netNeedName(); if(!n){ if(quiet) netOpen('home'); return; }
@@ -9622,24 +9702,41 @@ async function qmFind(my){
   my.phase='look'; qmPaint();
   let r; try{ r=await qmPost({op:'qfind',name:my.name,pid:netPid(),cid:netCid(),mode:my.mode,teams:qmTeams()}); }catch(e){ r={error:'Couldn\'t reach the game server.'}; }
   if(QM!==my){ if(r&&r.wait) qmLeaveReq(my.mode,r.id,r.tok); else if(r&&r.match) qmBail(r.code,r.tok); return; } // (stopped looking meanwhile)
+  if(r.paused){ qmRested(my); return; }
   if(r.match){ qmFound(my,r,0,r.tok); return; }
-  if(r.wait){ Object.assign(my,{id:r.id,tok:r.tok,n:r.n||0,phase:'wait',fail:0,err:''}); qmPaint(); qmCount(my); qmLoop(my); return; }
+  if(r.wait){ Object.assign(my,{id:r.id,tok:r.tok,n:r.n||0,phase:'wait',fail:0,err:''}); qmCounts(my,r); qmPaint(); qmLoop(my); return; }
   if(r.status===400){ QM=null; qmBar(); netOpen('home',{err:r.error}); return; } // (the name or the team)
   my.fail++; my.err=r.error||''; qmPaint(); await nsleep(Math.min(8000,1200*my.fail)); if(QM===my) qmFind(my);
 }
-/* waiting in line: the server holds each check-in a few seconds and answers the moment someone's found */
+/* waiting in line: a check-in every few seconds; the answer says when someone's found */
 async function qmLoop(my){
   if(my.looping) return; my.looping=true;
   try{
     while(QM===my&&my.phase==='wait'){
-      let r; try{ r=await qmPost({op:'qwait',id:my.id,tok:my.tok,mode:my.mode}); }catch(e){ r={error:'Couldn\'t reach the game server.'}; }
+      if(Date.now()-my.since>QM_GIVEUP){ qmGiveUp(my); return; }
+      await nsleep(qmEvery(Date.now()-my.since));
+      if(QM!==my||my.phase!=='wait') return;
+      let r; try{ r=await qmPost({op:'qwait',id:my.id,tok:my.tok,mode:my.mode,cv:2}); }catch(e){ r={error:'Couldn\'t reach the game server.'}; }
       if(QM!==my) return;
+      if(r.paused){ qmRested(my); return; }
       if(r.match){ const room=await qmRoom(r); if(QM!==my){ if(room) qmBail(r.code,r.tok); return; } if(room){ qmFound(my,room,1,r.tok); return; } qmFind(my); return; }
       if(r.gone){ qmFind(my); return; } // (the line lost track of us, say the phone slept: look again)
       if(r.error){ my.fail++; my.err=r.error; qmPaint(); await nsleep(Math.min(8000,1000*my.fail)); continue; }
-      my.fail=0; my.err=''; my.n=r.n||0; qmPaint(); qmCount(my);
+      my.fail=0; my.err=''; my.n=r.n||0; qmCounts(my,r); qmPaint();
     }
   } finally{ my.looping=false; }
+}
+function qmCounts(my,r){ const o=my.mode==='sim'?'arcade':'sim'; my.counts={[my.mode]:r.n||0,[o]:r.other||0,hour:r.hour||0}; }
+/* twenty minutes and nobody else looked: stop (and say so) */
+function qmGiveUp(my){
+  if(QM!==my) return; QM=null; qmBar(); qmLeaveReq(my.mode,my.id,my.tok);
+  const msg='Nobody else was looking for a game. Try again later, or play a friend with a code.';
+  if(!ov2.hidden&&NETV.view==='qm') netOpen('home',{err:msg}); else if(G) toast(G.half,msg,'');
+}
+/* the server's allowance is running low: stop looking (the Play online panel says why) */
+function qmRested(my){
+  if(QM!==my) return; QM=null; qmBar();
+  if(!ov2.hidden&&(NETV.view==='qm'||NETV.view==='home')) netOpen('home'); else if(G) toast(G.half,esc(netRestMsg()),'');
 }
 async function qmRoom(r){
   for(let i=0;i<5;i++){ try{ const x=await netFetch(`${NET_API}?code=${r.code}&since=0&full=1&tok=${r.tok}`); if(!x.error) return x; }catch(e){} await nsleep(700); }
@@ -9689,11 +9786,16 @@ function qmOppGone(N,s){
 /* after a quick-match game: a new opponent */
 function qmAgain(){ const m=NET?NET.mode:mode; netLeave(); setTimeout(()=>qmStart(m),250); }
 
-/* how many people are looking (and how many games started in the last hour): the other rules may be busier */
-async function qmCount(my){
-  if(my&&Date.now()-(my.cAt||0)<15000) return; if(my) my.cAt=Date.now();
-  let r; try{ r=await netFetch(`${NET_API}?mq=1&gv=${NET_GV}`); }catch(e){ return; }
-  if(r&&!r.error){ if(my){ if(QM===my){ my.counts=r; qmPaint(); } } return r; }
+/* how many people are looking (and how many games started in the last hour): the other rules may be busier.
+   Asked when the Play online panel opens, at most every half a minute; while you're in line it comes with each check-in. */
+let QM_CNT=null;
+async function qmCount(){
+  if(QM_CNT&&Date.now()-QM_CNT.at<30000) return Object.assign({},QM_CNT.r);
+  if(netResting()) return null;
+  let r; try{ r=await netFetch(`${NET_API}?mq=1&gv=${NET_GV}`); }catch(e){ return null; }
+  if(r&&r.paused) return {paused:true};
+  if(r&&!r.error){ QM_CNT={at:Date.now(),r}; return Object.assign({},r); }
+  return null;
 }
 function qmCountLine(r,m){
   if(!r) return '';
@@ -9746,7 +9848,8 @@ function qmCardHTML(V){
 <div class="nbtns"><button class="btn primary" type="button" data-nv="qfind">${QM?'Looking… (show)':'Find a game'}</button></div><p class="qmc" id="qmCount"></p></div>`;
 }
 async function qmCountHome(){
-  const r=await qmCount(null), el=$('qmCount'); if(!el||!r) return;
+  const r=await qmCount(), el=$('qmCount'); if(!el||!r) return;
+  if(r.paused){ if(!ov2.hidden&&NETV.view==='home') netDraw2(); return; } // resting: the panel says so
   if(QM&&QM.phase==='wait'&&r[QM.mode]) r[QM.mode]--; // (not counting yourself)
   const m=NETV.mode==='arcade'?'arcade':'sim', t=qmCountLine(r,m), o=m==='sim'?'arcade':'sim';
   el.textContent=t||(r[o]?`${r[o]===1?'1 person is':`${r[o]} people are`} looking for ${o==='arcade'?'an Arcade':'a Simulation'} game right now.`:'');
@@ -9766,7 +9869,7 @@ window.addEventListener('pagehide',()=>{ const my=QM; if(my&&my.id&&my.phase==='
    can be drawn on the first screen. (Before Oct 2026 this ran in 50-glue.js, too early for a renamed team.) */
 paintDaily(); achProg(); if(F) achFr(); if(G) renderGame();
 
-window.__fdl={addon:{ACHD:()=>ACHD,CHD:()=>CHD,DAYD:()=>DAYD,FSET:()=>FSET,start:id=>startChallenge(id==='daily'?dailyFor(today()):CH_BY[id]),achUnlock,openSettings,openAchievements,openChallenges,litActions,padPress,layerRoot,chFinal,buildChallenge,CHALL,ACHS,dailyFor,badgeSVG,exitChallenge,startTutorial,TUT:()=>TUT,FIELD:()=>FIELD,VO:()=>VO,voSay,voPick,voName,voBatter,fieldCheck,sfx:()=>sfx,parkSync,parkFor,PARK:()=>PARK_CUR,FR_CLUBS:()=>FR_CLUBS,trGain,plValue,drGet,lgOps,TR:()=>TR,stretchScene:()=>stretchScene(),crowdCanvas,asgSim,asgPending,asgStart,confOf,drOrder,genLogoKey,poWatch,poIn,potwList,seedTag,tvSegments:m=>tvSegments(m),activeSeries:()=>activeSeries(),poAllSeries:()=>poAllSeries(),faGet,faSign,faDecide,faResolve,ctEnsure,ctWorth,NET:()=>NET,netOpen,netCreate,netJoin,netPeek,netWatch,netRejoin,netLeave,netBack,netRematch,netSend,netOn,rvOn,rvRec,dbGet,dbSim,dbOpen,dlGet,evPreviewSegs,frNextSeason:()=>frNextSeason(),voTvPlan,voTvIds,voTvId,frDay:()=>frFinishDay(null),poDay:()=>frPlayoffDay(null),frExpand:()=>frExpand(),tvShow:m=>tvShow(m),frHuman,OL:()=>OL,olToday:()=>olToday(),olMine:()=>olMine(),olSimQuiet,olMaybeFinish,olReady,olOpenView,olExitView,olMerge3,olCommit,frSave:()=>frSave(),plSVG,brawlScene,champScene,hbpCheck,brawlMaybe,champMaybe,defMan,abRookie,faNewcomers,zonePick,AB_VAL:()=>AB_VAL,smartRun:g=>smartRun(g),gameTeam:T=>gameTeam(T),newState:(m,t,c)=>newState(m,t,c)}, get G(){return G}, get F(){return F}, get busy(){return busy}, setOpp:o=>setOpp(o,true), cpuPick:()=>cpuPick(), showFinal:()=>showFinal(), playWhole, MODES, ACTIONS, ABIL, DHS, P, render:()=>renderGame(),
+window.__fdl={addon:{ACHD:()=>ACHD,CHD:()=>CHD,DAYD:()=>DAYD,FSET:()=>FSET,start:id=>startChallenge(id==='daily'?dailyFor(today()):CH_BY[id]),achUnlock,openSettings,openAchievements,openChallenges,litActions,padPress,layerRoot,chFinal,buildChallenge,CHALL,ACHS,dailyFor,badgeSVG,exitChallenge,startTutorial,TUT:()=>TUT,FIELD:()=>FIELD,VO:()=>VO,voSay,voPick,voName,voBatter,fieldCheck,sfx:()=>sfx,parkSync,parkFor,PARK:()=>PARK_CUR,FR_CLUBS:()=>FR_CLUBS,trGain,plValue,drGet,lgOps,TR:()=>TR,stretchScene:()=>stretchScene(),crowdCanvas,asgSim,asgPending,asgStart,confOf,drOrder,genLogoKey,poWatch,poIn,potwList,seedTag,tvSegments:m=>tvSegments(m),activeSeries:()=>activeSeries(),poAllSeries:()=>poAllSeries(),faGet,faSign,faDecide,faResolve,ctEnsure,ctWorth,NET:()=>NET,netOpen,netCreate,netJoin,netPeek,netWatch,netRejoin,netLeave,netBack,netRematch,netSend,netOn,rvOn,rvRec,dbGet,dbSim,dbOpen,dlGet,evPreviewSegs,frNextSeason:()=>frNextSeason(),voTvPlan,voTvIds,voTvId,frDay:()=>frFinishDay(null),poDay:()=>frPlayoffDay(null),frExpand:()=>frExpand(),tvShow:m=>tvShow(m),frHuman,OL:()=>OL,olToday:()=>olToday(),olMine:()=>olMine(),olSimQuiet,olMaybeFinish,olReady,olOpenView,olExitView,olMerge3,olCommit,frSave:()=>frSave(),plSVG,brawlScene,champScene,hbpCheck,brawlMaybe,champMaybe,defMan,abRookie,faNewcomers,zonePick,AB_VAL:()=>AB_VAL,smartRun:g=>smartRun(g),gameTeam:T=>gameTeam(T),newState:(m,t,c)=>newState(m,t,c),netPlan:m=>netPlan(m),netWake:(a,b)=>netWake(a,b),netTouchAt:t=>{NET_TOUCH=t;},netResting:()=>netResting()}, get G(){return G}, get F(){return F}, get busy(){return busy}, setOpp:o=>setOpp(o,true), cpuPick:()=>cpuPick(), showFinal:()=>showFinal(), playWhole, MODES, ACTIONS, ABIL, DHS, P, render:()=>renderGame(),
   setHand:(t,ids)=>{ G.hands[t]=ids.slice(); renderGame(); }, setBases:b=>{ G.bases=b.slice(); renderGame(); }, setOuts:n=>{ G.outs=n; renderGame(); },
   setInning:(i,h)=>{ G.inning=i; G.half=h; G.halfPA=0; while(G.line[0].length<i) G.line[0].push(0); while(G.line[1].length<i-(h?0:1)) G.line[1].push(0); renderGame(); },
   setIdx:(t,i)=>{ G.idx[t]=i; renderGame(); }, activeAbils:t=>activeAbils(t), runAbility:(t,i)=>runAbility(t,activeAbils(t)[i]), newGame, openHub, frCreate:(n,a,z)=>{ frCreate(n,a,z); setFrUI(); }, frPregame, frSimToPlayoffs, frSimPlayoffs, frSimUser, frNextSeason, frResume, frExit, genPlayerCard, cardSrc, snapshot, applySnap, toCode, fromCode, openSaves, editQuickNames, frEditNames, quickGame, get tipsOn(){return tipsOn}};

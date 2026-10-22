@@ -10,7 +10,10 @@
 // Quick match ("Play now"): POST {op:"qfind", name, mode, gv, teams:{red, blue}} -> {match:true, tok, side:0, ...room} or {wait:true, id, tok, n}
 //   POST {op:"qwait", id, tok, mode, gv} -> {match:true, code, tok, side:1} | {wait:true, n} | {gone:true};  POST {op:"qleave", ...}
 //   GET /api/online?mq=1&gv=2 -> how many people are looking for a game right now
+// The server's monthly allowance (../lib/usage.mjs): when it runs low, new games are turned away first, then all
+// online play; those answers say {paused:true, retry: ms} so the game stops asking for a few hours.
 import { getStore } from "@netlify/blobs";
+import { count, level, share, REST_MSG, RETRY } from "../lib/usage.mjs";
 
 const HEAD = { "content-type": "application/json", "cache-control": "no-store", "access-control-allow-origin": "*", "access-control-allow-methods": "GET, POST, OPTIONS", "access-control-allow-headers": "content-type" };
 const reply = (body, status = 200) => new Response(JSON.stringify(body), { status, headers: HEAD });
@@ -103,9 +106,22 @@ async function update(S, code, fn) {
   return { error: "The game server is busy. Try again.", status: 503 };
 }
 
-export default async (req) => {
+export default async (req, context) => {
+  const t0 = Date.now();
+  try { return await handle(req); }
+  finally { count(t0, context); }
+};
+// the answer when online play is resting: shaped so that older copies of the game stop asking too
+// (they stop polling a game on 404, stop looking for a quick match on 400, and give up on a move on other 4xx)
+const rest = (status, more) => reply({ error: REST_MSG, paused: true, retry: RETRY, ...(more || {}) }, status);
+async function handle(req) {
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: HEAD });
-  const S = store();
+  const S = store(), lv = await level();
+  if (req.method === "GET") {
+    const q = new URL(req.url).searchParams;
+    if (lv >= 1 && q.get("mq")) return rest(200, { sim: 0, arcade: 0, hour: 0 });
+    if (lv >= 2) return rest(q.get("lg") ? 503 : 404); // (an online franchise: older copies would forget it on a 404, so they just try again later)
+  }
   if (req.method === "GET" && new URL(req.url).searchParams.get("lg")) return leagueGet(new URL(req.url).searchParams);
   if (req.method === "GET" && new URL(req.url).searchParams.get("mq")) return quickCount(new URL(req.url).searchParams);
   if (req.method === "GET") {
@@ -135,6 +151,13 @@ export default async (req) => {
   if (raw.length > 4000000) return reply({ error: "Too big." }, 400);
   let b; try { b = JSON.parse(raw); } catch (e) { return reply({ error: "Bad request." }, 400); }
   if (!/^lg/.test(String(b.op)) && raw.length > 12000) return reply({ error: "Too big." }, 400);
+  if (lv >= 1) { // resting: no new games (and at level 2 nothing at all, except stepping out of the quick-match line)
+    const op = String(b.op);
+    if (op === "qwait") return rest(200, { gone: true });
+    if (op === "qfind") return rest(400);
+    if (op !== "qleave" && (lv >= 2 || ["create", "join", "lgcreate", "lgjoin"].includes(op))) return rest(429);
+    if (op === "lgroom" && !(await store().getMetadata("L" + String(b.code || "").toUpperCase() + "-" + String(b.key || "").toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 40)))) return rest(429);
+  }
   if (/^lg/.test(String(b.op))) return league(b);
   if (/^q(find|wait|leave)$/.test(String(b.op))) return quick(b);
 
@@ -324,7 +347,7 @@ async function league(b) {
     return reply({ ok: true });
   }
   if (op === "lgroom") { // the online room for one league game: made by whoever gets there first, joined by the other player
-    const key = String(b.key || "").toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 40), side = b.side === 0 || b.side === 1 ? b.side : -1;
+    const key = String(b.key || "").toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 40), side = b.side === 0 || b.side === 1 ? b.side : -1; // (the same key as the resting check above)
     const L = await S.get(code, { type: "json" }), m = L && lgMember(L, tok);
     if (!m) return reply({ error: "Not your franchise." }, 403);
     if (!key || side < 0) return reply({ error: "Bad game." }, 400);
@@ -356,12 +379,14 @@ async function league(b) {
 
 /* ---------- quick match ("Play now"): play whoever else is looking for a game right now ----------
    One waiting line for each set of rules (Simulation or Arcade) and game version. Someone who finds nobody waiting joins
-   the line and checks in every few seconds (a long poll). The next person to look is matched with whoever has waited
-   longest, and the server opens a room for the two of them: the one who waited is the home team (RED deck), the newcomer
-   the away team (BLUE deck), each with the team and names from their own device. Anyone who stops checking in (closed
-   the page, lost signal) drops out of the line. */
+   the line and checks in every few seconds (more often at first, less often as the wait goes on). The next person to
+   look is matched with whoever has waited longest, and the server opens a room for the two of them: the one who waited
+   is the home team (RED deck), the newcomer the away team (BLUE deck), each with the team and names from their own
+   device. Anyone who stops checking in (closed the page, lost signal) drops out of the line.
+   (Copies of the game from before Nov 2026 check in with a long poll: the server holds their check-in up to 5 seconds.
+   Newer ones send cv:2 and get an answer right away, which uses far less of the server's allowance.) */
 const mstore = () => getStore({ name: "online-match", consistency: "strong" });
-const QFRESH = 15000, QMATCHED = 120000, QWAIT = 5000;
+const QFRESH = 30000, QMATCHED = 120000, QWAIT = 5000;
 const qKey = (mode, gv) => `mq-${mode}-${gv}`;
 const qLive = (Q, now) => Q.t.filter(x => !x.m && now - x.seen < QFRESH).length;
 async function qUpdate(MS, key, fn) {
@@ -398,7 +423,7 @@ async function quick(b) {
     if (!code) return reply({ error: "Couldn't start a game. Try again." }, 503);
     const myId = token(), myTok = token(), hostTok = token();
     const u = await qUpdate(MS, key, (Q, now) => {
-      Q.t = Q.t.filter(x => x.m || !(cid && x.cid === cid && now - x.seen > 7000)); // this device looking again: an old place in line it stopped checking on goes
+      Q.t = Q.t.filter(x => x.m || !(cid && x.cid === cid && now - x.seen > 20000)); // this device looking again: an old place in line it stopped checking on goes
       const o = Q.t.find(x => !x.m && (!pid || x.pid !== pid) && (!cid || x.cid !== cid)); // whoever has waited longest (never yourself)
       if (!o) { Q.t.push({ id: myId, tok: myTok, name, pid, cid, red, at: now, seen: now }); return { wait: true }; }
       o.m = { code, tok: hostTok, at: now, opp: name };
@@ -406,7 +431,7 @@ async function quick(b) {
       return { match: { id: o.id, name: o.name, pid: o.pid, cid: o.cid, red: o.red } };
     });
     if (u.error) return reply({ error: u.error }, u.status || 400);
-    if (u.res.wait) return reply({ wait: true, id: myId, tok: myTok, n: qLive(u.Q, Date.now()) - 1 });
+    if (u.res.wait) return reply({ wait: true, id: myId, tok: myTok, ...(await qCounts(MS, mode, gv, u.Q)) });
     const o = u.res.match, now = Date.now();
     const R = { v: 1, code, at: now, upd: now, seed: new Uint32Array(rand(4).buffer)[0], mode, host: 1, gv, qm: 1,
       p: [{ name, team: qAway(blue, o.red), tok: myTok, pid, cid }, { name: o.name, team: o.red, tok: hostTok, pid: o.pid, cid: o.cid }],
@@ -419,7 +444,19 @@ async function quick(b) {
     return reply({ match: true, tok: myTok, side: 0, ...roomOut(R, 0, true) });
   }
   if (!TOK.test(id) || !TOK.test(tok)) return reply({ error: "Bad request." }, 400);
-  if (op === "qwait") { // still looking: waits here up to a few seconds for a match
+  if (op === "qwait" && b.cv >= 2) { // still looking: a quick check-in (the game checks in again a few seconds later)
+    const v = await qUpdate(MS, key, (Q, now) => {
+      const y = Q.t.find(t => t.id === id && t.tok === tok);
+      if (!y) return { noWrite: true, gone: true };
+      if (y.m) { Q.t = Q.t.filter(t => t !== y); return { match: y.m }; }
+      y.seen = now;
+    });
+    if (v.error) return reply({ error: v.error }, v.status || 400);
+    if (v.res && v.res.gone) return reply({ gone: true });
+    if (v.res && v.res.match) { const m = v.res.match; return reply({ match: true, code: m.code, tok: m.tok, side: 1, opp: m.opp }); }
+    return reply({ wait: true, ...(await qCounts(MS, mode, gv, v.Q)) });
+  }
+  if (op === "qwait") { // (older copies of the game) still looking: waits here up to a few seconds for a match
     const end = Date.now() + QWAIT; let first = true;
     for (;;) {
       const Q = (await MS.get(key, { type: "json" })) || { t: [] }, now = Date.now(), x = (Q.t || []).find(t => t.id === id && t.tok === tok);
@@ -444,10 +481,17 @@ async function quick(b) {
   }
   return reply({ error: "Bad request." }, 400);
 }
+// for someone in line: how many others are looking with the same rules, with the other rules, and games in the last hour
+async function qCounts(MS, mode, gv, Q) {
+  const now = Date.now(), other = mode === "sim" ? "arcade" : "sim", O = (await MS.get(qKey(other, gv), { type: "json" })) || { t: [] };
+  const hour = [...(Q.r || []), ...(O.r || [])].filter(t => now - t < 3600000).length;
+  return { n: Math.max(0, qLive(Q, now) - 1), other: qLive({ t: O.t || [] }, now), hour };
+}
 // how many people are looking for a game right now, and how many quick-match games started in the last hour
 async function quickCount(q) {
   const MS = mstore(), gv = GV({ gv: parseInt(q.get("gv") || "1", 10) }), now = Date.now(), out = { hour: 0 };
   for (const m of MODES) { const Q = (await MS.get(qKey(m, gv), { type: "json" })) || { t: [] }; out[m] = qLive({ t: Q.t || [] }, now); out.hour += (Q.r || []).filter(t => now - t < 3600000).length; }
+  out.allowance = await share().catch(() => null); // the server's monthly allowance used so far (last 31 days)
   return reply(out);
 }
 

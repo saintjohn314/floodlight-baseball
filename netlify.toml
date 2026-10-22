@@ -1,4 +1,6 @@
-# The game is a single static page; the only server code is the short save-code function.
+# The game is a single static page. The only server code (netlify/functions): short save codes, the Daily Challenge
+# leaderboard, online games (the ordered list of moves for each game, found by its 4-character code), and a daily
+# clean-up. netlify/lib/usage.mjs keeps them all within the free plan's monthly allowance.
 [build]
   publish = "."
   functions = "netlify/functions"
@@ -8,4 +10,10 @@
   for = "/audio/*"
   [headers.values]
     Access-Control-Allow-Origin = "*"
+    Cache-Control = "public, max-age=604800"
+
+# The game's fonts (the same files as the apps): cached for a week.
+[[headers]]
+  for = "/fonts/*"
+  [headers.values]
     Cache-Control = "public, max-age=604800"

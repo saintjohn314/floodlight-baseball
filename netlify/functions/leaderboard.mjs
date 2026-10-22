@@ -3,6 +3,7 @@
 // GET  /api/leaderboard?date=YYYY-MM-DD&me=<player id>   -> today's top 25, how many played, and your rank
 // POST /api/leaderboard  {date, id, name, score, stars, lv} -> saves your score if it beats your best
 import { getStore } from "@netlify/blobs";
+import { count, level, RETRY } from "../lib/usage.mjs"; // the server's monthly allowance (see that file)
 
 const HEAD = { "content-type": "application/json", "cache-control": "no-store", "access-control-allow-origin": "*", "access-control-allow-methods": "GET, POST, OPTIONS", "access-control-allow-headers": "content-type" };
 const reply = (body, status = 200) => new Response(JSON.stringify(body), { status, headers: HEAD });
@@ -24,8 +25,14 @@ function board(entries, me) {
   };
 }
 
-export default async (req) => {
+export default async (req, context) => {
+  const t0 = Date.now();
+  try { return await handle(req); }
+  finally { count(t0, context); }
+};
+async function handle(req) {
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: HEAD });
+  if ((await level()) >= 3) return reply({ error: "The leaderboard is taking a break to stay within the game server's monthly allowance. Try again tomorrow.", paused: true, retry: RETRY }, 429);
   const store = getStore({ name: "daily-leaderboard", consistency: "strong" });
   if (req.method === "GET") {
     const q = new URL(req.url).searchParams, date = q.get("date") || "", me = q.get("me") || "";
@@ -60,6 +67,6 @@ export default async (req) => {
     return reply({ error: "The leaderboard is busy. Try again." }, 503);
   }
   return reply({ error: "Method not allowed." }, 405);
-};
+}
 
 export const config = { path: "/api/leaderboard" };
