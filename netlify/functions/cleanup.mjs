@@ -1,6 +1,6 @@
 // Once a day: deletes online games nobody has touched for over a week (the privacy policy says they go about a week
-// after the last move), and writes to the function log how much of the server's monthly allowance the last 31 days
-// used (see ../lib/usage.mjs).
+// after the last move), and writes to the function log how much of the server's monthly allowance this month has used
+// (see ../lib/usage.mjs).
 import { getStore } from "@netlify/blobs";
 import { count, used } from "../lib/usage.mjs";
 
@@ -22,7 +22,7 @@ export default async (req, context) => {
       }
     }
   } catch (e) { console.log("cleanup:", String(e)); }
-  try { const u = await used(); console.log(`cleanup: looked at ${looked} games, deleted ${deleted}. Last 31 days: ${u.last31[0]} requests, ${(u.last31[1] / 3600000).toFixed(1)} hours of run time.`); }
+  try { const u = await used(); console.log(`cleanup: looked at ${looked} games, deleted ${deleted}. This month: ${u.month[0]} requests, ${(u.month[1] / 3600000).toFixed(1)} hours of run time.`); }
   catch (e) { console.log("cleanup: couldn't read usage", String(e)); }
   count(t0, context);
   return new Response("ok");

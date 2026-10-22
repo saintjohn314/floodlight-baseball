@@ -491,7 +491,7 @@ async function qCounts(MS, mode, gv, Q) {
 async function quickCount(q) {
   const MS = mstore(), gv = GV({ gv: parseInt(q.get("gv") || "1", 10) }), now = Date.now(), out = { hour: 0 };
   for (const m of MODES) { const Q = (await MS.get(qKey(m, gv), { type: "json" })) || { t: [] }; out[m] = qLive({ t: Q.t || [] }, now); out.hour += (Q.r || []).filter(t => now - t < 3600000).length; }
-  out.allowance = await share().catch(() => null); // the server's monthly allowance used so far (last 31 days)
+  out.allowance = await share().catch(() => null); // how much of the server's monthly allowance this month has used
   return reply(out);
 }
 
