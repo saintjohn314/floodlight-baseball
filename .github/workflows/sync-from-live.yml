@@ -9,15 +9,46 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Download the live site's files
         run: |
           B=https://floodlight-baseball-dice-lab.netlify.app
-          mkdir -p audio netlify/functions dl
-          for f in index.html share.jpg manifest.webmanifest package.json audio/voice-calls.mp3 netlify/functions/leaderboard.mjs netlify/functions/save.mjs netlify/functions/online.mjs dl/floodlight-ios-src.zip audio/voice-names.mp3 audio/voice-tv.mp3 audio/crowd-bed.mp3 audio/CREDITS.txt; do
+          mkdir -p audio netlify/functions netlify/lib dl fonts privacy support
+          for f in index.html share.jpg manifest.webmanifest package.json \
+              audio/voice-calls.mp3 audio/voice-names.mp3 audio/voice-tv.mp3 audio/crowd-bed.mp3 audio/CREDITS.txt \
+              netlify/functions/leaderboard.mjs netlify/functions/save.mjs netlify/functions/online.mjs netlify/functions/cleanup.mjs \
+              netlify/lib/usage.mjs privacy/index.html support/index.html fonts/fonts.css fonts/OFL.txt dl/floodlight-ios-src.zip; do
             curl -fsSL "$B/$f?sync=$GITHUB_RUN_ID" -o "$f"
           done
-          ls -la . audio netlify/functions dl
+          # the font files the game uses (listed in fonts.css)
+          for f in $(grep -o '[a-z0-9-]*\.woff2' fonts/fonts.css | sort -u); do
+            curl -fsSL "$B/fonts/$f?sync=$GITHUB_RUN_ID" -o "fonts/$f"
+          done
+          ls -la . audio netlify/functions netlify/lib dl fonts privacy support
+      - name: Netlify settings (not served by the site, so kept here)
+        run: |
+          cat > netlify.toml <<'TOML'
+          # The game is a single static page. The only server code (netlify/functions): short save codes, the Daily Challenge
+          # leaderboard, online games (the ordered list of moves for each game, found by its 4-character code), and a daily
+          # clean-up. netlify/lib/usage.mjs keeps them all within the free plan's monthly allowance.
+          [build]
+            publish = "."
+            functions = "netlify/functions"
+
+          # The crowd recordings: cached for a week, and readable when the game is opened from another address.
+          [[headers]]
+            for = "/audio/*"
+            [headers.values]
+              Access-Control-Allow-Origin = "*"
+              Cache-Control = "public, max-age=604800"
+
+          # The game's fonts (the same files as the apps): cached for a week.
+          [[headers]]
+            for = "/fonts/*"
+            [headers.values]
+              Cache-Control = "public, max-age=604800"
+          TOML
+          sed -i 's/^          //' netlify.toml
       - name: Commit
         run: |
           git config user.name "github-actions[bot]"
