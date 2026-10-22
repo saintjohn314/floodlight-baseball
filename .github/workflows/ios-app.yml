@@ -27,7 +27,7 @@ jobs:
           curl -fsSL "${{ inputs.source }}" -o src.zip
           unzip -q src.zip -d src
           ls src/mobile
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
       - name: Install Capacitor and copy the game into the app
@@ -47,7 +47,7 @@ jobs:
           xcodebuild -project App.xcodeproj -scheme App -configuration Debug -sdk iphonesimulator \
             -destination 'generic/platform=iOS Simulator' -derivedDataPath build CODE_SIGNING_ALLOWED=NO build
           cd build/Build/Products/Debug-iphonesimulator && zip -qry "$GITHUB_WORKSPACE/FloodlightBaseball-simulator.zip" App.app
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: env.HAS_KEYS != 'true'
         with:
           name: FloodlightBaseball-simulator
