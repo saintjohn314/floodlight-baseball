@@ -1669,7 +1669,7 @@ html.rm .scn *{animation-duration:.01s!important;animation-iteration-count:1!imp
 <div class="guidegrid">
 <section class="card wide">
 <h2>Player abilities</h2>
-<p class="intro">Every player card has one ability. Each player can use theirs <b>once a game</b>. Buttons light up under the Roll button when one can be used; the rest pop up on their own the moment they apply. Iron Man and Ageless are always on. In quick games RED and BLUE use the original ten. In a franchise every club draws from all twenty, yours included.</p>
+<p class="intro">Every player card has one ability. Each player can use theirs <b>once a game</b>. Buttons light up under the Roll button when one can be used; the rest pop up on their own the moment they apply. Iron Man and Ageless are always on. In quick games RED and BLUE use the original ten. In a franchise every club starts with the same nine of them, and the new ten come in through free agency, the draft and rookies.</p>
 <ul class="ablist" id="ablist"></ul>
 </section>
 <section class="card">
@@ -4272,7 +4272,7 @@ function importSave(file){
   rd.readAsText(file);
 }
 function newFranchiseHTML(){
-  return `<div class="hgrid"><div class="hcard nextg"><h4>Start a franchise</h4><p>You manage <b>RED</b>: Wes Wright, Ezzy Lyons, Hank Hammer and the rest. Twenty-three computer teams with their own names, logos, ballparks and abilities fill out the league. Play a <b>32-game season</b>, ${ADDON_READY?'split into a <b>West</b> and an <b>East</b>. Six clubs from each conference make the playoffs, just like the big leagues: the top two get a bye, the rest play the <b>Wild Card Series</b>, then the <b>Division Series</b>, the <b>Championship Series</b> and the best-of-7 <b>Floodlight Series</b>. Along the way: a <b>Home Run Derby</b> and an <b>All-Star Game</b> at the halfway mark, the <b>trade deadline</b>, rivalries, contracts and free agency, a <b>Player of the Week</b> after games 10, 20 and 32, and Rookie of the Year and Slugger of the Year when the season ends. Watch the weather too: rain delays, rainouts made up as doubleheaders, and wind at the windy parks. Every club has a <b>starter, reliever and closer</b> with their own pitching stats. You can set the season length, the playoffs and the rules below.':'and the top four make the playoffs: best-of-3 semifinals, then the best-of-7 <b>Floodlight Series</b>.'} Every stat, record and champion is saved, and the franchise rolls on season after season.</p>
+  return `<div class="hgrid"><div class="hcard nextg"><h4>Start a franchise</h4><p>You manage <b>RED</b>: Wes Wright, Ezzy Lyons, Hank Hammer and the rest. Twenty-three computer teams with their own names, logos and ballparks fill out the league, and every club starts with the same nine abilities. Play a <b>32-game season</b>, ${ADDON_READY?'split into a <b>West</b> and an <b>East</b>. Six clubs from each conference make the playoffs, just like the big leagues: the top two get a bye, the rest play the <b>Wild Card Series</b>, then the <b>Division Series</b>, the <b>Championship Series</b> and the best-of-7 <b>Floodlight Series</b>. Along the way: a <b>Home Run Derby</b> and an <b>All-Star Game</b> at the halfway mark, the <b>trade deadline</b>, rivalries, contracts and free agency, a <b>Player of the Week</b> after games 10, 20 and 32, and Rookie of the Year and Slugger of the Year when the season ends. Watch the weather too: rain delays, rainouts made up as doubleheaders, and wind at the windy parks. Every club has a <b>starter, reliever and closer</b> with their own pitching stats. You can set the season length, the playoffs and the rules below.':'and the top four make the playoffs: best-of-3 semifinals, then the best-of-7 <b>Floodlight Series</b>.'} Every stat, record and champion is saved, and the franchise rolls on season after season.</p>
 <div class="form"><label>Team name<input type="text" id="nfName" maxlength="28" value="California Kings"></label><label>Scoreboard abbreviation<input type="text" id="nfAbbr" maxlength="4" value="CAL"></label>
 <div class="choice"><span style="font-size:13px;color:var(--muted);font-weight:600">League size</span><label><input type="radio" name="nfSize" value="24" checked> 24 clubs</label><label><input type="radio" name="nfSize" value="12"> 12 clubs</label><label><input type="radio" name="nfSize" value="6"> 6 clubs (the classic league)</label></div>
 ${ADDON_READY?lgFormHTML():''}
@@ -5058,7 +5058,7 @@ const IS_DESKTOP = !!(NATIVE && NATIVE.isDesktop);
 const CAP = (typeof window!=='undefined' && window.Capacitor && typeof window.Capacitor.isNativePlatform==='function' && window.Capacitor.isNativePlatform()) ? window.Capacitor : null;
 const IS_APP = !!CAP;
 const APP_OS = CAP ? String(CAP.getPlatform()) : '';
-const GAME_VERSION = '1.13.2';
+const GAME_VERSION = '1.13.3';
 const FULL_GAME = true; /*@edition*/ // the website is the free demo; build.py turns this on for the Steam game
 
 /* ---------- a shared add-on dialog layer (sits above the menu, never touches the game's own pop-ups) ---------- */
@@ -6798,6 +6798,7 @@ function frExpand(){
     if(abbrs.has(c.abbr)) c.abbr=abbrOf(c.name.split(' ')[0],abbrs); abbrs.add(c.abbr);
     const ps=genPlayers(used, 3+(Math.random()<.4?1:0), Math.random()<.3?1:0);
     F.teams[id]=Object.assign({id},c,{lineup:ps.map(p=>p.name),roster:Object.fromEntries(ps.map(p=>[p.name,Object.assign({ab:p.ab,n:p.n,f:p.f},p.hi?{hi:1}:{},p.jp?{jp:1}:{})]))});
+    abStartNine(F.teams[id]); // (every club starts with the same nine abilities: 69-abilities.js)
     F.ids.push(id); added.push(id);
     for(const n of F.teams[id].lineup) F.bio[n]=Object.assign(nwBioNew(n),{a:19+Math.floor(Math.random()*12)}); // expansion clubs sign players of every age
   }
@@ -9742,9 +9743,9 @@ function champScene(h){
 }
 
 /* ---------- twenty player abilities (Oct 2026): ten new ones join the original ten ----------
-   In quick games RED and BLUE keep the classic ten. In a franchise every club draws from all twenty, yours included
-   ("a fair start", below), and free agency, trades, the draft and the rookies who replace retired players can bring
-   a club an ability it doesn't have yet.
+   In quick games RED and BLUE keep the classic ten. In a franchise every club starts with the same nine of them ("a
+   fair start", below), and the new ten come in through free agency, the draft and the rookies who replace retired
+   players (trades move them around).
    At the plate:  Vision (a strikeout becomes a walk), Bloop Hitter (an Out becomes a single), Triple Threat (Roll for
                   Triple is a triple), In the Zone (before a roll: two dice, the better one counts), Deep Fly (on an Out
                   the runners on second and third tag up and move up a base).
@@ -9840,16 +9841,28 @@ function faNewcomers(pool){
 }
 
 /* ---------- a fair start (Oct 2026) ----------
-   Every franchise club draws its nine abilities from all twenty, yours included. Your club and BLUE's come from the
-   quick-game rosters and used to keep the classic ten, so your club had one fielding ability (the Gold Glove) against
-   two or three for everybody else, and none of the strong new bats. Over 20 simulated seasons that made it about a
-   .420 club (John went 534-746 and never made the playoffs). With a fair draw it plays .500.
-   Quick games still use the classic ten. The players keep their names, numbers and everything else; only the
-   ability changes.
-   - abFairNew: a new franchise (frCreate).
-   - abFairFix: a franchise made before this, once, when its next season starts (or before the first pitch of one).
-     Only the players who came over from the quick-game rosters get a new ability; anyone you signed, traded for,
-     drafted or called up keeps his. It is seeded by the franchise, so every screen of an online league gets the same. */
+   Every franchise club starts with the same nine abilities: RED's (the original ten but Hustle), one each. From then
+   on the new ten come in through free agency (most players new to the league have one), the draft and the rookies who
+   replace retired players (John, Oct 2026). Before this, the computer clubs drew from all twenty while your club and
+   BLUE's kept the quick-game rosters' classic ten, so your club had one fielding ability against two or three for
+   everybody else, and none of the strong new bats: over 20 simulated seasons that made it about a .420 club (John went
+   534-746 and never made the playoffs).
+   Quick games still use the classic ten. The players keep their names, numbers and everything else.
+   - abFairNew: a new franchise (frCreate): every club gets the nine. abStartNine: one club (also an expansion club).
+   - abFairFix: a franchise made before this (its computer clubs started with abilities from all twenty), once, when
+     its next season starts (or before the first pitch of one): the players who came over from the quick-game rosters
+     draw new abilities from all twenty too. Anyone you signed, traded for, drafted or called up keeps his. It is
+     seeded by the franchise, so every screen of an online league gets the same. */
+const FR_START_AB=['EYE','CLU','BNT','CON','GAP','SPD','SLG','GLV','IRN'];
+/* one club: exactly the nine, one each. A player who already has one of them (and the only one on the club with it)
+   keeps it; the rest get the ones left over. Iron Man never goes to a woman (as in genPlayers). */
+function abStartNine(T){
+  if(!T||!T.lineup) return; const have=new Set(), give=[];
+  for(const n of T.lineup){ const r=T.roster[n]; if(!r) continue; if(FR_START_AB.includes(r.ab)&&!have.has(r.ab)) have.add(r.ab); else give.push(n); }
+  const left=FR_START_AB.filter(k=>!have.has(k)); if(left.length) give.forEach((n,i)=>{ T.roster[n].ab=left[i%left.length]; });
+  const iron=T.lineup.find(n=>T.roster[n]&&T.roster[n].ab==='IRN'&&T.roster[n].f), guy=T.lineup.find(n=>T.roster[n]&&!T.roster[n].f);
+  if(iron&&guy){ const a=T.roster[iron].ab; T.roster[iron].ab=T.roster[guy].ab; T.roster[guy].ab=a; }
+}
 const AB_CLASSIC=['SPD','SLG','CON','EYE','GAP','CLU','IRN','BNT','GLV','HUS'];
 /* draw new abilities for the players in who: no two on the club the same while there are enough to go around, and
    Iron Man never goes to a woman (as in genPlayers) */
@@ -9863,7 +9876,7 @@ function abFairDraw(T,who,r){
 }
 function abFairNew(){
   if(!F||!F.teams) return;
-  for(const id of ['red','blue']){ const T=F.teams[id]; if(T) abFairDraw(T,T.lineup.filter(n=>T.roster[n]),Math.random); }
+  for(const id of F.ids||Object.keys(F.teams)) abStartNine(F.teams[id]);
   F.abFair=1;
 }
 /* a player who came over from a quick-game roster: by name (the classic names, or the ones you gave them in quick
@@ -9890,9 +9903,9 @@ function abFairFix(){
   try{ prepCards(['red','blue'].map(id=>F.teams[id]).filter(Boolean)); }catch(e){}
   const u=F.userId, mine=changed.filter(c=>c.id===u), ab=k=>(ABIL[k]||{}).name||k;
   try{ const T=F.teams[u]||F.teams.red;
-    nwAdd('pre',`New abilities for the ${nickOf(T)}`,`Every club in the league now draws its abilities from all twenty, and the players who came over from the original rosters learned new ones.\n`
+    nwAdd('pre',`New abilities for the ${nickOf(T)}`,`The players who came over from the original rosters were the only ones in the league still limited to the original ten abilities. Now they've learned new ones.\n`
       +changed.map(c=>`${c.n}${c.id!==u?` (${nwT(c.id)})`:''}: ${ab(c.from)} is now ${ab(c.to)}.`).join('\n'),{w:'Preseason',t:[...new Set(changed.map(c=>c.id))],pr:5}); }catch(e){ console.warn(e); }
-  return mine.length?`League update: every club now draws its abilities from all twenty, yours included. ${mine.length} of your players learned new ones: ${mine.map(c=>`<b>${esc(c.n)}</b> (${esc(ab(c.to))})`).join(', ')}. See them in the Teams tab.`:'';
+  return mine.length?`League update: your original players were the only ones in the league still limited to the original ten abilities. ${mine.length} of them learned new ones: ${mine.map(c=>`<b>${esc(c.n)}</b> (${esc(ab(c.to))})`).join(', ')}. See them in the Teams tab.`:'';
 }
 
 /* ---------- quick match ("Play now"): play whoever else is looking for a game right now (Oct 2026) ----------
