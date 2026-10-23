@@ -1557,6 +1557,10 @@ html.rm .scn *{animation-duration:.01s!important;animation-iteration-count:1!imp
 .pst2{font-size:11px;color:var(--muted)}
 .pstarters{display:inline-block;margin-top:4px;font-size:13px;color:var(--muted)}
 .pstarters b{color:var(--cream)}
+/* the name editors: each team's pitchers under its nine (71-pitchers.js) */
+.names .psub{margin-top:4px;padding-top:7px;border-top:1px dashed var(--line);font-family:var(--f-head);font-weight:700;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.names .prow.pit .n{font-size:10px;letter-spacing:.02em}
+.names .prow .prl{font-size:11px;color:var(--muted);justify-self:end;padding-right:4px}
 </style>
 </head>
 <body>
@@ -3773,7 +3777,7 @@ function genPlayers(used,hisp,jp,keep){
 }
 function frCreate(name,abbr,size,opts){
   size=size===6||size===12?size:24;
-  const used=new Set([...RED_LINEUP,...BLUE_LINEUP,...namedTeam('red').lineup,...namedTeam('blue').lineup,...DHS.map(d=>d.name)]);
+  const used=new Set([...RED_LINEUP,...BLUE_LINEUP,...namedTeam('red').lineup,...namedTeam('blue').lineup,...DHS.map(d=>d.name),...(ADDON_READY?pitAllNames():[])]);
   const teams={}, C=FR_CLUBS.slice(0,size-1).map(c=>Object.assign({},c)), NG=C.length-1; // NG clubs get generated players
   if(abbr) for(const c of C) if(c.abbr===abbr) c.abbr=abbrOf(c.name.split(' ')[0],new Set([abbr,...C.map(x=>x.abbr)]));
   const QR=namedTeam('red'), QB=namedTeam('blue'); // start from any custom names used in quick games
@@ -3994,7 +3998,7 @@ function frRookie(T,old,used){
   return {name,info:Object.assign({ab:ADDON_READY?abRookie(info.ab):info.ab,n},f?{f:1}:{},h?{hi:1}:{},j?{jp:1}:{},dk?{dk:1}:{})};
 }
 function frRetire(){
-  nwInit(); const out=[], used=new Set([...Object.keys(F.bio||{}),...Object.keys(F.career||{}),...F.ids.flatMap(id=>F.teams[id].lineup),...RED_LINEUP,...BLUE_LINEUP,...DHS.map(d=>d.name),...(F.retired||[]).map(r=>r.name)]);
+  nwInit(); const out=[], used=new Set([...Object.keys(F.bio||{}),...Object.keys(F.career||{}),...F.ids.flatMap(id=>F.teams[id].lineup),...RED_LINEUP,...BLUE_LINEUP,...DHS.map(d=>d.name),...pitAllNames(),...(F.retired||[]).map(r=>r.name)]);
   F.retired=F.retired||[];
   for(const id of F.ids){ const T=F.teams[id];
     T.lineup.forEach((n,i)=>{ const b=F.bio[n]||(F.bio[n]=nwBioNew(n));
@@ -4252,7 +4256,7 @@ function teamsHTML(){
 function settingsHTML(){
   const M=me();
   return `<div class="hgrid"><div class="hcard"><h4>Your team</h4><div class="form"><label>Team name<input type="text" id="frName" maxlength="28" value="${esc(M.name)}"></label><label>Scoreboard abbreviation (up to 4 letters)<input type="text" id="frAbbr" maxlength="4" value="${esc(M.abbr)}"></label><div class="hbtns"><button class="btn primary" type="button" data-act="rename">Save</button></div></div></div>
-<div class="hcard"><h4>Names</h4><p>Rename any team or player in your league. Stats, records and player cards follow the new names.</p><div class="hbtns"><button class="btn" type="button" data-act="names">Edit team &amp; player names</button></div>
+<div class="hcard"><h4>Names</h4><p>Rename any team, player or pitcher in your league. Stats, records and player cards follow the new names.</p><div class="hbtns"><button class="btn" type="button" data-act="names">Edit team, player &amp; pitcher names</button></div>
 ${frIsStd()?'':`<h4 style="margin-top:8px">The league's clubs</h4><p>Switch to the league's standard clubs, with their names, colors and logos${M.name===FR_USER.name?', and the California Kings in purple':''}. Players, stats, records and history all stay.</p><div class="hbtns"><button class="btn" type="button" data-act="stdclubs">Use the standard clubs</button></div>`}
 ${frExpandHTML()}<h4 style="margin-top:8px">Saving</h4><p>Your franchise saves after every at-bat. You can keep up to <b>three franchises</b> going at once: switch between them with the Franchises buttons at the top of the hub. Use <b>Save / Load</b> for save slots, or to move a franchise to your phone or another computer.</p><div class="hbtns"><button class="btn" type="button" data-act="export">Open Save / Load</button></div>
 <h4 style="margin-top:8px">Leave or restart</h4><div class="hbtns"><button class="btn" type="button" data-act="exit">Exit to quick games</button><button class="btn danger" type="button" data-act="reset">Delete franchise</button></div></div>${ADDON_READY?lgSettingsHTML():''}</div>`;
@@ -4272,7 +4276,7 @@ function newFranchiseHTML(){
 <div class="form"><label>Team name<input type="text" id="nfName" maxlength="28" value="California Kings"></label><label>Scoreboard abbreviation<input type="text" id="nfAbbr" maxlength="4" value="CAL"></label>
 <div class="choice"><span style="font-size:13px;color:var(--muted);font-weight:600">League size</span><label><input type="radio" name="nfSize" value="24" checked> 24 clubs</label><label><input type="radio" name="nfSize" value="12"> 12 clubs</label><label><input type="radio" name="nfSize" value="6"> 6 clubs (the classic league)</label></div>
 ${ADDON_READY?lgFormHTML():''}
-<div class="choice"><span style="font-size:13px;color:var(--muted);font-weight:600">Team &amp; player names</span><label><input type="radio" name="nfNames" value="keep" checked> Keep the names as they are</label><label><input type="radio" name="nfNames" value="custom"> Customize team and player names</label></div>
+<div class="choice"><span style="font-size:13px;color:var(--muted);font-weight:600">Team &amp; player names</span><label><input type="radio" name="nfNames" value="keep" checked> Keep the names as they are</label><label><input type="radio" name="nfNames" value="custom"> Customize team, player and pitcher names</label></div>
 <div class="hbtns"><button class="btn primary" type="button" id="nfGo">Create franchise</button></div></div></div>
 <div class="hcard"><h4>How it works</h4><p>Before every game you pick <b>home or away</b> and set your <b>batting order</b>. Games use Simulation rules: the D12, action cards, designated hitters and player abilities. Can't play them all? <b>Sim</b> any game or skip to the playoffs. Other teams' games are simulated as you go.</p><p>Every club has its <b>own ballpark</b>, and the Floodlight Series is played in a grand neutral stadium. Make <b>trades</b> with the other general managers until the deadline, and pick a rookie in the <b>draft</b> every offseason.</p><p>${ADDON_READY&&!FULL_GAME?'The free demo includes your whole first season, all the way through the Floodlight Series. ':''}Saved in this browser, with room for three franchises at once. Grab a backup from Settings any time.</p></div></div>`;
 }
@@ -4724,7 +4728,7 @@ const clean=(v,max)=>String(v||'').replace(/\s+/g,' ').trim().slice(0,max);
 function openNameEditor(o){
   const ov=$('ov');
   const teamHTML=T=>`<div class="nteam" data-tid="${esc(T.id)}" style="border-color:${T.color}66"><div class="tn"><input type="text" data-k="name" maxlength="28" value="${esc(T.name)}" aria-label="Team name" style="color:${ink(T.color)}"><input type="text" data-k="abbr" maxlength="4" value="${esc(T.abbr)}" aria-label="Scoreboard abbreviation" title="Scoreboard abbreviation, up to 4 letters"></div>
-${T.players.map((p,i)=>`<div class="prow"><span class="n">${i+1}</span><input type="text" data-k="p" data-key="${esc(p.key)}" maxlength="22" value="${esc(p.name)}" aria-label="Player ${i+1}">${abChip(p.ab)}</div>`).join('')}</div>`;
+${T.players.map((p,i)=>`<div class="prow"><span class="n">${i+1}</span><input type="text" data-k="p" data-key="${esc(p.key)}" maxlength="22" value="${esc(p.name)}" aria-label="Player ${i+1}">${abChip(p.ab)}</div>`).join('')}${T.pitchers&&T.pitchers.length?`<div class="psub">Pitchers</div>${T.pitchers.map(p=>`<div class="prow pit"><span class="n">${esc(p.role)}</span><input type="text" data-k="pp" data-key="${esc(p.key)}" maxlength="22" value="${esc(p.name)}" aria-label="${esc(PROLE[p.role]||'Pitcher')}"><span class="prl">${esc(PROLE[p.role]||'')}</span></div>`).join('')}`:''}</div>`;
   ov.innerHTML=`<div class="ovcard pre names" role="dialog" aria-modal="true" aria-labelledby="nmT">
 <button class="x" type="button" id="nmX" aria-label="Close">×</button>
 <span class="aside" style="color:var(--flood)">${esc(o.kicker||'Names')}</span><h3 id="nmT">${esc(o.title||'Team & player names')}</h3>
@@ -4744,9 +4748,12 @@ ${T.players.map((p,i)=>`<div class="prow"><span class="n">${i+1}</span><input ty
       const T=o.teams.find(x=>String(x.id)===box.dataset.tid);
       const name=clean(box.querySelector('[data-k=name]').value,28)||T.name; let abbr=(clean(box.querySelector('[data-k=abbr]').value,4)||T.abbr).toUpperCase();
       if(name!==T.name && abbr===String(T.abbr).toUpperCase()) abbr=autoAbbr(name,out.map(x=>x.abbr)); // renamed the team but left the old abbreviation: make a new one
-      const players=[...box.querySelectorAll('[data-k=p]')].map(inp=>{ const p=T.players.find(x=>x.key===inp.dataset.key), nm=clean(inp.value,22)||p.name; if(seen.has(nm.toLowerCase())) err=`Two players are named “${nm}”. Every player needs a different name.`; seen.add(nm.toLowerCase()); return {key:p.key,name:nm}; });
-      out.push({id:T.id,name,abbr,players});
+      const players=[...box.querySelectorAll('[data-k=p]')].map(inp=>{ const p=T.players.find(x=>x.key===inp.dataset.key), nm=clean(inp.value,22)||p.name; return {key:p.key,name:nm}; });
+      const pitchers=[...box.querySelectorAll('[data-k=pp]')].map(inp=>{ const p=(T.pitchers||[]).find(x=>x.key===inp.dataset.key), nm=clean(inp.value,22)||p.name; return {key:p.key,name:nm}; });
+      out.push({id:T.id,name,abbr,players,pitchers});
     });
+    { const all=out.flatMap(t=>[...t.players,...(t.pitchers||[])]), cnt={}; for(const x of all){ const k=x.name.toLowerCase(); cnt[k]=(cnt[k]||0)+1; }
+      for(const x of all){ if(x.name===x.key) continue; const k=x.name.toLowerCase(); if(cnt[k]>1) err=`Two people are named “${x.name}”. Every player and pitcher needs a different name.`; else if(o.taken&&o.taken.has(k)) err=`Someone else in the league is already named “${x.name}”. Pick a different name.`; } }
     const abbrs=out.map(t=>t.abbr); if(new Set(abbrs).size!==abbrs.length) err='Two teams have the same scoreboard abbreviation. Make each one different.';
     if(err){ const el=$('nmErr'); el.hidden=false; el.textContent=err; return; }
     close(); o.onSave(out);
@@ -4761,6 +4768,7 @@ function renameInGame(g,out){
   for(const T of g.teams){ const o=out.find(x=>x.id===T.id); if(!o) continue; if(o.name!==T.name) pairs.push([T.name,o.name]); T.name=o.name; T.abbr=o.abbr; }
   const ren=n=>pm[n]||n, rekey=obj=>{ const r={}; for(const [k,v] of Object.entries(obj||{})) r[ren(k)]=v; return r; };
   for(const T of g.teams){ T.lineup=T.lineup.map(ren); T.ab=rekey(T.ab); T.info=rekey(T.info); }
+  if(ADDON_READY) try{ pitRenameInGame(g,out,pairs); }catch(e){ console.warn(e); }
   g.box=rekey(g.box); g.bases=g.bases.map(n=>n&&ren(n)); g.injured=g.injured.map(a=>a.map(ren)); g.abUsed=g.abUsed.map(rekey);
   if(g.pinch) g.pinch.name=ren(g.pinch.name);
   pairs.sort((a,b)=>b[0].length-a[0].length);
@@ -4771,17 +4779,17 @@ function renameInGame(g,out){
 }
 /* quick games: rename RED and BLUE */
 function editQuickNames(after){
-  const N=loadNames(), teams=['red','blue'].map(id=>{ const B=BASE_TEAMS[id], t=N.teams[id]||{}; return {id,name:t.name||B.name,abbr:t.abbr||B.abbr,color:B.color,players:B.lineup.map(n=>({key:n,name:N.players[n]||n,ab:ROSTER[n].ab}))}; });
-  openNameEditor({kicker:'Quick game', title:'Team & player names', teams,
-    onSave:out=>{ const before=snapNames(); const n={teams:{},players:{}}; for(const t of out){ n.teams[t.id]={name:t.name,abbr:t.abbr}; for(const p of t.players) if(p.name!==p.key) n.players[p.key]=p.name; } saveNames(n); applyQuickRename(before); if(after) after(); },
+  const N=loadNames(), teams=['red','blue'].map(id=>{ const B=BASE_TEAMS[id], t=N.teams[id]||{}; return {id,name:t.name||B.name,abbr:t.abbr||B.abbr,color:B.color,players:B.lineup.map(n=>({key:n,name:N.players[n]||n,ab:ROSTER[n].ab})),pitchers:ADDON_READY?pitEdQuick(id):undefined}; });
+  openNameEditor({kicker:'Quick game', title:'Team, player & pitcher names', teams,
+    onSave:out=>{ const before=snapNames(); const n={teams:{},players:{}}; for(const t of out){ n.teams[t.id]={name:t.name,abbr:t.abbr}; for(const p of t.players) if(p.name!==p.key) n.players[p.key]=p.name; for(const p of t.pitchers||[]) if(p.name!==p.key) n.players[p.key]=p.name; } saveNames(n); applyQuickRename(before); if(after) after(); },
     onReset:()=>{ const before=snapNames(); lsDel('fdl-names'); applyQuickRename(before); if(after) after(); },
     onCancel:()=>{ if(after) after(); }});
 }
 /* carry a quick-game rename into the game on the field right now */
-function snapNames(){ return ['red','blue'].map(id=>{ const T=namedTeam(id); return {id,name:T.name,abbr:T.abbr,lineup:BASE_TEAMS[id].lineup.map(o=>({o,cur:T.lineup[BASE_TEAMS[id].lineup.indexOf(o)]}))}; }); }
+function snapNames(){ return ['red','blue'].map(id=>{ const T=namedTeam(id); return {id,name:T.name,abbr:T.abbr,lineup:BASE_TEAMS[id].lineup.map(o=>({o,cur:T.lineup[BASE_TEAMS[id].lineup.indexOf(o)]})),pit:ADDON_READY?pitSnap(id):[]}; }); }
 function applyQuickRename(before){
   const now=['red','blue'].map(namedTeam); prepCards(now);
-  const out=now.map((T,i)=>({id:T.id,name:T.name,abbr:T.abbr,players:before[i].lineup.map(({o,cur})=>({key:cur,name:T.lineup[BASE_TEAMS[T.id].lineup.indexOf(o)]}))}));
+  const out=now.map((T,i)=>({id:T.id,name:T.name,abbr:T.abbr,players:before[i].lineup.map(({o,cur})=>({key:cur,name:T.lineup[BASE_TEAMS[T.id].lineup.indexOf(o)]})),pitchers:(before[i].pit||[]).map(({o,cur})=>({key:cur,name:ADDON_READY?pitQName(o):o}))}));
   if(G && !G.isFr){ renameInGame(G,out); quickSave(); $('pcard').dataset.nm=''; renderGame(); }
 }
 
@@ -4797,14 +4805,15 @@ function frApplyNames(out){
     for(const h of F.history||[]) for(const a of Object.values(h.awards||{})) if(a&&a.name) a.name=ren(a.name);
     if(F.awards) for(const a of Object.values(F.awards)) if(a&&a.name) a.name=ren(a.name);
   }
+  if(ADDON_READY) try{ Object.assign(pm,pitFrRename(out)); }catch(e){ console.warn(e); }
   if(Object.keys(pm).length) nwRename(pm);
   frSave(); prepCards(F.ids.map(id=>F.teams[id]));
 }
 function frEditNames(after){
-  const teams=F.ids.filter(id=>!(ADDON_READY&&F.online)||id===F.userId).map(id=>{ const T=F.teams[id]; return {id,name:T.name,abbr:T.abbr,color:T.color,players:T.lineup.map(n=>({key:n,name:n,ab:T.roster[n].ab}))}; });
+  const teams=F.ids.filter(id=>!(ADDON_READY&&F.online)||id===F.userId).map(id=>{ const T=F.teams[id]; return {id,name:T.name,abbr:T.abbr,color:T.color,players:T.lineup.map(n=>({key:n,name:n,ab:T.roster[n].ab})),pitchers:ADDON_READY?pitEdFr(T):undefined}; });
   closeHub();
-  openNameEditor({kicker:`Franchise · ${frYear(F.season)} season`, title:'League names', teams, cancelText:'Keep these names',
-    sub:'Every team and player in your league. Tap a name to change it, or keep them all. Stats, records and player cards follow the new names.',
+  openNameEditor({kicker:`Franchise · ${frYear(F.season)} season`, title:'League names', teams, taken:ADDON_READY?frNamesTaken(teams.map(t=>t.id)):null, cancelText:'Keep these names',
+    sub:'Every team, player and pitcher in your league. Tap a name to change it, or keep them all. Stats, records and player cards follow the new names.',
     onSave:out=>{ frApplyNames(out); if(F.live){ renameInGame(F.live.G,out); if(G===F.live.G){ $('pcard').dataset.nm=''; renderGame(); } frSave(); } hubMsg='Names saved.'; openHub(); if(after) after(); }, onCancel:()=>{ openHub(); if(after) after(); }});
 }
 
@@ -4883,7 +4892,7 @@ function newGame(){
     sub: (two?'Both managers set a batting order.':'The computer manages BLUE. Pick home or away and your batting order.')+(ADDON_READY?pitQuickLine():''),
     homeLabel: two?'RED plays':'You play', home:exhHome,
     cols:[{T:T.red,editable:true,reset:namedTeam('red').lineup},{T:T.blue,editable:two,reset:namedTeam('blue').lineup,note:two?'':'Computer'}],
-    extra:{label:'✎ Team & player names',onClick:()=>editQuickNames(newGame)},
+    extra:{label:'✎ Team, player & pitcher names',onClick:()=>editQuickNames(newGame)},
     onPlay:({lineups,home})=>{ exhHome=home; try{ localStorage.setItem('fdl-home',home?'1':'0'); }catch(e){} saveLineups({red:lineups[0].map(n=>T.red.orig[n]||n),blue:lineups[1].map(n=>T.blue.orig[n]||n)}); startExhibition(true); }});
 }
 
@@ -5049,7 +5058,7 @@ const IS_DESKTOP = !!(NATIVE && NATIVE.isDesktop);
 const CAP = (typeof window!=='undefined' && window.Capacitor && typeof window.Capacitor.isNativePlatform==='function' && window.Capacitor.isNativePlatform()) ? window.Capacitor : null;
 const IS_APP = !!CAP;
 const APP_OS = CAP ? String(CAP.getPlatform()) : '';
-const GAME_VERSION = '1.13.1';
+const GAME_VERSION = '1.13.2';
 const FULL_GAME = true; /*@edition*/ // the website is the free demo; build.py turns this on for the Steam game
 
 /* ---------- a shared add-on dialog layer (sits above the menu, never touches the game's own pop-ups) ---------- */
@@ -6780,7 +6789,7 @@ function frExpand(){
   if(!frCanExpand()) return;
   const abbrs=new Set(F.ids.map(id=>F.teams[id].abbr));
   const pool=FR_CLUBS.filter(c=>!F.ids.some(id=>F.teams[id].name===c.name));
-  const used=new Set([...Object.keys(F.bio||{}),...Object.keys(F.career||{}),...F.ids.flatMap(id=>F.teams[id].lineup),...RED_LINEUP,...BLUE_LINEUP,...DHS.map(d=>d.name),...(F.retired||[]).map(r=>r.name)]);
+  const used=new Set([...Object.keys(F.bio||{}),...Object.keys(F.career||{}),...F.ids.flatMap(id=>F.teams[id].lineup),...RED_LINEUP,...BLUE_LINEUP,...DHS.map(d=>d.name),...pitAllNames(),...(F.retired||[]).map(r=>r.name)]);
   const added=[]; let k=1;
   for(const c0 of pool){
     if(F.ids.length>=FR_FULL) break;
@@ -6910,7 +6919,7 @@ const DR_NOTE={SLG:'Raw power. The ball jumps off the bat.',CLU:'Ice in the vein
   SPD:'Fastest player in the class.',EYE:'Takes walks like a ten-year vet.',BNT:'Lays down bunts for hits.',HUS:'Never stops running.',IRN:'Never misses a game.'};
 function drMake(){
   const order=drOrder();
-  const used=new Set([...Object.keys(F.bio||{}),...Object.keys(F.career||{}),...F.ids.flatMap(id=>F.teams[id].lineup),...RED_LINEUP,...BLUE_LINEUP,...DHS.map(d=>d.name),...(F.retired||[]).map(r=>r.name),...(F.gone||[])]);
+  const used=new Set([...Object.keys(F.bio||{}),...Object.keys(F.career||{}),...F.ids.flatMap(id=>F.teams[id].lineup),...RED_LINEUP,...BLUE_LINEUP,...DHS.map(d=>d.name),...pitAllNames(),...(F.retired||[]).map(r=>r.name),...(F.gone||[])]);
   const N=F.ids.length+4, pool=[], abs=Object.keys(ABIL);
   for(let i=0;i<N;i++){ const f=i<3, h=!f&&Math.random()<.3, j=!f&&!h&&Math.random()<.05; let name, fn, g=0;
     do{ fn=pick(j?FIRST_JP:h?(f?FIRST_HF:FIRST_HM):(f?FIRST_F:FIRST_M)); name=fn+' '+pick(j?LASTS_JP:h?LASTS_H:LASTS); }while(used.has(name)&&g++<500); used.add(name);
@@ -7880,7 +7889,7 @@ function faSign(name,rel){
   for(const st of [F.stats,F.pstats]) if(st&&st[name]) st[name].team=u;
   F.ct[name]={y:p.ask.y}; (D.fresh||(D.fresh=[])).push(name);
   // a player the computer was letting go is still on its roster: a stand-in holds his spot until the season starts
-  const O=p.from&&p.from!==u&&F.teams[p.from]; if(O&&O.roster[name]){ const used=new Set([...Object.keys(F.bio||{}),...F.ids.flatMap(id=>F.teams[id].lineup)]), R=frRookie(O,name,used), j=O.lineup.indexOf(name);
+  const O=p.from&&p.from!==u&&F.teams[p.from]; if(O&&O.roster[name]){ const used=new Set([...Object.keys(F.bio||{}),...F.ids.flatMap(id=>F.teams[id].lineup),...pitAllNames()]), R=frRookie(O,name,used), j=O.lineup.indexOf(name);
     delete O.roster[name]; O.lineup[j]=R.name; O.roster[R.name]=R.info; F.bio[R.name]=Object.assign(nwBioNew(R.name),{a:ROOKIE_AGE}); F.ct[R.name]={y:1}; D.dec[R.name]={cpu:1,d:'go',ph:1,ask:{y:1}}; }
   delete D.dec[name];
   D.pool=D.pool.filter(x=>x.name!==name&&x.name!==rel); delete D.dec[rel];
@@ -7894,7 +7903,7 @@ function faResolve(){
   const D=faGet(); if(!D||D.done) return; D.done=true;
   const u=F.userId, M=F.teams[u], notes=[], fresh=new Set(D.fresh||[]);
   { const seen=new Set(); D.pool=D.pool.filter(x=>!seen.has(x.name)&&seen.add(x.name)); } // one entry per player
-  const used=new Set([...Object.keys(F.bio||{}),...Object.keys(F.career||{}),...F.ids.flatMap(id=>F.teams[id].lineup),...RED_LINEUP,...BLUE_LINEUP,...DHS.map(d=>d.name),...(F.retired||[]).map(r=>r.name)]);
+  const used=new Set([...Object.keys(F.bio||{}),...Object.keys(F.career||{}),...F.ids.flatMap(id=>F.teams[id].lineup),...RED_LINEUP,...BLUE_LINEUP,...DHS.map(d=>d.name),...pitAllNames(),...(F.retired||[]).map(r=>r.name)]);
   // 1. your expiring players: re-sign or let go (anyone you didn't decide on stays)
   for(const [n,x] of Object.entries(D.dec)){ if(x.cpu) continue; const hid=F.ids.find(id=>F.teams[id].roster[n]); if(!hid) continue; const H=F.teams[hid];
     if(x.d!=='go'){ F.ct[n]={y:x.ask.y}; fresh.add(n); if(x.d==null&&hid===u) notes.push(`${n} re-signed for ${ctYrs(x.ask.y)}`); continue; }
@@ -8815,14 +8824,15 @@ async function netAct(a,el){
     return; }
   if(a==='cancel'){ const my=NET; if(my&&my.tok) netFetch(NET_API,{method:'POST',body:JSON.stringify({op:'cancel',code:my.code,tok:my.tok})}).catch(()=>{}); netStop(); lsDel(NET_KEY); closeX(true); return; }
 }
-/* names and batting order: the same editors as quick games, for this player's deck only (saved on this device) */
+/* names and batting order: the same editors as quick games, for this player's deck only (saved on this device);
+   the names include the team's three pitchers (71-pitchers.js) */
 function netEditNames(id,back){
   const N=loadNames(), B=BASE_TEAMS[id], t=N.teams[id]||{};
   openNameEditor({kicker:'Online game', title:'Your team & player names', sub:'Name your team and your players. Your opponent sees these names. Abilities and jersey numbers stay with each player.',
-    teams:[{id,name:t.name||B.name,abbr:t.abbr||B.abbr,color:B.color,players:B.lineup.map(n=>({key:n,name:N.players[n]||n,ab:ROSTER[n].ab}))}],
-    onSave:out=>{ const before=snapNames(), n=loadNames(), o=out[0]; n.teams[id]={name:o.name,abbr:o.abbr}; for(const p of o.players){ if(p.name!==p.key) n.players[p.key]=p.name; else delete n.players[p.key]; } saveNames(n);
+    teams:[{id,name:t.name||B.name,abbr:t.abbr||B.abbr,color:B.color,players:B.lineup.map(n=>({key:n,name:N.players[n]||n,ab:ROSTER[n].ab})),pitchers:pitEdQuick(id)}],
+    onSave:out=>{ const before=snapNames(), n=loadNames(), o=out[0]; n.teams[id]={name:o.name,abbr:o.abbr}; for(const p of [...o.players,...(o.pitchers||[])]){ if(p.name!==p.key) n.players[p.key]=p.name; else delete n.players[p.key]; } saveNames(n);
       if(!(G&&G.net)) applyQuickRename(before); back(); },
-    onReset:()=>{ const n=loadNames(); delete n.teams[id]; for(const k of B.lineup) delete n.players[k]; saveNames(n); back(); },
+    onReset:()=>{ const n=loadNames(); delete n.teams[id]; for(const k of B.lineup) delete n.players[k]; for(const p of PIT_DEF[id]||[]) delete n.players[p.name]; saveNames(n); back(); },
     onCancel:back});
 }
 function netEditOrder(id,back){
@@ -9815,7 +9825,7 @@ function abRookie(old){ return Math.random()<.65||!ABIL[old] ? pick(Object.keys(
 function faNewcomers(pool){
   if(!F||!F.ids) return;
   const N=Math.max(3,Math.round(F.ids.length/4));
-  const used=new Set([...Object.keys(F.bio||{}),...Object.keys(F.career||{}),...F.ids.flatMap(id=>F.teams[id].lineup),...RED_LINEUP,...BLUE_LINEUP,...DHS.map(d=>d.name),...(F.retired||[]).map(r=>r.name),...(F.gone||[]),...pool.map(p=>p.name)]);
+  const used=new Set([...Object.keys(F.bio||{}),...Object.keys(F.career||{}),...F.ids.flatMap(id=>F.teams[id].lineup),...RED_LINEUP,...BLUE_LINEUP,...DHS.map(d=>d.name),...pitAllNames(),...(F.retired||[]).map(r=>r.name),...(F.gone||[]),...pool.map(p=>p.name)]);
   const woman=Math.random()<.4?Math.floor(Math.random()*N):-1;
   F.bio=F.bio||{};
   for(let i=0;i<N;i++){
@@ -10117,7 +10127,7 @@ const whip=s=>s.OUT?(s.H+s.BB)*3/s.OUT:0;
 function pitStaffOf(T){
   if(!T||!T.id) return undefined;
   if(F&&F.teams&&F.teams[T.id]===T){ pitEnsure(); return Array.isArray(T.staff)&&T.staff.length===3?pitCopy(T.staff):undefined; }
-  if(T.id==='red'||T.id==='blue') return pitCopy(PIT_DEF[T.id]);
+  if(T.id==='red'||T.id==='blue') return pitCopy(pitNamedDef(T.id));
   return undefined;
 }
 /* a team without its pitchers on it (one that came over the internet): RED's and BLUE's, or the franchise club's */
@@ -10201,7 +10211,7 @@ function pitFinalHTML(){
 }
 /* the pregame: the two starters */
 function pitStartLine(A,H){ const a=pitStaffOf(A), h=pitStaffOf(H); if(!a||!h) return ''; return `<br><span class="pstarters">Starting pitchers: <b>${esc(a[0].name)}</b> for ${esc(A.abbr)}, <b>${esc(h[0].name)}</b> for ${esc(H.abbr)}</span>`; }
-function pitQuickLine(){ try{ const T=exhTeams(); return `<br><span class="pstarters">Starting pitchers: <b>${esc(PIT_DEF.red[0].name)}</b> for ${esc(T.red.abbr)}, <b>${esc(PIT_DEF.blue[0].name)}</b> for ${esc(T.blue.abbr)}</span>`; }catch(e){ return ''; } }
+function pitQuickLine(){ try{ const T=exhTeams(); return `<br><span class="pstarters">Starting pitchers: <b>${esc(pitQName(PIT_DEF.red[0].name))}</b> for ${esc(T.red.abbr)}, <b>${esc(pitQName(PIT_DEF.blue[0].name))}</b> for ${esc(T.blue.abbr)}</span>`; }catch(e){ return ''; } }
 
 /* ---------- the franchise ---------- */
 /* every club's three pitchers, made from the league's own seed: the same on every device in an online franchise.
@@ -10209,7 +10219,7 @@ function pitQuickLine(){ try{ const T=exhTeams(); return `<br><span class="pstar
 function pitEnsure(){
   if(!F||!F.teams||!F.ids) return false; let made=false;
   if(F.ids.every(id=>F.teams[id]&&Array.isArray(F.teams[id].staff)&&F.teams[id].staff.length===3)) return false;
-  const used=new Set([...PIT_NAMES,...RED_LINEUP,...BLUE_LINEUP,...DHS.map(d=>d.name),...F.ids.flatMap(id=>(F.teams[id].staff||[]).map(p=>p.name))]);
+  const used=new Set([...pitAllNames(),...RED_LINEUP,...BLUE_LINEUP,...DHS.map(d=>d.name),...pitBatNames()]);
   for(const id of F.ids){ const T=F.teams[id]; if(Array.isArray(T.staff)&&T.staff.length===3) continue; T.staff=pitGenStaff(id,used); made=true; }
   return made;
 }
@@ -10221,7 +10231,7 @@ function pitPerson(r,used){
 function pitNum(r,taken){ let n, g=0; do{ n=56+Math.floor(r()*44); }while(taken.has(n)&&g++<80); taken.add(n); return n; } // 56-99: never a batter's number
 function pitGenStaff(id,used){
   const r=rng(hashStr('pit|'+(F.created||0)+'|'+id)), age=()=>23+Math.floor(r()*12);
-  if(PIT_DEF[id]) return PIT_DEF[id].map(p=>Object.assign({},p,{a:age()}));
+  if(PIT_DEF[id]) return (F.online?PIT_DEF[id]:pitNamedDef(id)).map(p=>{ used.add(p.name); return Object.assign({},p,{a:age()}); });
   const taken=new Set();
   return PROLES.map(role=>Object.assign(pitPerson(r,used),{role,n:pitNum(r,taken),a:age()}));
 }
@@ -10255,7 +10265,7 @@ function pitCareerNow(){
 /* the winter: pitchers get a year older; the old ones retire and a young arm takes the spot */
 function pitOffseason(){
   if(!F||!F.ids) return; pitEnsure();
-  const used=new Set([...PIT_NAMES,...RED_LINEUP,...BLUE_LINEUP,...DHS.map(d=>d.name),...F.ids.flatMap(id=>(F.teams[id].staff||[]).map(p=>p.name))]), gone=[];
+  const used=new Set([...pitAllNames(),...RED_LINEUP,...BLUE_LINEUP,...DHS.map(d=>d.name),...pitBatNames()]), gone=[];
   for(const id of F.ids){ const T=F.teams[id], r=rng(hashStr('pito|'+(F.created||0)+'|'+F.season+'|'+id)), taken=new Set((T.staff||[]).map(p=>p.n));
     T.staff=(T.staff||[]).map(p=>{ const a=(p.a||28)+1;
       if(a<37||(a<41&&r()<.6)) return Object.assign({},p,{a});
@@ -10324,6 +10334,49 @@ function pitSelfCheck(n){
   }
   return {bad:bad.slice(0,12),tally};
 }
+
+/* ---------- renaming the pitchers (Oct 2026) ----------
+   The pitchers are in the same name editors as the players: Team & player names for quick games (RED's and BLUE's
+   three, saved with the other custom names under the real name, so they show in every quick game, online games and
+   new franchises), League names in a franchise (every club's three: their stats, careers, records and the Gazette
+   follow the new name), and Your team & player names for an online game. The hooks are in build.py ("renaming the
+   pitchers"). */
+function pitQName(n){ try{ return loadNames().players[n]||n; }catch(e){ return n; } }
+function pitNamedDef(id){ return (PIT_DEF[id]||[]).map(p=>Object.assign({},p,{name:pitQName(p.name)})); }
+/* the editor's rows: key is the name the pitcher goes by now (in a quick game, his real name) */
+function pitEdQuick(id){ return (PIT_DEF[id]||[]).map(p=>({key:p.name,name:pitQName(p.name),role:p.role})); }
+function pitEdFr(T){ pitEnsure(); return Array.isArray(T.staff)?T.staff.map(p=>({key:p.name,name:p.name,role:p.role})):undefined; }
+/* quick games: who each pitcher was before a rename, for the game on the field (snapNames, applyQuickRename) */
+function pitSnap(id){ return (PIT_DEF[id]||[]).map(p=>({o:p.name,cur:pitQName(p.name)})); }
+/* a game already under way: the pitchers on both teams and on the pitching lines (renameInGame; pairs fix the log) */
+function pitRenameInGame(g,out,pairs){
+  const pm={}; for(const t of out) for(const p of t.pitchers||[]) if(p.name!==p.key){ pm[p.key]=p.name; pairs.push([p.key,p.name]); }
+  if(!Object.keys(pm).length) return; const ren=n=>pm[n]||n;
+  for(const T of g.teams||[]) if(Array.isArray(T.staff)) T.staff=T.staff.map(p=>Object.assign({},p,{name:ren(p.name)}));
+  if(g.pit&&g.pit.s) for(const S of g.pit.s) for(const x of S.p) x.name=ren(x.name);
+}
+/* a franchise: the staffs, the season, playoff and career lines, and the records. Returns the renames for the Gazette. */
+function pitFrRename(out){
+  const pm={}; for(const t of out){ const T=F.teams[t.id]; if(!T||!Array.isArray(T.staff)) continue;
+    for(const p of t.pitchers||[]) if(p.name!==p.key&&T.staff.some(x=>x.name===p.key)) pm[p.key]=p.name; }
+  if(!Object.keys(pm).length) return pm; const ren=n=>pm[n]||n;
+  for(const id of F.ids){ const T=F.teams[id]; if(Array.isArray(T.staff)) T.staff=T.staff.map(p=>Object.assign({},p,{name:ren(p.name)})); }
+  for(const k of ['pit','ppit','pcar']) if(F[k]){ const o={}; for(const [n,v] of Object.entries(F[k])) o[ren(n)]=v; F[k]=o; }
+  for(const r of Object.values(F.precs||{})) if(r&&r.name) r.name=ren(r.name);
+  return pm;
+}
+/* names a franchise rename can't use: everyone in the league who isn't in the editor (another club in an online
+   league, retired players and pitchers, the designated hitters), so two people never share a stat line */
+function frNamesTaken(ids){
+  const lc=n=>String(n).toLowerCase(), people=id=>[...F.teams[id].lineup,...(F.teams[id].staff||[]).map(p=>p.name)];
+  const shown=new Set(ids.flatMap(people).map(lc));
+  const all=[...F.ids.filter(id=>!ids.includes(id)).flatMap(people),...Object.keys(F.career||{}),...Object.keys(F.stats||{}),...Object.keys(F.pcar||{}),...Object.keys(F.pit||{}),...(F.retired||[]).map(r=>r.name),...DHS.map(d=>d.name)];
+  return new Set(all.map(lc).filter(n=>!shown.has(n)));
+}
+/* everyone a new name must not match: pitchers (RED's and BLUE's under any custom names, every club's three, the
+   retired ones) for a new batter, and batters (on a club, retired, or ever in the league) for a new pitcher */
+function pitAllNames(){ const o=[...PIT_NAMES]; try{ for(const id of ['red','blue']) for(const p of pitNamedDef(id)) o.push(p.name); if(F&&F.ids) for(const id of F.ids) for(const p of F.teams[id].staff||[]) o.push(p.name); for(const n of Object.keys((F&&F.pcar)||{})) o.push(n); }catch(e){} return o; }
+function pitBatNames(){ if(!F||!F.ids) return []; return [...F.ids.flatMap(id=>F.teams[id].lineup),...Object.keys(F.bio||{}),...Object.keys(F.career||{}),...(F.retired||[]).map(r=>r.name)]; }
 
 /* ---------- league settings (Oct 2026): how long the season is, how many clubs make the playoffs, and which rules
    the franchise plays by. Picked when the franchise is made, and changed later in the hub (Settings > League
@@ -10832,9 +10885,12 @@ function brkProjectedHTML(){
 /* ---------- start-up: the first full draw ----------
    Runs after every add-on has loaded, so a quick-game team with a custom name (whose logo is drawn by 57-logos.js)
    can be drawn on the first screen. (Before Oct 2026 this ran in 50-glue.js, too early for a renamed team.) */
+/* the quick game made while the page was starting (before the add-ons) gets its pitchers, if no one has batted yet */
+try{ if(G&&G.pv&&!G.isFr&&!G.net&&!G.challenge&&!G.over&&G.inning===1&&!G.half&&!Object.values(G.box||{}).some(b=>b.PA)&&G.teams.some(T=>!Array.isArray(T.staff))){
+  for(const T of G.teams) if(!Array.isArray(T.staff)){ const s=pitStaffOf(T); if(s) T.staff=s; } if(!G.pit) delete G.pit; } }catch(e){ console.warn(e); }
 paintDaily(); achProg(); if(F) achFr(); if(G) renderGame();
 
-window.__fdl={addon:{ACHD:()=>ACHD,CHD:()=>CHD,DAYD:()=>DAYD,FSET:()=>FSET,start:id=>startChallenge(id==='daily'?dailyFor(today()):CH_BY[id]),achUnlock,openSettings,openAchievements,openChallenges,litActions,padPress,layerRoot,chFinal,buildChallenge,CHALL,ACHS,dailyFor,badgeSVG,exitChallenge,startTutorial,TUT:()=>TUT,FIELD:()=>FIELD,VO:()=>VO,voSay,voPick,voName,voBatter,fieldCheck,sfx:()=>sfx,parkSync,parkFor,PARK:()=>PARK_CUR,FR_CLUBS:()=>FR_CLUBS,trGain,plValue,drGet,lgOps,TR:()=>TR,stretchScene:()=>stretchScene(),crowdCanvas,asgSim,asgPending,asgStart,confOf,drOrder,genLogoKey,poWatch,poIn,potwList,seedTag,tvSegments:m=>tvSegments(m),activeSeries:()=>activeSeries(),poAllSeries:()=>poAllSeries(),faGet,faSign,faDecide,faResolve,ctEnsure,ctWorth,NET:()=>NET,netOpen,netCreate,netJoin,netPeek,netWatch,netRejoin,netLeave,netBack,netRematch,netSend,netOn,rvOn,rvRec,dbGet,dbSim,dbOpen,dlGet,evPreviewSegs,frNextSeason:()=>frNextSeason(),voTvPlan,voTvIds,voTvId,frDay:()=>frFinishDay(null),poDay:()=>frPlayoffDay(null),frExpand:()=>frExpand(),tvShow:m=>tvShow(m),frHuman,OL:()=>OL,olToday:()=>olToday(),olMine:()=>olMine(),olSimQuiet,olMaybeFinish,olReady,olOpenView,olExitView,olMerge3,olCommit,frSave:()=>frSave(),plSVG,brawlScene,champScene,hbpCheck,brawlMaybe,champMaybe,defMan,abRookie,faNewcomers,zonePick,AB_VAL:()=>AB_VAL,smartRun:g=>smartRun(g),gameTeam:T=>gameTeam(T),newState:(m,t,c)=>newState(m,t,c),netPlan:m=>netPlan(m),netWake:(a,b)=>netWake(a,b),netTouchAt:t=>{NET_TOUCH=t;},netResting:()=>netResting(),TVAT:l=>TVAT(l),brk:{model:()=>brkModel(),html:()=>brkHTML(),hunt:()=>brkHunt(),say:()=>brkHuntSay(),tv:m=>brkTvSeg(m)},wx:{day:()=>wxDay(),forceOut:()=>wxForceOut(),state:()=>F&&F.wx,set:(g,a,h,gi)=>wxSet(g,a,h,gi),scene:()=>wxRainScene(),climate:n=>wxClimate({name:n})},pit:{check:n=>pitSelfCheck(n),line:()=>G&&G.pit,ensure:()=>pitEnsure(),pack:g=>olPackG(g),unpack:r=>olUnpackG(r),offseason:()=>pitOffseason()},fair:{fix:()=>abFairFix(),orig:(n,i)=>abFairOrig(n,i)},voPlay:(d,p)=>voPlay(d,p),voPregame:()=>voPregame(),voPostgame:()=>voPostgame()}, get G(){return G}, get F(){return F}, get busy(){return busy}, setOpp:o=>setOpp(o,true), cpuPick:()=>cpuPick(), showFinal:()=>showFinal(), playWhole, MODES, ACTIONS, ABIL, DHS, P, render:()=>renderGame(),
+window.__fdl={addon:{ACHD:()=>ACHD,CHD:()=>CHD,DAYD:()=>DAYD,FSET:()=>FSET,start:id=>startChallenge(id==='daily'?dailyFor(today()):CH_BY[id]),achUnlock,openSettings,openAchievements,openChallenges,litActions,padPress,layerRoot,chFinal,buildChallenge,CHALL,ACHS,dailyFor,badgeSVG,exitChallenge,startTutorial,TUT:()=>TUT,FIELD:()=>FIELD,VO:()=>VO,voSay,voPick,voName,voBatter,fieldCheck,sfx:()=>sfx,parkSync,parkFor,PARK:()=>PARK_CUR,FR_CLUBS:()=>FR_CLUBS,trGain,plValue,drGet,lgOps,TR:()=>TR,stretchScene:()=>stretchScene(),crowdCanvas,asgSim,asgPending,asgStart,confOf,drOrder,genLogoKey,poWatch,poIn,potwList,seedTag,tvSegments:m=>tvSegments(m),activeSeries:()=>activeSeries(),poAllSeries:()=>poAllSeries(),faGet,faSign,faDecide,faResolve,ctEnsure,ctWorth,NET:()=>NET,netOpen,netCreate,netJoin,netPeek,netWatch,netRejoin,netLeave,netBack,netRematch,netSend,netOn,rvOn,rvRec,dbGet,dbSim,dbOpen,dlGet,evPreviewSegs,frNextSeason:()=>frNextSeason(),voTvPlan,voTvIds,voTvId,frDay:()=>frFinishDay(null),poDay:()=>frPlayoffDay(null),frExpand:()=>frExpand(),tvShow:m=>tvShow(m),frHuman,OL:()=>OL,olToday:()=>olToday(),olMine:()=>olMine(),olSimQuiet,olMaybeFinish,olReady,olOpenView,olExitView,olMerge3,olCommit,frSave:()=>frSave(),plSVG,brawlScene,champScene,hbpCheck,brawlMaybe,champMaybe,defMan,abRookie,faNewcomers,zonePick,AB_VAL:()=>AB_VAL,smartRun:g=>smartRun(g),gameTeam:T=>gameTeam(T),newState:(m,t,c)=>newState(m,t,c),netPlan:m=>netPlan(m),netWake:(a,b)=>netWake(a,b),netTouchAt:t=>{NET_TOUCH=t;},netResting:()=>netResting(),TVAT:l=>TVAT(l),brk:{model:()=>brkModel(),html:()=>brkHTML(),hunt:()=>brkHunt(),say:()=>brkHuntSay(),tv:m=>brkTvSeg(m)},wx:{day:()=>wxDay(),forceOut:()=>wxForceOut(),state:()=>F&&F.wx,set:(g,a,h,gi)=>wxSet(g,a,h,gi),scene:()=>wxRainScene(),climate:n=>wxClimate({name:n})},pit:{check:n=>pitSelfCheck(n),line:()=>G&&G.pit,ensure:()=>pitEnsure(),pack:g=>olPackG(g),unpack:r=>olUnpackG(r),offseason:()=>pitOffseason()},fair:{fix:()=>abFairFix(),orig:(n,i)=>abFairOrig(n,i)},pitNames:{taken:ids=>frNamesTaken(ids),def:id=>pitNamedDef(id)},voPlay:(d,p)=>voPlay(d,p),voPregame:()=>voPregame(),voPostgame:()=>voPostgame()}, get G(){return G}, get F(){return F}, get busy(){return busy}, setOpp:o=>setOpp(o,true), cpuPick:()=>cpuPick(), showFinal:()=>showFinal(), playWhole, MODES, ACTIONS, ABIL, DHS, P, render:()=>renderGame(),
   setHand:(t,ids)=>{ G.hands[t]=ids.slice(); renderGame(); }, setBases:b=>{ G.bases=b.slice(); renderGame(); }, setOuts:n=>{ G.outs=n; renderGame(); },
   setInning:(i,h)=>{ G.inning=i; G.half=h; G.halfPA=0; while(G.line[0].length<i) G.line[0].push(0); while(G.line[1].length<i-(h?0:1)) G.line[1].push(0); renderGame(); },
   setIdx:(t,i)=>{ G.idx[t]=i; renderGame(); }, activeAbils:t=>activeAbils(t), runAbility:(t,i)=>runAbility(t,activeAbils(t)[i]), newGame, openHub, frCreate:(n,a,z,o)=>{ frCreate(n,a,z,o); setFrUI(); }, frPregame, frSimToPlayoffs, frSimPlayoffs, frSimUser, frNextSeason, frResume, frExit, genPlayerCard, cardSrc, snapshot, applySnap, toCode, fromCode, openSaves, editQuickNames, frEditNames, quickGame, get tipsOn(){return tipsOn}};
