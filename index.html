@@ -1665,7 +1665,7 @@ html.rm .scn *{animation-duration:.01s!important;animation-iteration-count:1!imp
 <div class="guidegrid">
 <section class="card wide">
 <h2>Player abilities</h2>
-<p class="intro">Every player card has one ability. Each player can use theirs <b>once a game</b>. Buttons light up under the Roll button when one can be used; the rest pop up on their own the moment they apply. Iron Man and Ageless are always on. RED and BLUE use the original ten abilities; franchise players can have any of all twenty.</p>
+<p class="intro">Every player card has one ability. Each player can use theirs <b>once a game</b>. Buttons light up under the Roll button when one can be used; the rest pop up on their own the moment they apply. Iron Man and Ageless are always on. In quick games RED and BLUE use the original ten. In a franchise every club draws from all twenty, yours included.</p>
 <ul class="ablist" id="ablist"></ul>
 </section>
 <section class="card">
@@ -3786,6 +3786,7 @@ function frCreate(name,abbr,size,opts){
   F={v:1,created:Date.now(),season:1,userId:'red',teams,ids:Object.keys(teams),history:[],records:{},career:{},live:null,retired:[]};
   if(ADDON_READY) lgApplyNew(F,opts);
   if(ADDON_READY) try{ pitEnsure(); }catch(e){ console.warn(e); }
+  if(ADDON_READY) try{ abFairNew(); }catch(e){ console.warn(e); }
   F.bio={}; for(const id of F.ids) for(const n of teams[id].lineup) F.bio[n]=Object.assign(nwBioNew(n),{a:ROOKIE_AGE}); // every career starts at 18
   frNewSeason(); frSave();
 }
@@ -3981,6 +3982,7 @@ function frNextSeason(){
   const gone=frRetire(), cls=frInduct(gone); F.season++; frNewSeason(); if(ADDON_READY) try{ rvSeason(); }catch(e){ console.warn(e); } nwRetire(gone); nwHof(cls); F.rookies=gone.map(g=>g.rookie);
   hubMsg=`The ${frYear(F.season)} season is set. Same ${frCountWord(F.ids.length)} teams, a fresh ${SG()}-game schedule.`+(gone.length?` ${gone.length} player${gone.length===1?'':'s'} retired, and ${gone.length===1?'a rookie takes that spot':'rookies take their spots'}. <button class="btn small" type="button" data-act="rookies">Name the rookies</button>`:'')
     +(cls.length?` ${cls.length} ${cls.length===1?'legend was':'legends were'} voted into the Hall of Fame. <button class="btn small" type="button" data-act="hof">See the Hall of Fame</button>`:'');
+  if(ADDON_READY) try{ const m=abFairFix(); if(m) hubMsg+=' '+m; }catch(e){ console.warn(e); }
   frSave(); renderHub();
 }
 /* a new 18-year-old who replaces a retiring player: same team, same lineup spot and ability, and the same background so the league's makeup holds */
@@ -4071,7 +4073,7 @@ function renderFbar(){
 function frExit(){ if(ADDON_READY&&F&&F.online) olExitView(); autoSave(); frMode=false; FR=null; setFrUI(); closeHub(); setWhere('quick'); if(!resumeQuick(jparse(lsGet(QKEY)))||G.over) startExhibition(); }
 
 /* ---------- the hub ---------- */
-function openHub(){ if(busy) return; const h=$('hub'); h.hidden=false; h.classList.add('anim'); renderHub(); setTimeout(()=>h.classList.remove('anim'),300); document.body.style.overflow='hidden'; if(F){ tvMaybe(); if(ADDON_READY) champMaybe(900); if(ADDON_READY&&F.online) olHubOpened(); } }
+function openHub(){ if(busy) return; const h=$('hub'); h.hidden=false; h.classList.add('anim'); renderHub(); setTimeout(()=>h.classList.remove('anim'),300); document.body.style.overflow='hidden'; if(F){ if(ADDON_READY&&!F.online) try{ const m=abFairFix(); if(m){ hubMsg=m; frSave(); renderHub(); } }catch(e){ console.warn(e); } tvMaybe(); if(ADDON_READY) champMaybe(900); if(ADDON_READY&&F.online) olHubOpened(); } }
 function closeHub(){ $('hub').hidden=true; document.body.style.overflow=''; }
 const TABS=[['home','Home'],['news','News'],['standings','Standings'],['schedule','Schedule'],['stats','Player stats'],['records','Records'],['hof','Hall of Fame'],['champs','Champions'],['teams','Teams'],['settings','Settings']];
 function renderHub(){
@@ -5047,7 +5049,7 @@ const IS_DESKTOP = !!(NATIVE && NATIVE.isDesktop);
 const CAP = (typeof window!=='undefined' && window.Capacitor && typeof window.Capacitor.isNativePlatform==='function' && window.Capacitor.isNativePlatform()) ? window.Capacitor : null;
 const IS_APP = !!CAP;
 const APP_OS = CAP ? String(CAP.getPlatform()) : '';
-const GAME_VERSION = '1.13.0';
+const GAME_VERSION = '1.13.1';
 const FULL_GAME = true; /*@edition*/ // the website is the free demo; build.py turns this on for the Steam game
 
 /* ---------- a shared add-on dialog layer (sits above the menu, never touches the game's own pop-ups) ---------- */
@@ -9730,8 +9732,9 @@ function champScene(h){
 }
 
 /* ---------- twenty player abilities (Oct 2026): ten new ones join the original ten ----------
-   RED and BLUE keep the classic ten. Franchise clubs draw from all twenty, so free agency, trades, the draft and the
-   rookies who replace retired players can bring a club an ability it doesn't have yet.
+   In quick games RED and BLUE keep the classic ten. In a franchise every club draws from all twenty, yours included
+   ("a fair start", below), and free agency, trades, the draft and the rookies who replace retired players can bring
+   a club an ability it doesn't have yet.
    At the plate:  Vision (a strikeout becomes a walk), Bloop Hitter (an Out becomes a single), Triple Threat (Roll for
                   Triple is a triple), In the Zone (before a roll: two dice, the better one counts), Deep Fly (on an Out
                   the runners on second and third tag up and move up a base).
@@ -9824,6 +9827,62 @@ function faNewcomers(pool){
     F.bio[name]=Object.assign(nwBioNew(name),{a:age});
     pool.push({name,from:null,info,age,w:ctWorth(name,Object.assign({age},info)),ask:{y:ctYears(age+1-(ab==='AGL'?3:0))},nw:1});
   }
+}
+
+/* ---------- a fair start (Oct 2026) ----------
+   Every franchise club draws its nine abilities from all twenty, yours included. Your club and BLUE's come from the
+   quick-game rosters and used to keep the classic ten, so your club had one fielding ability (the Gold Glove) against
+   two or three for everybody else, and none of the strong new bats. Over 20 simulated seasons that made it about a
+   .420 club (John went 534-746 and never made the playoffs). With a fair draw it plays .500.
+   Quick games still use the classic ten. The players keep their names, numbers and everything else; only the
+   ability changes.
+   - abFairNew: a new franchise (frCreate).
+   - abFairFix: a franchise made before this, once, when its next season starts (or before the first pitch of one).
+     Only the players who came over from the quick-game rosters get a new ability; anyone you signed, traded for,
+     drafted or called up keeps his. It is seeded by the franchise, so every screen of an online league gets the same. */
+const AB_CLASSIC=['SPD','SLG','CON','EYE','GAP','CLU','IRN','BNT','GLV','HUS'];
+/* draw new abilities for the players in who: no two on the club the same while there are enough to go around, and
+   Iron Man never goes to a woman (as in genPlayers) */
+function abFairDraw(T,who,r){
+  const keep=new Set(T.lineup.filter(n=>!who.includes(n)).map(n=>(T.roster[n]||{}).ab).filter(Boolean));
+  let pool=Object.keys(ABIL).filter(k=>!keep.has(k)); if(pool.length<who.length) pool=Object.keys(ABIL);
+  const sh=pool.map(k=>[r(),k]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);
+  who.forEach((n,i)=>{ T.roster[n].ab=sh[i%sh.length]; });
+  const iron=who.find(n=>T.roster[n].ab==='IRN'&&T.roster[n].f), guy=who.find(n=>!T.roster[n].f);
+  if(iron&&guy){ const a=T.roster[iron].ab; T.roster[iron].ab=T.roster[guy].ab; T.roster[guy].ab=a; }
+}
+function abFairNew(){
+  if(!F||!F.teams) return;
+  for(const id of ['red','blue']){ const T=F.teams[id]; if(T) abFairDraw(T,T.lineup.filter(n=>T.roster[n]),Math.random); }
+  F.abFair=1;
+}
+/* a player who came over from a quick-game roster: by name (the classic names, or the ones you gave them in quick
+   games), or by the ability, number and the rest he started with (if you renamed him in the franchise) */
+function abFairOrig(n,info){
+  if(!info||!AB_CLASSIC.includes(info.ab)) return false;
+  const base=[...RED_LINEUP,...BLUE_LINEUP];
+  if(base.includes(n)) return true;
+  try{ if(namedTeam('red').lineup.includes(n)||namedTeam('blue').lineup.includes(n)) return true; }catch(e){}
+  return base.some(k=>ROSTER[k].ab===info.ab&&ROSTER[k].n===info.n&&!!ROSTER[k].f===!!info.f);
+}
+/* returns a line for the hub when it changed anything */
+function abFairFix(){
+  if(!F||!F.teams||F.abFair) return '';
+  if(F.phase!=='reg'||F.day!==0||F.live) return ''; // the start of a season, before the first pitch
+  const changed=[];
+  for(const id of ['red','blue']){ const T=F.teams[id]; if(!T) continue;
+    const who=T.lineup.filter(n=>abFairOrig(n,T.roster[n])); if(!who.length) continue;
+    const was=Object.fromEntries(who.map(n=>[n,T.roster[n].ab]));
+    abFairDraw(T,who,rng(hashStr('abfair|'+(F.created||0)+'|'+id)));
+    for(const n of who) if(T.roster[n].ab!==was[n]) changed.push({id,n,from:was[n],to:T.roster[n].ab}); }
+  F.abFair=1;
+  if(!changed.length) return '';
+  try{ prepCards(['red','blue'].map(id=>F.teams[id]).filter(Boolean)); }catch(e){}
+  const u=F.userId, mine=changed.filter(c=>c.id===u), ab=k=>(ABIL[k]||{}).name||k;
+  try{ const T=F.teams[u]||F.teams.red;
+    nwAdd('pre',`New abilities for the ${nickOf(T)}`,`Every club in the league now draws its abilities from all twenty, and the players who came over from the original rosters learned new ones.\n`
+      +changed.map(c=>`${c.n}${c.id!==u?` (${nwT(c.id)})`:''}: ${ab(c.from)} is now ${ab(c.to)}.`).join('\n'),{w:'Preseason',t:[...new Set(changed.map(c=>c.id))],pr:5}); }catch(e){ console.warn(e); }
+  return mine.length?`League update: every club now draws its abilities from all twenty, yours included. ${mine.length} of your players learned new ones: ${mine.map(c=>`<b>${esc(c.n)}</b> (${esc(ab(c.to))})`).join(', ')}. See them in the Teams tab.`:'';
 }
 
 /* ---------- quick match ("Play now"): play whoever else is looking for a game right now (Oct 2026) ----------
@@ -10775,7 +10834,7 @@ function brkProjectedHTML(){
    can be drawn on the first screen. (Before Oct 2026 this ran in 50-glue.js, too early for a renamed team.) */
 paintDaily(); achProg(); if(F) achFr(); if(G) renderGame();
 
-window.__fdl={addon:{ACHD:()=>ACHD,CHD:()=>CHD,DAYD:()=>DAYD,FSET:()=>FSET,start:id=>startChallenge(id==='daily'?dailyFor(today()):CH_BY[id]),achUnlock,openSettings,openAchievements,openChallenges,litActions,padPress,layerRoot,chFinal,buildChallenge,CHALL,ACHS,dailyFor,badgeSVG,exitChallenge,startTutorial,TUT:()=>TUT,FIELD:()=>FIELD,VO:()=>VO,voSay,voPick,voName,voBatter,fieldCheck,sfx:()=>sfx,parkSync,parkFor,PARK:()=>PARK_CUR,FR_CLUBS:()=>FR_CLUBS,trGain,plValue,drGet,lgOps,TR:()=>TR,stretchScene:()=>stretchScene(),crowdCanvas,asgSim,asgPending,asgStart,confOf,drOrder,genLogoKey,poWatch,poIn,potwList,seedTag,tvSegments:m=>tvSegments(m),activeSeries:()=>activeSeries(),poAllSeries:()=>poAllSeries(),faGet,faSign,faDecide,faResolve,ctEnsure,ctWorth,NET:()=>NET,netOpen,netCreate,netJoin,netPeek,netWatch,netRejoin,netLeave,netBack,netRematch,netSend,netOn,rvOn,rvRec,dbGet,dbSim,dbOpen,dlGet,evPreviewSegs,frNextSeason:()=>frNextSeason(),voTvPlan,voTvIds,voTvId,frDay:()=>frFinishDay(null),poDay:()=>frPlayoffDay(null),frExpand:()=>frExpand(),tvShow:m=>tvShow(m),frHuman,OL:()=>OL,olToday:()=>olToday(),olMine:()=>olMine(),olSimQuiet,olMaybeFinish,olReady,olOpenView,olExitView,olMerge3,olCommit,frSave:()=>frSave(),plSVG,brawlScene,champScene,hbpCheck,brawlMaybe,champMaybe,defMan,abRookie,faNewcomers,zonePick,AB_VAL:()=>AB_VAL,smartRun:g=>smartRun(g),gameTeam:T=>gameTeam(T),newState:(m,t,c)=>newState(m,t,c),netPlan:m=>netPlan(m),netWake:(a,b)=>netWake(a,b),netTouchAt:t=>{NET_TOUCH=t;},netResting:()=>netResting(),TVAT:l=>TVAT(l),brk:{model:()=>brkModel(),html:()=>brkHTML(),hunt:()=>brkHunt(),say:()=>brkHuntSay(),tv:m=>brkTvSeg(m)},wx:{day:()=>wxDay(),forceOut:()=>wxForceOut(),state:()=>F&&F.wx,set:(g,a,h,gi)=>wxSet(g,a,h,gi),scene:()=>wxRainScene(),climate:n=>wxClimate({name:n})},pit:{check:n=>pitSelfCheck(n),line:()=>G&&G.pit,ensure:()=>pitEnsure(),pack:g=>olPackG(g),unpack:r=>olUnpackG(r),offseason:()=>pitOffseason()},voPlay:(d,p)=>voPlay(d,p),voPregame:()=>voPregame(),voPostgame:()=>voPostgame()}, get G(){return G}, get F(){return F}, get busy(){return busy}, setOpp:o=>setOpp(o,true), cpuPick:()=>cpuPick(), showFinal:()=>showFinal(), playWhole, MODES, ACTIONS, ABIL, DHS, P, render:()=>renderGame(),
+window.__fdl={addon:{ACHD:()=>ACHD,CHD:()=>CHD,DAYD:()=>DAYD,FSET:()=>FSET,start:id=>startChallenge(id==='daily'?dailyFor(today()):CH_BY[id]),achUnlock,openSettings,openAchievements,openChallenges,litActions,padPress,layerRoot,chFinal,buildChallenge,CHALL,ACHS,dailyFor,badgeSVG,exitChallenge,startTutorial,TUT:()=>TUT,FIELD:()=>FIELD,VO:()=>VO,voSay,voPick,voName,voBatter,fieldCheck,sfx:()=>sfx,parkSync,parkFor,PARK:()=>PARK_CUR,FR_CLUBS:()=>FR_CLUBS,trGain,plValue,drGet,lgOps,TR:()=>TR,stretchScene:()=>stretchScene(),crowdCanvas,asgSim,asgPending,asgStart,confOf,drOrder,genLogoKey,poWatch,poIn,potwList,seedTag,tvSegments:m=>tvSegments(m),activeSeries:()=>activeSeries(),poAllSeries:()=>poAllSeries(),faGet,faSign,faDecide,faResolve,ctEnsure,ctWorth,NET:()=>NET,netOpen,netCreate,netJoin,netPeek,netWatch,netRejoin,netLeave,netBack,netRematch,netSend,netOn,rvOn,rvRec,dbGet,dbSim,dbOpen,dlGet,evPreviewSegs,frNextSeason:()=>frNextSeason(),voTvPlan,voTvIds,voTvId,frDay:()=>frFinishDay(null),poDay:()=>frPlayoffDay(null),frExpand:()=>frExpand(),tvShow:m=>tvShow(m),frHuman,OL:()=>OL,olToday:()=>olToday(),olMine:()=>olMine(),olSimQuiet,olMaybeFinish,olReady,olOpenView,olExitView,olMerge3,olCommit,frSave:()=>frSave(),plSVG,brawlScene,champScene,hbpCheck,brawlMaybe,champMaybe,defMan,abRookie,faNewcomers,zonePick,AB_VAL:()=>AB_VAL,smartRun:g=>smartRun(g),gameTeam:T=>gameTeam(T),newState:(m,t,c)=>newState(m,t,c),netPlan:m=>netPlan(m),netWake:(a,b)=>netWake(a,b),netTouchAt:t=>{NET_TOUCH=t;},netResting:()=>netResting(),TVAT:l=>TVAT(l),brk:{model:()=>brkModel(),html:()=>brkHTML(),hunt:()=>brkHunt(),say:()=>brkHuntSay(),tv:m=>brkTvSeg(m)},wx:{day:()=>wxDay(),forceOut:()=>wxForceOut(),state:()=>F&&F.wx,set:(g,a,h,gi)=>wxSet(g,a,h,gi),scene:()=>wxRainScene(),climate:n=>wxClimate({name:n})},pit:{check:n=>pitSelfCheck(n),line:()=>G&&G.pit,ensure:()=>pitEnsure(),pack:g=>olPackG(g),unpack:r=>olUnpackG(r),offseason:()=>pitOffseason()},fair:{fix:()=>abFairFix(),orig:(n,i)=>abFairOrig(n,i)},voPlay:(d,p)=>voPlay(d,p),voPregame:()=>voPregame(),voPostgame:()=>voPostgame()}, get G(){return G}, get F(){return F}, get busy(){return busy}, setOpp:o=>setOpp(o,true), cpuPick:()=>cpuPick(), showFinal:()=>showFinal(), playWhole, MODES, ACTIONS, ABIL, DHS, P, render:()=>renderGame(),
   setHand:(t,ids)=>{ G.hands[t]=ids.slice(); renderGame(); }, setBases:b=>{ G.bases=b.slice(); renderGame(); }, setOuts:n=>{ G.outs=n; renderGame(); },
   setInning:(i,h)=>{ G.inning=i; G.half=h; G.halfPA=0; while(G.line[0].length<i) G.line[0].push(0); while(G.line[1].length<i-(h?0:1)) G.line[1].push(0); renderGame(); },
   setIdx:(t,i)=>{ G.idx[t]=i; renderGame(); }, activeAbils:t=>activeAbils(t), runAbility:(t,i)=>runAbility(t,activeAbils(t)[i]), newGame, openHub, frCreate:(n,a,z,o)=>{ frCreate(n,a,z,o); setFrUI(); }, frPregame, frSimToPlayoffs, frSimPlayoffs, frSimUser, frNextSeason, frResume, frExit, genPlayerCard, cardSrc, snapshot, applySnap, toCode, fromCode, openSaves, editQuickNames, frEditNames, quickGame, get tipsOn(){return tipsOn}};
